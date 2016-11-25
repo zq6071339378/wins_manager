@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.AreaMngMapper">
+
+	<resultMap
+		type="hashmap"
+		id="areaMngMapperResult">
+		<result
+			property="areaId"
+			column="Area_Id" />
+		<result
+			property="provinceId"
+			column="Province_Id" />
+		<result
+			property="cityId"
+			column="City_Id" />
+		<result
+			property="districtId"
+			column="District_Id" />
+		<result
+			property="hotpointId"
+			column="Hotpoint_Id" />
+		<result
+			property="areaName"
+			column="Area_Name" />
+		<result
+			property="areaAddr"
+			column="Area_Addr" />
+		<result
+			property="areaLongitude"
+			column="Area_Longitude" />
+		<result
+			property="areaLatitude"
+			column="Area_Latitude" />
+		<result
+			property="startIp"
+			column="Start_Ip" />
+		<result
+			property="endIp"
+			column="End_Ip" />
+		<result
+			property="bsidCode"
+			column="Bsid_Code" />
+		<result
+			property="Area_Type"
+			column="Area_Type" />
+		<result
+			property="createUser"
+			column="Create_User" />
+		<result
+			property="createTime"
+			column="Create_Time" />
+	</resultMap>
+
+	<sql id="areaMngInfo">
+		Area_Id,Province_Id,City_Id,District_Id,Hotpoint_Id,Area_Name,Area_Addr,Area_Longitude,
+		Area_Latitude,Start_Ip,End_Ip,Bsid_Code,Area_Type,Create_User,Create_Time
+	</sql>
+
+	<insert
+		id="insertInfo"
+		parameterType="hashmap"
+		useGeneratedKeys="true"
+		keyProperty="id">
+		insert into
+		sys_area_info_t(Province_Id,City_Id,District_Id,Hotpoint_Id,Area_Name,Area_Addr,Start_Ip,End_Ip,Area_Type,Create_User,Create_Time)
+		values(#{provinceId},#{cityId},#{districtId},#{hotpointId},#{areaName},#{areaAddr},#{startIp},#{endIp},#{areaType},#{createUser},#{createTime})
+	</insert>
+
+
+
+	<select
+		id="countByCondition"
+		parameterType="hashmap"
+		resultType="int">
+		select count(1) from sys_area_info_t
+		<where>
+			<if test="condition!=null">
+				<foreach
+					collection="condition"
+					index="key"
+					item="value"
+					separator="and">
+					${key}=#{value}
+				</foreach>
+			</if>
+		</where>
+	</select>
+
+
+	<select
+		id="findByCondition"
+		parameterType="hashmap"
+		resultMap="areaMngMapperResult">
+		SELECT
+		CONCAT(IFNULL(t3.`Province_Name`,''),IFNULL(t4.City_Name,''),IFNULL(t5.District_Name,''),IFNULL(t6.HotPoint_Name,''),IFNULL(t1.Area_Name,''))
+		area_name,t1.`Start_Ip`,t1.`End_Ip`,t2.`User_Name`
+		Create_User,t1.`Create_Time` ,t1.area_id,t1.Bsid_Code
+		FROM
+		sys_area_info_t t1
+		LEFT JOIN sys_province_info_t t3 ON t1.`Province_Id`=t3.`Province_Id`
+		LEFT
+		JOIN sys_city_info_t t4 ON t1.`City_Id`=t4.`City_Id`
+		LEFT JOIN
+		sys_district_info_t t5 ON t1.`District_Id`=t5.`District_Id`
+		LEFT JOIN
+		sys_hotpoint_info_t t6 ON t1.`Hotpoint_Id`=t6.`Hotpoint_Id`
+		LEFT JOIN
+		sys_user_info_t t2 ON t1.`Create_User`=t2.`User_Id`
+		<where>
+			<if test="provinceId != null">
+				and t3.province_id=#{provinceId}
+			</if>
+			<if test="cityId != null">
+				and t4.city_id=#{cityId}
+			</if>
+			<if test="areaId != null">
+				and t5.district_id=#{areaId}
+			</if>
+			<if test="hotpointId != null">
+				and t6.hotpoint_id=#{hotpointId}
+			</if>
+			<if test="areaName != null">
+				and Area_Name=#{areaName}
+			</if>
+			<if test="showStatus != null">
+				and Show_Status=#{showStatus}
+			</if>
+		</where>
+		ORDER BY create_time DESC
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+
+	<update
+		id="updateInfo"
+		parameterType="hashmap">
+		update sys_area_info_t
+		<set>
+			<foreach
+				collection="condition"
+				separator=","
+				index="key"
+				item="value"
+				close="">
+				${key}=#{value}
+			</foreach>
+		</set>
+		where area_id=#{areaId}
+	</update>
+
+	<delete
+		id="deleteById"
+		parameterType="int">
+		delete from sys_area_info_t
+		where area_id=#{id}
+	</delete>
+
+	<select
+		id="getInfo"
+		parameterType="int"
+		resultMap="areaMngMapperResult">
+		SELECT
+		t3.`Province_Name`,t4.City_Name,t5.District_Name,t6.HotPoint_Name,t1.`Start_Ip`,t1.`End_Ip`,t1.area_id,t1.`Province_Id`
+		,t1.`City_Id`,t1.`District_Id`,t1.`Hotpoint_Id`,t1.`Area_Name`,t1.`Area_Addr`
+		FROM sys_area_info_t t1
+		LEFT JOIN sys_province_info_t t3 ON t1.`Province_Id`=t3.`Province_Id`
+		LEFT
+		JOIN sys_city_info_t t4 ON t1.`City_Id`=t4.`City_Id`
+		LEFT JOIN
+		sys_district_info_t t5 ON t1.`District_Id`=t5.`District_Id`
+		LEFT JOIN
+		sys_hotpoint_info_t t6 ON t1.`Hotpoint_Id`=t6.`Hotpoint_Id`
+		where
+		t1.`Area_Id`=#{id}
+	</select>
+
+</mapper>

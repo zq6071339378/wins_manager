@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.MaterialTemplateMapper">
+
+	<resultMap
+		type="hashmap"
+		id="materialTemplateResult">
+		<result
+			property="templateId"
+			column="Template_Id" />
+		<result
+			property="templateName"
+			column="Template_Name" />
+		<result
+			property="templateUrl"
+			column="Template_Url" />
+		<result
+			property="templateImage"
+			column="Template_Image" />
+		<result
+			property="templateType"
+			column="Template_Type" />
+		<result
+			property="templateState"
+			column="Template_State" />
+		<result
+			property="createUser"
+			column="Create_User" />
+		<result
+			property="createTime"
+			column="Create_Time" />
+		<result
+			property="templateRemark"
+			column="Template_Remark" />
+		<result
+			property="terminalType"
+			column="Terminal_Type" />
+		<result
+			property="showType"
+			column="Show_Type" />
+		<result
+			property="martixPath"
+			column="Martix_Path" />
+
+	</resultMap>
+
+	<sql id="materialTemplate">
+		Template_Id as templateId,
+		Template_Name as templateName,
+		Template_Url as templateUrl,
+		Template_Image as templateImage,
+		Template_Type as templateType,
+		Template_State as templateState,
+		Martix_Path as martixPath,
+		Create_User as createUser,
+		Create_Time as
+		createTime,
+		Terminal_Type as terminalType,
+		Show_Type as showType,
+		Template_Remark as templateRemark
+	</sql>
+
+	<sql id="materialTemplateList">
+		Template_Id as templateId,
+		Template_Name as templateName,
+		Template_Url as templateUrl,
+		Template_Image as templateImage,
+		Template_Type as templateType,
+		Template_State as templateState,
+		Martix_Path as martixPath,
+		t.Create_User as createUser,
+		date_format(t.Create_Time,'%Y-%m-%d %H:%i:%s')as createTime,
+		Template_Remark as templateRemark,
+		Terminal_Type as terminalType,
+		Show_Type as showType,
+		u.user_name as userName
+	</sql>
+
+	<insert
+		id="insertInfo"
+		parameterType="hashmap"
+		useGeneratedKeys="true"
+		keyProperty="Template_Id">
+		insert into material_template_t
+		(
+		<foreach
+			collection="condition"
+			separator=","
+			index="key">${key}</foreach>
+		)
+		values(
+		<foreach
+			collection="condition"
+			separator=","
+			item="value"
+			close="">#{value}</foreach>
+		)
+	</insert>
+
+	<select
+		id="getInfo"
+		parameterType="int"
+		resultMap="materialTemplateResult">
+		select
+		<include refid="materialTemplate"></include>
+		from material_template_t
+		<where>
+			Template_Id=#{templateId}
+		</where>
+	</select>
+
+	<select
+		id="countByCondition"
+		parameterType="hashmap"
+		resultType="int">
+		select count(1) FROM material_template_t t left join sys_user_info_t u
+		on t.Create_User=u.user_id
+		WHERE
+		(t.`Create_User` in (select a.`User_Id` from `sys_user_info_t` a
+			where a.Create_User=(select b.Create_User from `sys_user_info_t` b where b.`User_Id`=#{userId}) 
+			and a.`Show_Status`=#{showStatus} ) or
+			t.`Create_User`=#{userId})
+			<if test="tType!=null">and Terminal_Type = #{tType}</if>
+			<if test="pageName!=null">and Page_Name like '%${pageName}%'</if>
+			and t.Template_State>0
+	</select>
+
+	<select
+		id="findByCondition"
+		parameterType="hashmap"
+		resultMap="materialTemplateResult">
+		select
+		<include refid="materialTemplateList"></include>
+		FROM material_template_t t left join sys_user_info_t u on
+		t.Create_User=u.user_id
+		WHERE
+		(t.`Create_User` in (select a.`User_Id` from `sys_user_info_t` a
+			where a.Create_User=(select b.Create_User from `sys_user_info_t` b where b.`User_Id`=#{userId}) 
+			and a.`Show_Status`=#{showStatus} ) or
+			t.`Create_User`=#{userId})
+		<if test="tType!=null">
+			<if test="tType==5">
+				and (Terminal_Type=2 OR Terminal_Type=3)
+			</if>
+			<if test="tType!=5">
+				and Terminal_Type = #{tType}
+			</if>
+		</if>
+		<if test="templateName!=null">
+			and Template_Name like '%${templateName}%'
+		</if>
+		and t.Template_State>0
+		order by t.Create_Time desc
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+	
+	<select
+		id="findmaterial"
+		parameterType="hashmap"
+		resultMap="materialTemplateResult">
+		select
+		<include refid="materialTemplateList"></include>
+		FROM material_template_t t left join sys_user_info_t u on
+		t.Create_User=u.user_id
+		WHERE
+		(t.`Create_User` in (select a.`User_Id` from `sys_user_info_t` a
+			where a.Create_User=(select b.Create_User from `sys_user_info_t` b where b.`User_Id`=#{userId}) 
+			and a.`Show_Status`=#{showStatus} ) or
+			t.`Create_User`=#{userId})
+		<if test="tType!=null">
+			<if test="tType==5">
+				and (Terminal_Type=2 OR Terminal_Type=3)
+			</if>
+			<if test="tType!=5">
+				and Terminal_Type = #{tType}
+			</if>
+		</if>
+		<if test="templateName!=null">
+			and Template_Name like '%${templateName}%'
+		</if>
+		and t.Template_State>0
+		order by t.Create_Time desc
+	</select>
+
+	<update
+		id="deleteById"
+		parameterType="int">
+		update material_template_t
+		<set>
+			Template_State = 0
+		</set>
+		where Template_Id=#{templateId}
+	</update>
+
+	<update
+		id="updateInfo"
+		parameterType="hashmap">
+		update material_template_t
+		<set>
+			<foreach
+				collection="condition"
+				separator=","
+				index="key"
+				item="value"
+				close="">
+				${key}=#{value}
+			</foreach>
+		</set>
+		where Template_Id=#{templateId}
+	</update>
+
+	<select
+		id="count"
+		resultType="int">
+		select count(1) from material_template_t
+	</select>
+
+</mapper>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.AdnetworkMapper">
+	<resultMap type="hashmap" id="adnetworkMapperResult">
+		<result property="networkId" column="network_id" />
+		<result property="networkName" column="network_name"/>
+		<result property="buyType" column="buy_type"/>
+		<result property="totalPrice" column="total_price"/>
+		<result property="exportFlux" column="export_flux"/>
+		<result property="flowRadio" column="flow_radio"/>
+		<result property="startTime" column="start_time"/>
+		<result property="endTime" column="end_time"/>
+		<result property="creatTime" column="create_time"/>
+	</resultMap>
+	
+	<select id="searchAdnetwork"  parameterType="hashmap" resultMap="adnetworkMapperResult">
+	    SELECT network_id,network_name FROM adnetwork_info_t
+		<where>
+			<if test="searchAdnetwork!=null">
+				and network_name like "%${searchAdnetwork}%"
+			</if>
+		</where>
+	<!-- 	ORDER BY cu.Create_Time DESC
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if> -->
+	</select>
+
+	<select id="findByCondition" parameterType="hashmap" resultMap="adnetworkMapperResult">
+		SELECT *
+		FROM adnetwork_info_t
+		<where>
+		
+			<if test="networkName!=null">
+				AND network_name LIKE '%${networkName}%'
+			</if>
+		</where>
+	<!--  ORDER BY start_time DESC
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>  -->
+	</select>
+
+	<delete id="deleteById" parameterType="int">
+		delete from adnetwork_info_t WHERE network_id=#{networkId}
+	</delete>
+
+	<select id="getInfoByCondition" parameterType="hashmap" resultMap="adnetworkMapperResult">
+	SELECT *
+		FROM adnetwork_info_t
+		<where>
+			network_id = #{networkId}
+		</where>
+	</select>
+	
+<insert id="insertInfo" parameterType="hashmap" useGeneratedKeys="true" keyProperty="id">
+		INSERT adnetwork_info_t (network_name,buy_type,total_price,export_flux,flow_radio,start_time,end_time)
+		VALUES (#{networkName},#{buyType},#{totalPrice},#{exportFlux},#{flowRadio},#{startTime},#{endTime})
+	</insert>
+
+	<update id="updateInfo" parameterType="java.util.HashMap">
+		update adnetwork_info_t
+		<set>
+			<if test="networkName != null">
+				network_name=#{networkName},
+			</if>
+			<if test="buyType != null">
+				buy_type=#{buyType},
+			</if>
+			<if test="totalPrice != null">
+				total_price=#{totalPrice},
+			</if>
+			<if test="exportFlux != null">
+				export_flux=#{exportFlux},
+			</if>
+			<if test="flowRadio != null">
+				flow_radio=#{flowRadio},
+			</if>
+			<if test="startTime != null">
+	            start_time=#{startTime},		
+			</if>
+			<if test="endTime !=null ">
+			   end_time=#{endTime},
+			</if>
+		<!-- 	<if test="customerAddress != null">
+				Customer_Address=#{customerAddress},
+			</if>
+			<if test="remarks != null">
+				Remarks=#{remarks},
+			</if> -->
+		</set>
+		WHERE network_id=#{networkId}
+	</update>
+</mapper>

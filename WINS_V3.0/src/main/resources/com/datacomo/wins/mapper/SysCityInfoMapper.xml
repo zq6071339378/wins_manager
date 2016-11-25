@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.SysCityInfoMapper">
+
+	<resultMap
+		type="hashmap"
+		id="cityMapperResult">
+		<result
+			property="cityId"
+			column="City_Id" />
+		<result
+			property="provinceId"
+			column="Province_Id" />
+		<result
+			property="cityName"
+			column="City_Name" />
+		<result
+			property="cityEn"
+			column="City_En" />
+		<result
+			property="ctiyPy"
+			column="Ctiy_Py" />
+		<result
+			property="createUser"
+			column="Create_User" />
+		<result
+			property="createTime"
+			column="Create_Time" />
+	</resultMap>
+
+	<sql id="cityInfo">
+		City_Id,Province_Id,City_Name,City_En,Ctiy_Py,Create_User,Create_Time
+	</sql>
+
+	<select
+		id="findByCondition"
+		parameterType="hashmap"
+		resultMap="cityMapperResult">
+		select
+		<include refid="cityInfo"></include>
+		FROM sys_city_info_t
+		where province_id=#{provinceId}
+		order by City_Id
+	</select>
+
+	<select
+		id="getInfo"
+		parameterType="int"
+		resultMap="cityMapperResult">
+		SELECT City_Id,Province_Id,City_Name,City_En,Ctiy_Py FROM
+		sys_city_info_t WHERE City_Id = #{cityId}
+	</select>
+
+
+</mapper>

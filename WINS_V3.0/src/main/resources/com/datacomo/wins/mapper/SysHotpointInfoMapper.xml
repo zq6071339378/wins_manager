@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.SysHotpointInfoMapper">
+
+	<resultMap
+		type="hashmap"
+		id="hotpointMapperResult">
+		<result
+			property="hotpointId"
+			column="Hotpoint_Id" />
+		<result
+			property="provinceId"
+			column="Province_Id" />
+		<result
+			property="cityId"
+			column="City_Id" />
+		<result
+			property="districtId"
+			column="District_Id" />
+		<result
+			property="hotPointName"
+			column="HotPoint_Name" />
+		<result
+			property="hotPointType"
+			column="HotPoint_Type" />
+		<result
+			property="hotPointImage"
+			column="HotPoint_Image" />
+		<result
+			property="Longitude"
+			column="Longitude" />
+		<result
+			property="Latitude"
+			column="Latitude" />
+		<result
+			property="createUser"
+			column="Create_User" />
+		<result
+			property="createTime"
+			column="Create_Time" />
+	</resultMap>
+
+	<sql id="hotpointInfo">
+		Hotpoint_Id,Province_Id,City_Id,District_Id,HotPoint_Name,HotPoint_Type,HotPoint_Image,Longitude,Latitude,Create_User,Create_Time
+	</sql>
+
+	<select
+		id="findByCondition"
+		parameterType="hashmap"
+		resultMap="hotpointMapperResult">
+		select
+		<include refid="hotpointInfo"></include>
+		FROM sys_hotpoint_info_t
+		where district_id=#{districtId}
+	</select>
+
+</mapper>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.SysUserInfoMapper">
+
+	<resultMap
+		type="hashmap"
+		id="sysUserInfoMapperResult">
+		<result
+			property="userId"
+			column="User_Id" />
+		<result
+			property="roleId"
+			column="Role_Id" />
+		<result
+			property="userName"
+			column="User_Name" />
+		<result
+			property="userPwd"
+			column="User_Pwd" />
+		<result
+			property="realName"
+			column="Real_Name" />
+		<result
+			property="headPath"
+			column="Head_Path" />
+		<result
+			property="userPhone"
+			column="User_Phone" />
+		<result
+			property="userEmail"
+			column="User_Email" />
+		<result
+			property="userRemark"
+			column="User_Remark" />
+		<result
+			property="userStatus"
+			column="User_Status" />
+		<result
+			property="loginTime"
+			column="Login_Time" />
+		<result
+			property="loginIp"
+			column="Login_Ip" />
+		<result
+			property="createUser"
+			column="Create_User" />
+		<result
+			property="createTime"
+			column="Create_Time" />
+		<result
+			property="updateUser"
+			column="Update_User" />
+		<result
+			property="updateTime"
+			column="Update_Time" />
+		<result
+			property="roleType"
+			column="role_type" />
+		<result
+			property="cityId"
+			column="City_Id" />
+		<result
+			property="provinceId"
+			column="Province_Id" />
+		<result
+			property="showStatus"
+			column="Show_Status" />
+	</resultMap>
+	<select
+		id="getInfoByCondition"
+		parameterType="hashmap"
+		resultMap="sysUserInfoMapperResult">
+		SELECT
+		u.User_Name,u.User_Pwd,u.User_Id,u.role_id,u.City_Id,u.Province_Id,r.role_type,u.login_ip,u.user_phone,u.Show_Status
+		FROM sys_user_info_t u ,sys_role_info_t r
+		<where>
+			<if test="userName != null">
+				and u.user_name=#{userName}
+			</if>
+			<if test="password != null">
+				and u.user_pwd=#{password}
+			</if>
+			and user_status=1 AND u.`Role_Id`=r.`Role_Id`
+		</where>
+	</select>
+
+	<update
+		id="updateInfo"
+		parameterType="java.util.HashMap">
+		update sys_user_info_t
+		<set>
+			<if test="loginTime != null">
+				Login_time=#{loginTime},
+			</if>
+		</set>
+		where user_name = #{userName}
+	</update>
+</mapper>

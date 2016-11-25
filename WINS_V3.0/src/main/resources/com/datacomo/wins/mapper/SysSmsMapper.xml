@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.SysSmsMapper">
+
+	<resultMap
+		type="hashmap"
+		id="sysSmsMapperResult">
+		<result
+			property="smsId"
+			column="sms_id" />
+		<result
+			property="smsPhone"
+			column="sms_phone" />
+		<result
+			property="smsMessage"
+			column="sms_message" />
+		<result
+			property="smsStatus"
+			column="sms_status" />
+		<result
+			property="smsSeq"
+			column="sms_seq" />
+		<result
+			property="validCode"
+			column="valid_code" />
+		<result
+			property="createTime"
+			column="create_time" />
+		<result
+			property="disableTime"
+			column="disable_time" />
+	</resultMap>
+
+	<sql id="smsInfo">
+		sms_id, sms_phone, sms_message, sms_status, sms_seq,
+		valid_code, create_time, disable_time
+	</sql>
+
+	<insert
+		id="insertInfo"
+		parameterType="hashmap">
+		insert into sys_sms_info(sms_phone, sms_message,
+		sms_status, sms_seq, valid_code, create_time, disable_time)
+		values(#{smsPhone},#{smsMessage},#{smsStatus},#{smsSeq},#{validCode},#{createTime},#{disableTime})
+	</insert>
+</mapper>

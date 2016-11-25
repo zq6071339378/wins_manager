@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.MaterialPageMapper">
+
+	<resultMap
+		type="hashmap"
+		id="materialPageResult">
+		<result
+			property="pageId"
+			column="Page_Id" />
+		<result
+			property="templateId"
+			column="Template_Id" />
+		<result
+			property="pageName"
+			column="Page_Name" />
+		<result
+			property="pageURL"
+			column="Page_URL" />
+		<result
+			property="createUser"
+			column="Create_User" />
+		<result
+			property="createTime"
+			column="Create_Time" />
+		<result
+			property="pageRemark"
+			column="Page_Remark" />
+		<result
+			property="martixPath"
+			column="Martix_Path" />
+	</resultMap>
+
+	<sql id="materialPageInfo">
+		
+		Page_Id as pageId,
+		Page_Name as pageName,
+		Page_URL as pageURL,
+		concat(i.Province_Name,ifnull(c.City_Name,'')) as provinceCity,
+		p.Create_User as createUser,
+		date_format(p.Create_Time,'%Y-%m-%d %H:%i:%s')as createTime,
+		p.Martix_Path as martixPath,
+		Page_Remark as pageRemark,
+		u.user_name as userName,
+		t.Template_Id as templateId,
+		t.Template_Type as templateType,
+		t.Terminal_Type as terminalType,
+		t.Show_Type as showType,
+		t.Template_Name as templateName
+	</sql>
+
+	<insert
+		id="insertInfo"
+		parameterType="hashmap"
+		useGeneratedKeys="true"
+		keyProperty="Page_Id">
+		insert into material_page_t
+		(
+		<foreach
+			collection="condition"
+			separator=","
+			index="key">${key}</foreach>
+		)
+		values(
+		<foreach
+			collection="condition"
+			separator=","
+			item="value"
+			close="">#{value}</foreach>
+		)
+	</insert>
+
+	<select
+		id="getInfo"
+		parameterType="int"
+		resultMap="materialPageResult">
+		select
+		<include refid="materialPageInfo"></include>
+		from material_page_t
+		<where>
+			id=#{id}
+		</where>
+	</select>
+
+	<select
+		id="countByCondition"
+		parameterType="hashmap"
+		resultType="int">
+		select count(1) 		FROM material_page_t p
+		left join material_template_t t on p.Template_Id=t.Template_Id
+		left join sys_user_info_t u ON p.Create_User = u.user_id
+		left  join  sys_city_info_t c  on  c.City_Id=u.City_Id
+		left  join  sys_province_info_t i  on  i.Province_Id=u.Province_Id
+
+		WHERE
+		(p.`Create_User` in (select a.`User_Id` from `sys_user_info_t` a
+			where a.Create_User=#{userId} and a.`Show_Status`=#{showStatus} ) or
+			p.`Create_User`=#{userId})
+			<if test="tType!=null">and t.Terminal_Type = ${tType}</if>
+			<if test="pageName!=null">and Page_Name like '%${pageName}%'</if>
+	</select>
+	<delete
+		id="deleteById"
+		parameterType="int">
+		DELETE material_page_t FROM material_page_t
+		WHERE Page_Id=#{id}
+	</delete>
+
+	<select
+		id="findByCondition"
+		parameterType="hashmap"
+		resultMap="materialPageResult">
+		select
+		<include refid="materialPageInfo"></include>
+		FROM material_page_t p
+		left join material_template_t t on p.Template_Id=t.Template_Id
+		left join sys_user_info_t u ON p.Create_User = u.user_id
+		left  join  sys_city_info_t c  on  c.City_Id=u.City_Id
+		left  join  sys_province_info_t i  on  i.Province_Id=u.Province_Id
+	
+		WHERE
+		(p.`Create_User` in (select a.`User_Id` from `sys_user_info_t` a
+			where a.Create_User=#{userId} and a.`Show_Status`=#{showStatus} ) or
+			p.`Create_User`=#{userId})
+			<if test="tType!=null">and t.Terminal_Type = ${tType}</if>
+			<if test="pageName!=null">and Page_Name like '%${pageName}%'</if>
+		order by p.Create_Time desc
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+
+	<update
+		id="updateInfo"
+		parameterType="hashmap">
+		update material_page_t
+		<set>
+			<foreach
+				collection="condition"
+				separator=","
+				index="key"
+				item="value"
+				close="">
+				${key}=#{value}
+			</foreach>
+		</set>
+		where Page_Id=#{id}
+	</update>
+
+	<select
+		id="count"
+		resultType="int">
+		select count(1) from material_page_t
+	</select>
+
+</mapper>

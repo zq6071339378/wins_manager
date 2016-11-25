@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Type" content="text/html; charset=UTF-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no">
+<meta content="no-cache" http-equiv="pragma">
+<meta content="no-cache" http-equiv="cache-control">
+<script>
+<!--直接访问模板默认数据 -->
+window["$$$wins_pm"]={ "bUrl":"http://172.16.2.201","tUrl": "http://172.16.2.201/tb/gslt/20150402","p1": "0_67","mdtest":"1"};
+</script>
+<link rel="stylesheet" href="query.css">
+</head>
+<script id="top_js"></script>
+<body>
+	<div id="main_body">
+		<input id="hirouter_content_data" type="hidden" value=""> <input
+			id="hirouter_content_data_list" type="hidden" value="">
+		<div id="wins_toolbar_html">
+			<div class="wins_bg">
+				<div
+					style="position: absolute; display: block; width: 300px; height: 250px; top: 45px; text-align: left;"
+					id="wins_replace_content">
+					<p style="text-align: center; color: red; font-size: 22px;">
+						<i id="adid_page_2_tab_desc2" group="地区" adtitle="地区 "
+							admodel="text">XXX</i>100M</br>光纤宽带改造集中登记通知
+					</p>
+					<p style="text-indent: 50px; font-size: 18px;">
+						登记日期：<i id="adid_page_2_tab_desc3" group="登记日期" adtitle="登记日期 "
+							admodel="text">XXX</i>
+					</p>
+					<p style="text-indent: 50px; font-size: 18px;">
+						登记时间：<i id="adid_page_2_tab_desc4" group="登记时间" adtitle="登记时间 "
+							admodel="text">XXX</i>
+					</p>
+					<p style="text-indent: 50px; font-size: 18px;">
+						登记地点：<i id="adid_page_2_tab_desc5" group="登记地点" adtitle="登记地点 "
+							admodel="text">XXX</i>
+					</p>
+					<p style="font-size: 14px; text-align: center;">铜缆宽带整体升级，敬请安排时间到场</p>
+					<p style="text-align: center;" class="footer">
+					<div id="adid_ad_url" adtitle="链接路径" admodel="link" group="广告链接"
+						href="javascript:;" onclick="__linkhits(_$$(this).attr('href'));"
+						style="border-style: none; cursor: pointer; width: 100%; text-align: center;">
+						<a href="javascript:;" class="tb_btn">&nbsp;</a>
+					</div>
+					</p>
+				</div>
+				<a class="wins_close" href="javascript:;"
+					onclick="wins_close_toolbar();">&nbsp;</a>
+			</div>
+		</div>
+	</div>
+
+</body>
+<script id="bottom_js">
+__newjq=false;
+if(typeof(window.jQuery) == 'undefined')
+ __newjq=true;
+(function(LTB) {
+	if(__newjq) {
+		var jsrc=document.createElement('script');
+		jsrc.type="text/javascript";
+		jsrc.onload=LTB;
+		jsrc.src='http://libs.baidu.com/jquery/1.11.1/jquery.min.js';
+		document.body.appendChild(jsrc);
+	}
+	else 
+		LTB();
+})(function() {
+	if(__newjq) {
+	 window._$$=jQuery.noConflict(true);
+	 window.Zepto && window.$!==window.Zepto && (window.$=window.Zepto);
+	 window.$ in window && typeof window.$ =='undefined' && delete window.$;
+	}else{
+	 window._$$=jQuery;
+	}
+window.__linkhits =function(hitsUrl){
+	try{
+		var img=document.createElement("img");img.src=$$$wins_pm.bUrl+'/dcwinsfeed/pagehits.gif?p1='+$$$wins_pm.p1+'&pt='+$$$wins_pm.pt+'&uid='+$$$wins_pm.uid+'&pid='+$$$wins_pm.pid+'&pageName=toolbar&hitsUrl='+encodeURIComponent(hitsUrl);
+		if(hitsUrl!=null){
+			if(hitsUrl.indexOf("?")==-1){
+				hitsUrl = hitsUrl+"?kdNum="+$$$wins_pm.mdn+"&cust_name="+escape($$$wins_pm.name)+"&latnId="+$$$wins_pm.cityCode;
+			}else{
+				hitsUrl = hitsUrl+"&kdNum="+$$$wins_pm.mdn+"&cust_name="+escape($$$wins_pm.name)+"&latnId="+$$$wins_pm.cityCode;
+			}
+		}
+	}catch(e){
+	}
+	setTimeout(function(){location.href=hitsUrl;},500);
+};
+
+window.__updateShowStatus=function(status){
+	try{
+		var img=document.createElement("img");img.src=$$$wins_pm.bUrl+'/dcwinsfeed/updateshow.gif?showStatus='+status+'&p1='+$$$wins_pm.p1+'&pt='+$$$wins_pm.pt+'&uid='+$$$wins_pm.uid+'&pid='+$$$wins_pm.pid+'&pageName=toolbar&ua='+encodeURIComponent(navigator.userAgent);
+	}catch(e){
+	}
+};
+
+(function(){	
+	wins_wss_queryPolicy();
+})();
+
+
+function wins_wss_queryPolicy(){
+	_$$.getJSON($$$wins_pm.bUrl+'/queryPolicyInfo.json?p1='+$$$wins_pm.p1+'&pt='+$$$wins_pm.pt+'&opcode=100000&&termtype=1&callback=?',function(respdata){
+		if(0==respdata.flag){
+			var info=respdata.info;
+			var summaryUsed=0;
+			var summaryUsedTisu=0;
+
+			var gddxsp=info.GDDXSP;
+			$$$wins_pm.pt=info.pt;
+			$$$wins_pm.pid=info.pid;
+			$$$wins_pm.uid=info.uid;
+			$$$wins_pm.mdn=info.mdn;
+			$$$wins_pm.keystr=info.keystr;
+			$$$wins_pm.pp=info.pp;
+			var userDynamicDes=info.userDynamicDes;
+			//push path
+			__updateShowStatus(0);
+			if(userDynamicDes!=null){
+				var _array =userDynamicDes.split(",");
+				_$$("#wins_replace_content").html(function(){
+					var _html=_$$(this).html();
+					_$$.each(_array,function(i,n){
+						_html=_html.replace("{#}",n);
+						if(i==4){
+							$$$wins_pm.name=n;
+						}else if(i==5){
+							$$$wins_pm.cityCode=n;
+						}
+					});
+					return _html;
+				});
+			}
+			
+			_$$("#wins_image_src").attr('src',$$$wins_pm.tUrl+"/images/yjxy.png");
+			_$$("#wins_toolbar").show();
+			_$$("#wins_toolbar_html").show();
+		}else {
+			__updateShowStatus(2);
+		}
+	});
+}
+
+window.wins_close_toolbar=function wins_close_toolbar(e){
+	_$$("#wins_toolbar_html").hide();
+	__pagehits("close");
+	_$$.getJSON($$$wins_pm.bUrl+'/addwuser3.json?uid='+$$$wins_pm.uid+'&p1='+$$$wins_pm.p1+'&pid='+$$$wins_pm.pid+'&ustatus=2&callback=?',function(respdata){
+		_$$("#wins_toolbar").remove();
+	});
+	return false;
+};
+
+window.__pagehits=function pagehits(hitsUrl){
+	try{
+		var img=document.createElement("img");img.src=$$$wins_pm.bUrl+'/dcwinsfeed/pagehits.gif?p1='+$$$wins_pm.p1+'&pt='+$$$wins_pm.pt+'&uid='+$$$wins_pm.uid+'&pid='+$$$wins_pm.pid+'&pageName=toolbar&hitsUrl='+encodeURIComponent(hitsUrl);
+	}catch(e){		
+	}
+};
+
+//订购 数据 、App数据加载方法
+window.__init_push_tb=function(){
+	$$$push_tb = {
+	data:{},
+	listdata:{}
+	};
+};
+
+window.__hirouter_load_toolbar=function(){
+
+	if(_$$("#hirouter_content_data").val() !=""){
+		$$$push_tb.data = JSON.parse(_$$("#hirouter_content_data").val());
+	}
+
+	if(_$$("#hirouter_content_data_list").val() !=""){
+		$$$push_tb.listdata = JSON.parse(_$$("#hirouter_content_data_list").val());
+	}
+
+	_$$.each($$$push_tb.data ,function(key,obj){
+		_$$.each(obj,function(key2,val){
+			if(key2 == "text"){
+				_$$("#"+key).html(val);
+			}else if(key2=="src"){
+				val = val.replace("..",$$$wins_pm.tUrl);
+				_$$("#"+key).attr(key2,val);
+			}else{
+				_$$("#"+key).attr(key2,val);
+			}
+		});
+	});
+
+  	_$$.each($$$push_tb.listdata ,function(key,obj){
+		if(  key.indexOf("_app_") > 0 ) {
+			_$$.each(obj,function(index,item){
+				_$$("#"+key).append($$$push_tb.getAppInfoHTML(item));
+			})
+		}else if(  key.indexOf("_file_") > 0 ) {
+			_$$.each(obj,function(index,item){
+				_$$("#"+key).append($$$push_tb.getFileInfoHTML(item));
+			})
+		}else if(  key.indexOf("_product_") > 0 ) {
+			_$$.each(obj,function(index,item){
+				_$$("#"+key).append($$$push_tb.getproductInfoHTML(item));
+			})
+		}else if(  key.indexOf("_plan_") > 0 ) {
+			_$$.each(obj,function(index,item){
+				_$$("#"+key).append($$$push_tb.getTrafficPlanHTML(item));
+			})
+		}
+
+  	});
+
+};
+__init_push_tb();
+__hirouter_load_toolbar();
+});
+</script>
+</html>

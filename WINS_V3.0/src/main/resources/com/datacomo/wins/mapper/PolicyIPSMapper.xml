@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.PolicyIPSMapper">
+	<resultMap type="hashmap" id="IPSMapperResult">
+		<result property="ipsId" column="Ips_Id"/>
+		<result property="provinceId" column="Province_Id"/>
+		<result property="cityId" column="City_Id"/>
+		<result property="ipsCode" column="Ips_Code"/>
+		<result property="ipsName" column="Ips_Name"/>
+		<result property="ipsIp" column="Ips_Ip"/>
+		<result property="ipsStatus" column="Ips_Status"/>
+		<result property="pushUrl" column="Push_Url"/>
+		<result property="createName" column="User_Name"/>
+		<result property="provinceName" column="Province_Name"/>
+		<result property="cityName" column="City_Name"/>
+		<result property="createTime" column="Create_Time"/>
+	</resultMap>
+
+	<select id="findByCondition" parameterType="hashmap" resultMap="IPSMapperResult">
+		SELECT pc.Ips_Id,pc.Ips_Name,pc.Ips_Ip,pc.Ips_Status,pc.Create_Time,pc.Province_Id,pc.City_Id,sp.Province_Name,sc.City_Name,su.User_Name FROM policy_ips_config_t pc
+		LEFT JOIN sys_province_info_t sp ON pc.Province_Id=sp.Province_Id
+		LEFT JOIN sys_city_info_t sc ON pc.City_Id=sc.City_Id
+		LEFT JOIN sys_user_info_t su ON pc.Create_User=su.User_Id
+		<where>
+			(pc.Create_User IN (SELECT User_Id FROM sys_user_info_t WHERE Create_User=#{userId}) OR pc.Create_User=#{userId}) AND su.Show_Status=#{showStatus}
+			<if test="cityId!=null">
+				AND pc.City_Id=#{cityId}
+			</if>
+		</where>
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+
+	<select id="countByCondition" parameterType="hashmap" resultType="int">
+		SELECT count(*) FROM policy_ips_config_t pc
+		LEFT JOIN sys_province_info_t sp ON pc.Province_Id=sp.Province_Id
+		LEFT JOIN sys_city_info_t sc ON pc.City_Id=sc.City_Id
+		LEFT JOIN sys_user_info_t su ON pc.Create_User=su.User_Id
+		<where>
+			(pc.Create_User IN (SELECT User_Id FROM sys_user_info_t WHERE Create_User=#{userId}) OR pc.Create_User=#{userId}) AND su.Show_Status=#{showStatus}
+			<if test="cityId!=null">
+				AND pc.City_Id=#{cityId}
+			</if>
+		</where>
+	</select>
+
+	<select id="count" resultType="int">
+		SELECT count(*) FROM policy_ips_config_t
+	</select>
+
+	<select id="getInfoByCondition" parameterType="hashmap" resultMap="IPSMapperResult">
+		SELECT pc.Ips_Id,pc.Ips_Name,pc.Ips_Ip,pc.Ips_Status,pc.Province_Id,pc.City_Id FROM policy_ips_config_t pc WHERE pc.Ips_Id=#{ipsId}
+	</select>
+
+	<select id="getMaxValue" resultType="int">
+		SELECT max(Ips_Id) FROM policy_ips_config_t
+	</select>
+
+	<delete id="deleteById" parameterType="int">
+		delete from policy_ips_config_t WHERE Ips_Id=#{ipsId}
+	</delete>
+
+	<update id="updateInfo" parameterType="java.util.HashMap">
+		update policy_ips_config_t
+		<set>
+			<if test="ipsName != null">
+				Ips_Name=#{ipsName},
+			</if>
+			<if test="provinceId != null">
+				Province_Id=#{provinceId},
+			</if>
+			<if test="cityId != null">
+				City_Id=#{cityId},
+			</if>
+			<if test="ipsIp != null">
+				Ips_Ip=#{ipsIp},
+			</if>
+			<if test="ipsStatus != null">
+				Ips_Status=#{ipsStatus},
+			</if>
+		</set>
+		WHERE Ips_Id=#{ipsId}
+	</update>
+
+	<insert id="insertInfo" parameterType="hashmap" useGeneratedKeys="true" keyProperty="id">
+		INSERT policy_ips_config_t
+		(<foreach
+				collection="condition"
+				separator=","
+				index="key">${key}</foreach>
+		)
+		values
+		(<foreach
+				collection="condition"
+				separator=","
+				item="value"
+				close="">#{value}</foreach>
+		)
+	</insert>
+
+</mapper>

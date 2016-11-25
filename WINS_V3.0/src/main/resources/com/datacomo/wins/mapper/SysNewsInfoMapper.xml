@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.SysNewsInfoMapper">
+
+	<resultMap
+		type="hashmap"
+		id="sysNewsMapperResult">
+		<result
+			property="News_Id"
+			column="News_Id" />
+		<result
+			property="User_Id"
+			column="User_Id" />
+		<result
+			property="News_Title"
+			column="News_Title" />
+		<result
+			property="News_Content"
+			column="News_Content" />
+		<result
+			property="News_Type"
+			column="News_Type" />
+		<result
+			property="Create_User"
+			column="Create_User" />
+		<result
+			property="Create_Time"
+			column="Create_Time" />
+		<result
+			property="Receive_Name"
+			column="Receive_Name" />
+		<result
+			property="Is_Read"
+			column="Is_Read" />
+	</resultMap>
+
+	<resultMap
+		type="hashmap"
+		id="userInfoMapperResult">
+		<result
+			property="userId"
+			column="User_Id" />
+		<result
+			property="roleId"
+			column="Role_Id" />
+		<result
+			property="userName"
+			column="User_Name" />
+		<result
+			property="userPwd"
+			column="User_Pwd" />
+		<result
+			property="realName"
+			column="Real_Name" />
+		<result
+			property="headPath"
+			column="Head_Path" />
+		<result
+			property="userPhone"
+			column="User_Phone" />
+		<result
+			property="userEmail"
+			column="User_Email" />
+		<result
+			property="userRemark"
+			column="User_Remark" />
+		<result
+			property="userStatus"
+			column="User_Status" />
+		<result
+			property="loginTime"
+			column="Login_Time" />
+		<result
+			property="loginIp"
+			column="Login_Ip" />
+		<result
+			property="createUser"
+			column="Create_User" />
+		<result
+			property="createTime"
+			column="Create_Time" />
+		<result
+			property="updateUser"
+			column="Update_User" />
+		<result
+			property="updateTime"
+			column="Update_Time" />
+		<result
+			property="provinceId"
+			column="Province_Id" />
+		<result
+			property="provinceName"
+			column="Province_Name" />
+		<result
+			property="cityId"
+			column="City_Id" />
+		<result
+			property="cityName"
+			column="City_Name" />
+		<result
+			property="roleId"
+			column="Role_Id" />
+		<result
+			property="roleName"
+			column="Role_Name" />
+		<result
+			property="createName"
+			column="Create_Name" />
+		<result
+			property="showStatus"
+			column="Show_Status" />
+	</resultMap>
+
+	<sql id="sysNewsInfo">
+		News_Id,User_Id,News_Title,News_Content,News_Type,Create_User,Create_Time,Receive_Name,Is_Read
+	</sql>
+
+
+	<select
+		id="findByCondition"
+		parameterType="hashmap"
+		resultMap="sysNewsMapperResult">
+		select
+		a.News_Id,a.User_Id,a.News_Title,a.News_Content,a.News_Type,a.Create_User,a.Create_Time,a.Receive_Name,a.Is_Read
+		FROM sys_news_info_t AS a LEFT JOIN sys_user_info_t AS b ON a.User_Id
+		= b.User_Id
+		<where>
+			<if test="News_Content!=null and News_Content!=''">
+				a.News_Content like
+				CONCAT(CONCAT('%',#{News_Content}),'%')
+			</if>
+			<if test="Create_Date!=null">
+				DATE(a.Create_Time) = #{Create_Date}
+			</if>
+			<if test="News_Type!=null and News_Type!=''">
+				and a.News_Type = #{News_Type}
+			</if>
+			<if test="User_Id!=null">
+				and a.User_Id = #{User_Id}
+			</if>
+			<if test="Show_Status!=null">
+				and b.Show_Status = #{Show_Status}
+			</if>
+			<if test="Is_Read!=null">
+				and a.Is_Read = #{Is_Read}
+			</if>
+			<if test="cityId!=null">
+				AND b.City_Id = #{cityId}
+			</if>
+		</where>
+		ORDER BY Create_Time DESC
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+
+
+	<select
+		id="countByCondition"
+		parameterType="hashmap"
+		resultType="int">
+		select count(1) from sys_news_info_t AS a LEFT JOIN sys_user_info_t AS
+		b ON a.User_Id = b.User_Id
+		<where>
+			<if test="News_Content!=null and News_Content!=''">
+				a.News_Content like
+				CONCAT(CONCAT('%',#{News_Content}),'%')
+			</if>
+			<if test="Create_Date!=null">
+				DATE(a.Create_Time) = #{Create_Date}
+			</if>
+			<if test="News_Type!=null and News_Type!=''">
+				and a.News_Type = #{News_Type}
+			</if>
+			<if test="User_Id!=null">
+				and a.User_Id = #{User_Id}
+			</if>
+			<if test="Show_Status!=null">
+				and b.Show_Status = #{Show_Status}
+			</if>
+			<if test="Is_Read!=null">
+				and a.Is_Read = #{Is_Read}
+			</if>
+			<if test="cityId!=null">
+				AND b.City_Id = #{cityId}
+			</if>
+		</where>
+	</select>
+
+	<update
+		id="updateNews"
+		parameterType="java.util.HashMap">
+		update sys_news_info_t
+		<set>
+			Is_Read = 0,
+		</set>
+		<if test="News_Id!=null and User_Id!=null">
+			where News_Id = #{News_Id}
+		</if>
+		<if test="User_Id!=null and News_Id==null">
+			where User_Id = #{User_Id}
+		</if>
+	</update>
+
+
+	<select
+		id="count"
+		resultType="int">
+		select count(1) from
+		sys_news_info_t
+	</select>
+
+	<select
+		id="getInfoListByCondition"
+		parameterType="hashmap"
+		resultMap="sysNewsMapperResult">
+		select
+		<include refid="sysNewsInfo"></include>
+		FROM sys_news_info_t
+		<where>
+			News_Content like CONCAT(CONCAT('%',#{News_Content}),'%') ORDER
+			BY Create_Time DESC
+		</where>
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+
+	<delete
+		id="deleteById"
+		parameterType="int">
+		delete from sys_news_info_t
+		<where>
+			News_Id=#{news_id}
+		</where>
+	</delete>
+
+	<delete
+		id="deleteByUserId"
+		parameterType="int">
+		delete from sys_news_info_t
+		<where>
+			News_Id=#{news_id}
+		</where>
+	</delete>
+
+	<insert
+		id="insertInfo"
+		parameterType="hashmap"
+		useGeneratedKeys="true"
+		keyProperty="News_Id">
+		insert into
+		sys_news_info_t(User_Id,News_Title,News_Content,News_Type,Create_User,Create_Time,Receive_Name,Is_Read)
+		values(#{User_Id},#{News_Title},#{News_Content},#{News_Type},#{Create_User},#{Create_Time},#{Receive_Name},#{Is_Read})
+	</insert>
+
+	<!--获取未读信息数目 -->
+	<select
+		id="getNotReadCountByCondition"
+		parameterType="hashmap"
+		resultType="int">
+		select count(1) from sys_news_info_t
+		<where>
+			User_Id = #{User_Id} and Is_Read=#{Is_Read}
+		</where>
+	</select>
+
+	<!--获取未读信息 -->
+	<select
+		id="getNotReadInfoByCondition"
+		parameterType="hashmap"
+		resultMap="sysNewsMapperResult">
+		select
+		<include refid="sysNewsInfo"></include>
+		FROM sys_news_info_t
+		<where>
+			User_Id = #{User_Id} and Is_Read=#{Is_Read}
+		</where>
+		ORDER BY Create_Time DESC
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+
+	<!--根据角色类型查询所有角色的用户名 -->
+	<select
+		id="getInfoByRoleId"
+		parameterType="hashmap"
+		resultMap="userInfoMapperResult">
+		select User_Id,User_Name from sys_user_info_t
+		<where>
+			<if test="Role_Id!=null">
+				Role_Id =#{Role_Id}
+			</if>
+			<if test="Show_Status!=null">
+				AND Show_Status =#{Show_Status}
+			</if>
+		</where>
+	</select>
+
+
+</mapper>

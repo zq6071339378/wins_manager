@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.SysTaskMapper">
+
+	<resultMap
+		type="hashmap"
+		id="sysTasksMapperResult">
+		<result
+			property="Report_Id"
+			column="Report_Id" />
+		<result
+			property="Report_Date"
+			column="Report_Date" />
+		<result
+			property="Report_Period"
+			column="Report_Period" />
+		<result
+			property="Server_Name"
+			column="Server_Name" />
+		<result
+			property="Server_Ip"
+			column="Server_Ip" />
+		<result
+			property="Cpu_Usage"
+			column="Cpu_Usage" />
+		<result
+			property="Memory_Usage"
+			column="Memory_Usage" />
+		<result
+			property="Harddisk_Usage"
+			column="Harddisk_Usage" />
+		<result
+			property="Network_Uplink"
+			column="Network_Uplink" />
+		<result
+			property="Network_Downlink"
+			column="Network_Downlink" />
+		<result
+			property="Create_Time"
+			column="Create_Time" />
+	</resultMap>
+
+	<resultMap
+		type="hashmap"
+		id="monitorAlarmMapperResult">
+		<result
+			property="Alarm_Id"
+			column="Alarm_Id" />
+		<result
+			property="Cpu_Limit"
+			column="Cpu_Limit" />
+		<result
+			property="Memory_Limit"
+			column="Memory_Limit" />
+		<result
+			property="Harddisk_Limit"
+			column="Harddisk_Limit" />
+		<result
+			property="User_Id"
+			column="User_Id" />
+		<result
+			property="Receive_Name"
+			column="Receive_Name" />
+		<result
+			property="Create_User"
+			column="Create_User" />
+	</resultMap>
+
+	<resultMap
+		type="hashmap"
+		id="serverInfoMapperResult">
+		<result
+			property="Server_Name"
+			column="Server_Name" />
+		<result
+			property="Server_Ip"
+			column="Server_Ip	" />
+		<result
+			property="Server_Port"
+			column="Server_Port" />
+		<result
+			property="User_Name"
+			column="User_Name" />
+		<result
+			property="User_Passwd"
+			column="User_Passwd" />
+		<result
+			property="Master_Name"
+			column="Master_Name" />
+	</resultMap>
+
+	<sql id="sysTasksInfo">
+		Report_Date,Report_Period,Server_Name,Server_Ip,Cpu_Usage,Memory_Usage,Harddisk_Usage,Network_Uplink,Network_Downlink,Create_Time
+	</sql>
+
+	<sql id="monitorAlarmInfo">
+		Alarm_Id,Cpu_Limit,Memory_Limit,Harddisk_Limit,User_Id,Receive_Name,Create_User
+	</sql>
+
+
+	<select
+		id="findByCondition"
+		parameterType="hashmap"
+		resultMap="sysTasksMapperResult">
+		select
+		<include refid="sysTasksInfo"></include>
+		FROM report_monitor_hour_t
+		<where>
+			<if test="Report_Date!=null">
+				Report_Date=#{Report_Date}
+			</if>
+			<if test="Report_Period!=null">
+				and Report_Period=(select max(Report_Period) from
+				report_monitor_hour_t where Report_Date=#{Report_Date})
+			</if>
+			<if test="Server_Name!=null">
+				and Server_Name=#{Server_Name}
+			</if>
+		</where>
+		<if test="Report_Date==null or Server_Name==null">
+			ORDER BY Server_Name,Create_Time DESC
+		</if>
+		<if test="Report_Date!=null and Server_Name!=null">
+			ORDER BY Report_Period
+		</if>
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+
+
+	<select
+		id="countByCondition"
+		parameterType="hashmap"
+		resultType="int">
+		select count(1) from report_monitor_hour_t
+		<where>
+			<if test="Report_Date!=null">
+				Report_Date=#{Report_Date}
+			</if>
+			<if test="Report_Period!=null">
+				and Report_Period=(select max(Report_Period) from
+				report_monitor_hour_t where Report_Date=#{Report_Date})
+			</if>
+			<if test="Server_Name!=null">
+				and Server_Name=#{Server_Name}
+			</if>
+		</where>
+	</select>
+
+
+	<select
+		id="count"
+		resultType="int">
+		select count(1) from sys_news_info_t
+	</select>
+
+	<select
+		id="getInfoListByCondition"
+		parameterType="hashmap"
+		resultMap="sysTasksMapperResult">
+		select
+		<include refid="sysTasksInfo"></include>
+		FROM sys_news_info_t
+		<where>
+			News_Content like CONCAT(CONCAT('%',#{News_Content}),'%') ORDER
+			BY Create_Time DESC
+		</where>
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+
+	<select
+		id="getMonitorAlarmInfo"
+		parameterType="hashmap"
+		resultMap="monitorAlarmMapperResult">
+		select
+		<include refid="monitorAlarmInfo"></include>
+		FROM sys_monitor_alarm_t
+		limit 1
+	</select>
+
+	<update
+		id="updateMonitorAlarmInfo"
+		parameterType="java.util.HashMap">
+		update sys_monitor_alarm_t
+		<set>
+			<if test="Cpu_Limit != null">
+				Cpu_Limit = #{Cpu_Limit},
+			</if>
+			<if test="Memory_Limit != null">
+				Memory_Limit = #{Memory_Limit},
+			</if>
+			<if test="Harddisk_Limit != null">
+				Harddisk_Limit = #{Harddisk_Limit},
+			</if>
+			<if test="Receive_Name != null">
+				Receive_Name = #{Receive_Name},
+			</if>
+			<if test="User_Id != null">
+				User_Id = #{User_Id},
+			</if>
+		</set>
+		limit 1
+	</update>
+
+	<delete
+		id="deleteById"
+		parameterType="int">
+		delete from sys_news_info_t
+		<where>
+			News_Id=#{news_id}
+		</where>
+	</delete>
+
+	<delete
+		id="deleteByUserId"
+		parameterType="int">
+		delete from sys_news_info_t
+		<where>
+			News_Id=#{news_id}
+		</where>
+	</delete>
+
+	<insert
+		id="insertInfo"
+		parameterType="hashmap"
+		useGeneratedKeys="true"
+		keyProperty="News_Id">
+		insert into
+		report_monitor_hour_t(Report_Date,Report_Period,Server_Name,Server_Ip,Cpu_Usage,Memory_Usage,Harddisk_Usage,Network_Uplink,Network_Downlink)
+		SELECT
+		#{Report_Date},#{Report_Period},#{Server_Name},#{Server_Ip},#{Cpu_Usage},#{Memory_Usage},#{Harddisk_Usage},#{Network_Uplink},#{Network_Downlink}
+		FROM DUAL
+		WHERE NOT EXISTS(SELECT Report_Id FROM report_monitor_hour_t
+		WHERE Report_Date=#{Report_Date} and Report_Period=#{Report_Period}
+		and Server_Name=#{Server_Name})
+	</insert>
+
+	<!--获取未读信息数目 -->
+	<select
+		id="getNotReadCountByCondition"
+		parameterType="hashmap"
+		resultType="int">
+		select count(1) from sys_news_info_t
+		<where>
+			User_Id = #{User_Id} and Is_Read=#{Is_Read}
+		</where>
+	</select>
+
+	<!--获取未读信息 -->
+	<select
+		id="getNotReadInfoByCondition"
+		parameterType="hashmap"
+		resultMap="sysTasksMapperResult">
+		select
+		<include refid="sysTasksInfo"></include>
+		FROM sys_news_info_t
+		<where>
+			User_Id = #{User_Id} and Is_Read=#{Is_Read}
+		</where>
+		ORDER BY Create_Time DESC
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+
+	<!--根据用户名获取ID -->
+	<select
+		id="getUserId"
+		parameterType="hashmap"
+		resultType="int">
+		select User_Id from sys_user_info_t
+		<where>
+			<if test="User_Name != null">
+				User_Name = #{User_Name}
+			</if>
+		</where>
+		limit 1
+	</select>
+
+	<!--获取服务器登录信息 -->
+	<select
+		id="getServerInfo"
+		resultMap="serverInfoMapperResult">
+		select Server_Name,Server_Ip,Server_Port,User_Name,User_Passwd,Master_Name
+		from sys_service_info_t
+	</select>
+</mapper>

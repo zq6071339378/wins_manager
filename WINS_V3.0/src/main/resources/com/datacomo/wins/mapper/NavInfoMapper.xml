@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.NavInfoMapper">
+
+	<resultMap
+		type="hashmap"
+		id="NavInfoMapperResult">
+		<result
+			property="menuId"
+			column="Menu_Id" />
+		<result
+			property="parentId"
+			column="Parent_Id" />
+		<result
+			property="menuName"
+			column="Menu_Name" />
+		<result
+			property="menuCSS"
+			column="Menu_CSS" />
+		<result
+			property="menuUrl"
+			column="Menu_Url" />
+		<result
+			property="maxRole"
+			column="Max_Role" />
+		<result
+			property="isLeaf"
+			column="is_leaf" />
+	</resultMap>
+
+	<sql id="navInfoInfo">
+		Menu_Id,Menu_Name,Menu_CSS
+	</sql>
+
+	<select
+		id="findByCondition"
+		parameterType="hashmap"
+		resultMap="NavInfoMapperResult">
+		SELECT
+		smi.`Menu_Id`,smi.`Menu_Name`,smi.`Menu_CSS`,smi.`Menu_Url`,smi.`Max_Role`,smi.is_leaf,smi.Parent_Id
+		FROM sys_menu_info_t smi,sys_role_menu_relation_t srmr,sys_role_info_t
+		sri
+		WHERE smi.`Menu_Id`=srmr.`Menu_Id` AND sri.`Role_Id`=srmr.`Role_Id`
+		AND smi.`Parent_Id`=#{parentId}
+		AND sri.`Role_Type`=#{roleType} ORDER BY smi.Menu_Seq ASC
+	</select>
+	<select
+		id="findZHByConditionZH"
+		parameterType="hashmap"
+		resultMap="NavInfoMapperResult">
+		SELECT
+		smi.`Menu_Id`,smi.`Menu_Name`,smi.`Menu_CSS`,smi.`Menu_Url`,smi.`Max_Role`,smi.is_leaf,smi.Parent_Id
+		FROM sys_menu_info_zh_t smi,sys_role_menu_relation_t srmr,sys_role_info_t
+		sri
+		WHERE smi.`Menu_Id`=srmr.`Menu_Id` AND sri.`Role_Id`=srmr.`Role_Id`
+		AND smi.`Parent_Id`=#{parentId}
+		AND sri.`Role_Type`=#{roleType} ORDER BY srmr.Menu_Id ASC
+	</select>
+
+
+
+</mapper>

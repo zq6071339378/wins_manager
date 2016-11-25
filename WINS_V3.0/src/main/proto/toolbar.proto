@@ -1,0 +1,68 @@
+option java_package = "com.hotdata.dsp.proto";
+option java_outer_classname = "Toolbar";
+
+message tbBidRequest {
+  //生成的唯一请求id，总共16字节长
+  required bytes id = 2;
+  optional bytes ip = 4;//用户的ip地址
+ 
+  optional string user_agent =13;//”toolbar”
+ 
+  optional bytes geo_LBS_id =40;//地理信息标识ID；有这个ID，可以找到对应的省市县；使用地。
+  optional string url = 11;//手机展示页面的Url地址;
+message Mobile { 
+	optional string  Imsi  = 123; //通讯码
+	optional string  MDN = 20;//手机号码
+    	optional string platform = 3;//iphone或者android
+    	optional string brand = 12;//apple还是samsung
+   	optional string model = 13;//型号
+   	message DeviceOsVersion {
+        optional int32 os_version_major = 1;
+        optional int32 os_version_minor = 2;
+        optional int32 os_version_micro = 3;
+    }
+    optional DeviceOsVersion os_version = 14;//os版本号 
+ }
+   optional Mobile mobile = 28; 
+
+   //这个字段包含请求广告属于的分类id;
+   repeated int32  category_id = 19;
+
+  //该消息是关于这页的广告位信息
+  message AdSlot {
+      required int32 id = 1;  
+    
+    //允许的广告尺寸的宽和高的像素数。大部分请求允许仅仅是一个尺寸，但有些允许多于一个尺寸的，宽和高必须在同一个坐标。
+    //例如，如果宽的值为 [728, 300, 468] ，高的值是[90, 250, 60],能够允许格式表示为：728x90, 300x250, and 468x60.
+    repeated int32 width =728;
+    repeated int32 height =90;
+
+}
+ repeated AdSlot adslot = 14;
+}
+message tbBidResponse {
+  message Ad {
+optional string buyer_creative_id = 10;//创意的ID
+optional string html_snippet = 1;//广告类型为html片段
+    message TemplateParameter {//广告模版的约束；
+      	optional string buyer_creative_id = 2;
+        optional string click_through_url = 3;
+        optional int32 left = 4;//左侧的距离
+        optional int32 right = 5;//右侧的距离
+        optional int32 top = 6;//顶部的距离
+        optional int32 bottom = 7;//底部的距离
+        optional int32 backup_index = 9;
+    }
+    repeated TemplateParameter template_parameter = 13;
+    repeated string click_through_url = 4;//跟踪的url;
+    repeated int32 category = 7;//广告的分类
+    repeated int32 restricted_category = 17;//广告限制的分类
+    repeated string advertiser_name = 11;//广告主的名称
+    optional int32 width = 14;//广告宽度的像素
+    optional int32 height = 15;//广告高度的像素
+ 
+  }
+  repeated Ad ad = 2;
+  optional string debug_string = 5; 
+  optional int32 processing_time_ms = 4;  
+}

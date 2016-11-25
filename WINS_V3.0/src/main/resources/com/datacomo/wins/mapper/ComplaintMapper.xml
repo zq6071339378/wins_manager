@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.ComplaintMapper">
+	<!-- 用户投诉总信息 -->
+	<resultMap type="hashmap" id="ComplaintMapperResult">
+		<result property="pushUser" column="Push_User"/>
+		<result property="policyId" column="Policy_Id"/>
+		<result property="policyName" column="Policy_Name"/>
+		<result property="numOrder" column="Num_Order"/>
+		<result property="numPush" column="Num_Push"/>
+		<result property="numClick" column="Num_Click"/>
+		<result property="feedbackCont" column="Feedback_Cont"/>
+	</resultMap>
+
+	<select id="showComplaint" parameterType="hashmap" resultMap="ComplaintMapperResult">
+		select a.Push_User,a.Feedback_Cont,h.Policy_Id,h.Policy_Name,b.Num_Order,h.Num_Push,h.Num_Click from toolbar_feedback_record_t a ,
+		(select Order_Mdn,count(*) as Num_Order from toolbar_package_record_t where Order_Status=1 and Order_Time like '%${createTime}%' group by Order_Mdn) b,
+		(select c.Push_User,c.Num_Push,c.policy_Id,c.policy_name,d.Num_Click from
+			(select Push_User,count(*) as Num_Push,pr.policy_Id,policy_name from ${pushtableName} pr left join Policy_business_t pt on pr.policy_id=pt.policy_Id where Show_Status = 0 and pr.Create_Time like '%${createTime}%' group by Push_User,pr.policy_Id) c,
+			(select Push_User,count(*) as Num_Click,cr.policy_Id from ${clicktableName} cr where cr.Create_Time like '%${createTime}%' group by Push_User,cr.policy_Id) d
+			where c.Push_User = d.Push_User and c.policy_Id=d.policy_Id ) h,
+		policy_business_t f,
+		sys_user_info_t g
+		<where>
+			a.Push_User =b.Order_Mdn and a.Push_User=h.Push_User and h.Policy_Id = f.Policy_Id and f.Create_User = g.User_Id and g.Show_Status=1
+			and a.Create_Time like '%${createTime}%'
+			<if test="pushUser!=null">
+				and a.Push_User like '%${pushUser}%'
+			</if>
+		</where>
+		group by h.policy_Id
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+
+	<select
+		id="showComplaintcount"
+		parameterType="hashmap"
+		resultType="int">
+		select count(1) from (
+		select a.Push_User,a.Feedback_Cont,h.Policy_Id,h.Policy_Name,b.Num_Order,h.Num_Push,h.Num_Click from toolbar_feedback_record_t a ,
+		(select Order_Mdn,count(*) as Num_Order from toolbar_package_record_t where Order_Status=1 and Order_Time like '%${createTime}%' group by Order_Mdn) b,
+		(select c.Push_User,c.Num_Push,c.policy_Id,c.policy_name,d.Num_Click from
+		(select Push_User,count(*) as Num_Push,pr.policy_Id,policy_name from ${pushtableName} pr left join Policy_business_t pt on pr.policy_id=pt.policy_Id where Show_Status = 0 and pr.Create_Time like '%${createTime}%' group by Push_User,pr.policy_Id) c,
+		(select Push_User,count(*) as Num_Click,cr.policy_Id from ${clicktableName} cr where cr.Create_Time like '%${createTime}%' group by Push_User,cr.policy_Id) d
+		where c.Push_User = d.Push_User and c.policy_Id=d.policy_Id ) h,
+		policy_business_t f,
+		sys_user_info_t g
+		<where>
+			a.Push_User =b.Order_Mdn and a.Push_User=h.Push_User and h.Policy_Id = f.Policy_Id and f.Create_User = g.User_Id and g.Show_Status=1
+			and a.Create_Time like '%${createTime}%'
+			<if test="pushUser!=null">
+				and a.Push_User like '%${pushUser}%'
+			</if>
+		</where>
+		group by h.policy_Id) as total
+	</select>
+	<!-- 账户推送信息 -->
+	<resultMap
+		type="hashmap"
+		id="PushMapperResult">
+		<result
+			property="PushUser"
+			column="Push_User" />
+		<result
+			property="PolicyId"
+			column="Policy_Id" />
+		<result
+			property="PushTime"
+			column="Push_Time" />
+		<result
+			property="PushImsi"
+			column="Push_Imsi" />
+		<result
+			property="PushBsid"
+			column="Push_Bsid" />
+		<result
+			property="PushIp"
+			column="Push_Ip" />
+		<result
+			property="ShowTime"
+			column="Show_Time" />
+		<result
+			property="IpsSeq"
+			column="Ips_Seq" />
+	</resultMap>
+
+	<sql id="Pushinfo">
+		Push_User,Policy_Id,date_format(Push_Time,'%Y-%m-%d %H:%i:%s')as Push_Time,Push_Imsi,Push_Bsid,Push_Ip,date_format(Show_Time,'%Y-%m-%d %H:%i:%s')as Show_Time,Ips_Seq
+	</sql>
+
+	<select id="showPush" parameterType="hashmap" resultMap="PushMapperResult">
+		SELECT <include refid="Pushinfo"></include> FROM ${pushtableName}
+		where policy_Id=#{policyId} and show_status=0 and Push_User = #{PushUser}
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+
+	</select>
+
+	<select id="showPushcount" parameterType="hashmap" resultType="int">
+		select count(1) from (
+		SELECT <include refid="Pushinfo"></include> FROM ${pushtableName}
+		where policy_Id=#{policyId} and show_status=0 and Push_User = #{PushUser}
+		) as total
+	</select>
+	<!-- 账户点击信息 -->
+	<resultMap
+		type="hashmap"
+		id="ClickMapperResult">
+		<result
+			property="PushUser"
+			column="Push_User" />
+		<result
+			property="ClickName"
+			column="Click_Name" />
+		<result
+			property="ClickUrl"
+			column="Click_Url" />
+		<result
+			property="ClickTime"
+			column="Click_Time" />
+		<result
+			property="IpsSeq"
+			column="Ips_Seq" />
+
+
+	</resultMap>
+
+	<sql id="Clickinfo">
+		Push_User,Click_Name,Click_Url,date_format(Click_Time,'%Y-%m-%d %H:%i:%s') as Click_Time,Ips_Seq
+	</sql>
+
+	<select id="showClick" parameterType="hashmap" resultMap="ClickMapperResult">
+		SELECT <include refid="Clickinfo"></include> FROM ${clicktableName}
+		where policy_Id=#{policyId} and Push_User = #{PushUser}
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+
+	<select id="showClickcount" parameterType="hashmap" resultType="int">
+		select count(*) FROM ${clicktableName} where policy_Id=#{policyId} and Push_User = #{PushUser}
+	</select>
+	<!-- 账户订购信息 -->
+	<resultMap
+		type="hashmap"
+		id="OrderMapperResult">
+		<result
+			property="OrderMdn"
+			column="Order_Mdn" />
+		<result
+			property="OrderTime"
+			column="Order_Time" />
+		<result
+			property="OrderImsi"
+			column="Order_Imsi" />
+		<result
+			property="OrderCode"
+			column="Order_Code" />
+		<result
+			property="OrderStatus"
+			column="Order_Status" />
+		<result
+			property="IpsSeq"
+			column="Ips_Seq" />
+	</resultMap>
+
+	<sql id="Orderinfo">
+		Order_Mdn,date_format(Order_Time,'%Y-%m-%d %H:%i:%s') as
+		Order_Time,Order_Imsi,Order_Code,
+		(CASE Order_Status
+		WHEN 1 THEN '成功'
+		WHEN 2 THEN '失败'
+		END) as Order_Status
+		,Ips_Seq
+	</sql>
+
+	<select id="showOrder" parameterType="hashmap" resultMap="OrderMapperResult">
+		SELECT
+		<include refid="Orderinfo"></include>
+		FROM toolbar_package_record_t
+		<if test="PushUser!=null">
+			where Order_Mdn = #{PushUser}
+		</if>
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+
+	</select>
+
+	<select
+		id="showOrdercount"
+		parameterType="hashmap"
+		resultType="int">
+		select count(1) from (SELECT
+		<include refid="Orderinfo"></include>
+		FROM toolbar_package_record_t
+		<if test="PushUser!=null">
+			where Order_Mdn = #{PushUser}
+		</if>
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+		) as total
+	</select>
+</mapper>

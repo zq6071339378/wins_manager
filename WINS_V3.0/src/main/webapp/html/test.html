@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+</head>
+<body>
+	<div class="myDiv">
+		<p></p>
+	</div>
+	<button>change color</button>
+	<span></span>
+	<div></div>
+	<div></div>
+	<div></div>
+	<div></div>
+	<div id="stop">stop here</div>
+	<div></div>
+	<div></div>
+	<div></div>
+	<img src="test1.jpg" />
+	<img src="test1.jpg" />
+	<script src="js/jquery/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript">
+			$("div > p").css("color","red");
+			$(document.body).css("background","blue");
+			$(myDiv.elements).hide();
+			$("input:radio",document.forms[0]);
+			$("div",xml.responseXML);
+			$("<div><p>test</p></div>").appendTo("body");
+			$("<input type='checkbox'>");
+			$("<div>",{
+				"class":"test",
+				text:"click me!",
+				click:function(){
+					$(this).toggleClass("test");
+				}
+			}).appendTo("body");
+			$("<input />",{
+				type:"text",
+				val:"test",
+				focusin:function(){
+					$(this).addClass("active");
+				},
+				focusout:function(){
+					$(this).removeClass("active");
+				}
+			}).appendTo("form");
+			$("div").focusin(function(){
+				$(this).css("background-color","#ffffcc");
+			});
+			$(function(){
+				//文档加载就绪，执行其中放到函数
+			})
+			//暂停或者恢复被请求的ready事件
+			$.holdReady(true);
+			$.getscript("myplugin.js",function(){
+				$,holdReady(false);
+			})
+			$("img").each(function(i){
+				this.src = "test"+i+".jpg";
+			});
+			//index索引值 domEle获取遍历每个dom对象   选择器+遍历
+			$("button").click(function(){
+				$("div").each(function(index,domEle){
+					$(domEle).css("background-color","yellow");
+					if($(this).is("#stop")){
+						$("span").text("stopped at div index #" + index);
+						return false;
+					}
+				})
+			})
+			$("img").size();
+			$("ul").append("<li>"+$("ul").selector)
+		</script>
+</body>
+</html>

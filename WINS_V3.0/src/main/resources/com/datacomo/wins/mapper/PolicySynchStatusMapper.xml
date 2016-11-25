@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.PolicySynchStatusMapper">
+	<resultMap
+		type="hashmap"
+		id="policySynchStatusResult">
+		<result
+			property="synchId"
+			column="synch_Id" />
+		<result
+			property="synchStatus"
+			column="synch_status" />
+		<result
+			property="lastStatus"
+			column="last_status" />
+		<result
+			property="lastSynchtime"
+			column="last_synchtime" />
+	</resultMap>
+
+	<select
+		id="getInfoByCondition"
+		parameterType="hashmap"
+		resultMap="policySynchStatusResult">
+		select synch_Id,synch_status,last_status,last_synchtime from
+		policy_synch_status_t where synch_Id=1
+	</select>
+
+	<update
+		id="updateInfo"
+		parameterType="java.util.HashMap">
+		update policy_synch_status_t
+		<set>
+			<if test="synchStatus != null">
+				synch_status=#{synchStatus},
+			</if>
+			<if test="lastStatus != null">
+				last_status=#{lastStatus},
+			</if>
+			<if test="lastSynchtime != null">
+				last_synchtime=#{lastSynchtime},
+			</if>
+		</set>
+		where synch_Id = 1
+	</update>
+</mapper>

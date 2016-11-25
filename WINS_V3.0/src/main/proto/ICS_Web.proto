@@ -1,0 +1,197 @@
+package com.datacomo.wins.base.socket.im.proto;
+option java_outer_classname = "IMProtobuf";
+
+message Policy_Business
+{
+   optional int32 			policyId=1;
+   optional string 			policyName=2;
+   enum Policy_Status{
+     NOUsed  = 0;
+     Used    = 1;
+     Suspend = 2;
+   }
+   optional  Policy_Status 	policyStatus=3 [default = NOUsed];
+   optional int32 			PolicyType=4;
+   enum First_Push{
+     NOFirst = 0;
+     First   = 1;  
+   }
+   optional First_Push 		firstPush=5 [default = First];
+   optional int32       	policyLevel = 6 [default = 1];
+   
+    enum Policy_Relation{
+      ALLRelation = 0;
+      AreaAndGroup = 1;
+      Groupself = 2;
+      AreaAndGroupself = 3;
+      AreaAndSpecial = 4;
+      SpecialAndGroup = 5;
+      SpecialAndGroupself = 6;
+      AreaAndGroupAndSpecial=7;
+      AreaAndGroupselfAndSpecial = 8;
+    }
+    
+   optional Policy_Relation policyRelation = 7;
+   enum Policy_ShowStatus {
+      Policy_Hide = 0;
+      Policy_Show = 1;
+    }
+   optional Policy_ShowStatus 	policyShow = 8[default = Policy_Show];
+   
+    enum Roam_Type {
+      ALLRoamType = 0;
+      LocalArea = 1;
+      Roam = 2;
+    }
+   optional Roam_Type 		RoamType = 9[default = LocalArea];
+    enum Terminal_Type{
+       PC_PAD = 0;
+       MobilePhone = 1;
+    }  
+    optional Terminal_Type 	terminalType = 10[default = PC_PAD];
+    optional int32 			pushLimit = 11 [default = 1];
+    optional int32 			pushInterval = 12;
+    optional int32 			showLimit = 13;
+    optional int32 			hitLimit = 14;
+    optional int32 			showNum = 15;
+	optional int32 			hitNum = 16;
+    enum Content_Type{
+      Page = 0;
+      Picture = 1;
+      Flash = 2;
+    }
+    optional Content_Type  	contentType = 17 [default = Page];
+    
+    optional string 		pushURL = 18;
+    
+    enum Show_Type{
+     Instand = 1;
+     Float = 2;
+     Couplet = 3;
+     Corner = 4;
+     Shadow = 5;
+     Toolbar = 6;
+    }
+    
+    optional Show_Type 		ShowType = 19 [default = Instand];
+    
+    optional int32 			showHeight = 20;
+    optional int32 			showWidth = 21;
+    optional int32 			showTime = 22;
+    
+    enum Show_Close{
+      Close_Hide = 0;
+      Close_Show = 1;
+    }
+    optional Show_Close 	showClose = 23 [default = Close_Show];
+    enum Sync_Status{
+		NOSync = 0;
+		INSync  = 1;
+		OKSync  = 2;
+    }
+	optional Sync_Status	syncStatus = 24 [default = NOSync];
+	optional string 		effectTime = 25;
+    optional int32 			createUser = 26 ;
+    optional string 		createTime = 27;
+    optional int32  		updateUser = 28; 
+    optional string 		updateTime = 29;
+    enum Check_Status{
+     NOCheck = 0;
+     Passed  = 1;
+     NOPass  = 2;
+    }
+    optional Check_Status 	checkStatus = 30 [default = NOCheck];
+	optional string  		checkuser = 31;
+	optional int32   		checkTime = 32;
+	enum Is_Param{
+     NO = 0;
+     YES  = 1;
+    }
+	optional Is_Param   	isParam =33[default = NO];
+    optional string  		description = 34;
+}
+
+//policy_filter_user_t
+message Filter_User
+{
+   required string  filterUser=1;
+   required int32  	userStatus=2;
+   required int32 	policyId=3;
+   optional string  invalidTime=4;
+   optional int32  	createUser=5;
+   optional string  createTime=6;
+   optional string  effectTime=7;
+}
+//policy_filter_url_t
+message Filter_Url
+{
+   required string  urlDomain=1;
+   optional string  urlPath=2;
+   optional int32  	createUser=3;
+   optional string 	createTime=4;
+}
+
+message UpdateInfo
+{
+  enum Update_Flag{
+    Insert = 0;
+    Delete = 1;
+    Update = 2;  
+  }
+  optional Update_Flag           	updateflag = 1[default = Insert];
+  repeated Filter_User  		     	filterUser = 2;
+  repeated Filter_Url            	filterUrl = 3;
+}
+
+
+message WebShow
+{
+  optional  int32    showStatus=1;          //展现状态，0为成功，其它为展现失败的原因
+  optional  int32    policyID=2;            //展现策略ID
+  optional  string   userURL=3;             //用户访问的URL
+  optional  string   ua=4;         
+  optional  string   showtime=5;            //展现时间
+}
+
+//Web统计的策略点击次数及用户数，每天给ICS发送一次入库
+message HitButton
+{
+    required int32  policyId=1;
+    required string pageName=2; //页面名称 
+    required string hitTime=3; //点击时间
+    required string hitURL=4; //点击的URL
+}
+
+message Push_Status
+{
+   optional int32  pushStatus=1;       //推送状态
+   optional string webRecvPushTime=2;  //Web接收到推送的时间
+}
+
+
+message ICS_Web
+{
+  optional string          mdn=1;
+  optional string          bsid=2;
+  optional string          imsi=3;
+  optional string          pushTime=4;
+  optional int32           terminalType=5;
+  optional int32           roamType=6;
+  optional int32           showType=7;
+  optional int32           clientIP=8;
+  optional int32           pushSerialNum=9; 
+  optional int32           ipsNum=10;
+  optional int32           ipsStatus=11;
+  repeated Policy_Business policyBusiness=12;
+  repeated UpdateInfo      updateData=13;
+  optional string		       keyword=14;  //按关键字推送时返回     华为推送中用这个字段传递带关键字的uri
+  optional int32		       urlMode=15;//按定向网址推送时使用(1:domain 2:domain+path)
+  optional string		       originURL=16;//用户访问的源网站
+  optional string          userCooki=17;    //随查询策略一并返回
+  optional WebShow         webShowMsg=18;   //Toolbar展现信息
+  optional HitButton       hitButtonMsg=19; //点击次数统计
+  optional Push_Status     pushStatusMsg=20;//推送状态
+  optional string          userFeedBackMsg=21;//用户信息反馈
+  optional string          userDynamicDes=22;//用户动态信息返回       
+}
+

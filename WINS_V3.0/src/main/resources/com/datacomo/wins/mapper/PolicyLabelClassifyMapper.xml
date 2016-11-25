@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.PolicyLabelClassifyMapper">
+
+	<resultMap type="hashmap" id="labelClassifyMapperResult">
+		<result property="classifyId" column="Classify_Id" />
+		<result property="groupId" column="Group_Id" />
+		<result property="enName" column="En_Name" />
+		<result property="ynName" column="Yn_Name" />
+		<result property="chName" column="Ch_Name" />
+		<result property="createUser" column="Create_User" />
+		<result property="createTime" column="Create_Time" />
+	</resultMap>
+	
+	<delete id="deleteAllInfo" parameterType="int">
+		DELETE FROM policy_peoplelabel_classify_t
+	</delete>
+
+	<insert id="insertAllInfo" parameterType="hashmap" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO policy_peoplelabel_classify_t (Group_Id,En_Name,Yn_Name,Ch_Name,Create_User,Create_Time) VALUES
+		<foreach collection="list" separator="," item="item" index="index">
+			(#{item.groupId},#{item.enName},#{item.ynName},#{item.chName},#{createUser},#{createTime})
+		</foreach>
+	</insert>
+
+	<select id="findAllInfo" parameterType="hashmap" resultMap="labelClassifyMapperResult">
+		SELECT a.En_Name AS classify,b.Group_Name AS label,b.Group_Id FROM policy_peoplelabel_classify_t a,policy_group_t b where a.Group_Id = b.Group_Id
+	</select>
+
+</mapper>

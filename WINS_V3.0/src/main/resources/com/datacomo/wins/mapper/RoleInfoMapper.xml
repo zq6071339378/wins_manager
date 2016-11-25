@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.RoleInfoMapper">
+	<resultMap
+		type="hashmap"
+		id="roleInfoResult">
+		<result
+			property="roleId"
+			column="Role_Id" />
+		<result
+			property="roleName"
+			column="Role_Name" />
+		<result
+			property="roleDesc"
+			column="Role_Desc" />
+		<result
+			property="roleType"
+			column="Role_Type" />
+		<result
+			property="parentId"
+			column="Parent_Id" />
+		<result
+			property="createUser"
+			column="Create_User" />
+		<result
+			property="createName"
+			column="User_Name" />
+		<result
+			property="createTime"
+			column="Create_Time" />
+		<result
+			property="roleStatus"
+			column="role_status" />
+	</resultMap>
+
+	<select
+		id="countByCondition"
+		parameterType="hashmap"
+		resultType="int">
+		select count(1) FROM sys_role_info_t r ,sys_user_info_t u
+		<where>
+			r.Create_User = u.User_Id
+			<if test="roleName!=null">
+				and r.Role_Name like '%${roleName}%'
+			</if>
+			<if test="roleId != null">
+				AND r.Role_Id = #{roleId}
+			</if>
+			<if test="createUser">
+				AND r.Create_User = #{createUser}
+			</if>
+			<if test="showStatus !=null ">
+				AND u.Show_Status = #{showStatus}
+			</if>
+		</where>
+	</select>
+
+	<select
+		id="findByCondition"
+		parameterType="hashmap"
+		resultMap="roleInfoResult">
+		select
+		r.Role_Id,r.Role_Status,r.Role_Name,r.Role_Desc,r.Create_Time,u.user_Name
+		FROM sys_role_info_t r ,sys_user_info_t u
+		<where>
+			r.Create_User = u.User_Id
+			<if test="roleName!=null">
+				and r.Role_Name like '%${roleName}%'
+			</if>
+			<if test="roleId != null">
+				AND r.Role_Id = #{roleId}
+			</if>
+			<if test="showStatus !=null ">
+				AND u.Show_Status = #{showStatus}
+			</if>
+		</where>
+		ORDER BY r.Create_Time DESC
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+
+	<delete
+		id="deleteById"
+		parameterType="int">
+		delete from sys_role_info_t
+		<where>
+			Role_Id=#{roleId}
+		</where>
+	</delete>
+
+	<insert
+		id="insertInfo"
+		parameterType="hashmap"
+		useGeneratedKeys="true"
+		keyProperty="role_id">
+		insert into
+		sys_role_info_t(Role_Name,Role_Desc,Create_User,Create_Time,Role_Type,role_status)
+		values(#{roleName},#{roleDesc},#{createUser},#{createTime},#{roleType},#{roleStatus})
+	</insert>
+
+	<select
+		id="getCountByCondition"
+		parameterType="hashmap"
+		resultType="int">
+		select count(1) from sys_role_info_t r JOIN sys_user_info_t u ON
+		r.Create_User = u.User_Id
+		<where>
+			r.Role_Name = #{roleName}
+			<if test="showStatus!=null">
+				AND u.Show_Status = #{showStatus}
+			</if>
+		</where>
+	</select>
+
+	<select
+		id="getInfoByCondition"
+		parameterType="hashmap"
+		resultMap="roleInfoResult">
+		select Role_Id,Role_Name,Role_Desc,Create_Time,Create_User FROM
+		sys_role_info_t
+		<where>
+			<if test="roleId != null">
+				Role_Id = #{roleId}
+			</if>
+
+		</where>
+	</select>
+
+	<update
+		id="updateInfo"
+		parameterType="java.util.HashMap">
+		update sys_role_info_t
+		<set>
+			<if test="roleStatus != null">
+				role_status = #{roleStatus},
+			</if>
+			<if test="roleName != null">
+				Role_Name = #{roleName},
+			</if>
+			<if test="roleDesc != null">
+				Role_Desc = #{roleDesc},
+			</if>
+			<if test="roleType != null">
+				Role_Type = #{roleType},
+			</if>
+		</set>
+		where Role_Id = #{roleId}
+	</update>
+
+	<select
+		id="getRoleIds"
+		parameterType="String"
+		resultType="int">
+		select Role_Id from sys_role_info_t
+		<where>
+			Role_Type = #{Role_Type}
+		</where>
+	</select>
+
+</mapper>

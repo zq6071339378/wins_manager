@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.SysProvinceInfoMapper">
+
+	<resultMap
+		type="hashmap"
+		id="ProvinceMapperResult">
+		<result
+			property="provinceId"
+			column="Province_Id" />
+		<result
+			property="provinceName"
+			column="Province_Name" />
+		<result
+			property="provinceEn"
+			column="Province_En" />
+		<result
+			property="provincePy"
+			column="Province_Py" />
+		<result
+			property="createUser"
+			column="Create_User" />
+		<result
+			property="createTime"
+			column="Create_Time" />
+	</resultMap>
+
+	<sql id="provinceInfo">
+		Province_Id,Province_Name,Province_En,Province_Py,Create_User,Create_Time
+	</sql>
+
+	<select
+		id="findByCondition"
+		parameterType="hashmap"
+		resultMap="ProvinceMapperResult">
+		select
+		<include refid="provinceInfo"></include>
+		FROM sys_province_info_t
+		<if test="provinceId != null">
+			where province_id=#{provinceId}
+		</if>
+		ORDER BY province_id
+	</select>
+
+	<select
+		id="getInfo"
+		parameterType="int"
+		resultMap="ProvinceMapperResult">
+		SELECT Province_Id,Province_Name,Province_En,Province_Py
+		FROM sys_province_info_t WHERE Province_Id = #{provinceId}
+	</select>
+
+</mapper>

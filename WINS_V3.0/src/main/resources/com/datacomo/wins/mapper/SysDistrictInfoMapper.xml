@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.SysDistrictInfoMapper">
+
+	<resultMap
+		type="hashmap"
+		id="districeMapperResult">
+		<result
+			property="districtId"
+			column="District_Id" />
+		<result
+			property="cityId"
+			column="City_Id" />
+		<result
+			property="districtName"
+			column="District_Name" />
+		<result
+			property="districtEn"
+			column="District_En" />
+		<result
+			property="districtPy"
+			column="District_Py" />
+		<result
+			property="createTime"
+			column="Create_Time" />
+		<result
+			property="createUser"
+			column="Create_User" />
+	</resultMap>
+
+	<sql id="districtInfo">
+		District_Id,City_Id,District_Name,District_En,District_Py,Create_Time,Create_User
+	</sql>
+
+
+
+
+	<select
+		id="findByCondition"
+		parameterType="hashmap"
+		resultMap="districeMapperResult">
+		select
+		<include refid="districtInfo"></include>
+		FROM sys_district_info_t where city_id=#{cityId}
+		order by District_Id
+	</select>
+
+
+</mapper>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.SysIndustryLabelMapper">
+
+	<resultMap type="hashmap" id="industryMapperResult">
+		<result property="industryId" column="Industry_Id" />
+		<result property="industry_uuid" column="Industry_uuid" />
+		<result property="industry_puuid" column="Industry_puuid" />
+		<result property="enName" column="En_Name" />
+		<result property="ynName" column="Yn_Name" />
+		<result property="chName" column="Ch_Name" />
+		<result property="createTime" column="Create_Time" />
+	</resultMap>
+
+	<resultMap type="hashmap" id="industrybaseMapperResult">
+		<result property="industryId" column="industry_id" />
+		<result property="industryName" column="industry_name"/>
+		<result property="industryLevel" column="industry_level"/>
+		<result property="parentId" column="parent_id"/>
+	</resultMap>
+
+
+	<select id="findFirstIndustry" parameterType="hashmap" resultMap="industrybaseMapperResult">
+		SELECT industry_id,industry_name,industry_level,parent_id FROM sys_industry_base_info
+	</select>
+
+	<select id="findChildIndustry" parameterType="hashmap" resultMap="industryMapperResult">
+	SELECT industry_id,industry_name,industry_level,parent_id FROM sys_industry_base_info
+		<where>
+	  		<if test="parent_id">
+		  		parent_id=#{parent_id}
+	  		</if>
+  		</where>
+	</select>
+	
+	<delete id="deleteAll" parameterType="int">
+		DELETE FROM sys_industry_label_t;
+	</delete>
+
+	<select id="findAll" parameterType="hashmap" resultMap="industryMapperResult">
+		SELECT Industry_Id,Industry_uuid,Industry_puuid,En_Name,Yn_Name,Ch_Name,Create_Time FROM sys_industry_label_t
+	</select>
+
+	<insert id="insertInfo" parameterType="hashmap" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO sys_industry_label_t (Industry_uuid,Industry_puuid,En_Name,Yn_Name,Ch_Name,Create_Time) VALUES
+		<foreach collection="list" separator="," item="item" index="index">
+			(#{item.uuid},#{item.puuid},#{item.enName},#{item.ynName},#{item.chName},#{createTime})
+		</foreach>
+	</insert>
+
+	<select id="findByCondition" parameterType="hashmap" resultMap="industryMapperResult">
+		SELECT Industry_Id,Industry_uuid,Industry_puuid,En_Name,Yn_Name,Ch_Name,Create_Time FROM sys_industry_label_t
+	</select>
+	<select id="findByIndustry" parameterType="hashmap" resultMap="industryMapperResult">
+		SELECT Industry_Id,Industry_uuid,Industry_puuid,En_Name,Yn_Name,Ch_Name,Create_Time FROM sys_industry_label_t
+	</select>
+
+
+</mapper>

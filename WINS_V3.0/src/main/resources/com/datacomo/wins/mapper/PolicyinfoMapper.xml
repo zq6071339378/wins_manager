@@ -1,0 +1,1065 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.PolicyinfoMapper">
+	<!-- 推送策略总信息 -->
+	<resultMap type="hashmap" id="PolicyinfoMapperResult">
+		<result property="ReportId" column="Report_Id"/>
+		<result property="PolicyId" column="Policy_Id"/>
+		<result property="PolicyName" column="Policy_Name"/>
+		<result property="activityName" column="Activity_Name"/>
+		<result property="customerName" column="Customer_Name"/>
+		<result property="TerminalType" column="Terminal_Type"/>
+		<result property="CheckStatus" column="Check_Status"/>
+		<result property="ProvinceCity" column="Province_City"/>
+		<result property="ReportDate" column="Report_Date"/>
+		<result property="TargetUsers" column="Target_Users"/>
+		<result property="PushUsers" column="Push_Users"/>
+		<result property="PushNum" column="Push_Num"/>
+		<result property="ReceiveUsers" column="Receive_Users"/>
+		<result property="ReceiveNum" column="Receive_Num"/>
+		<result property="ShowUsers" column="Show_Users"/>
+		<result property="ShowNum" column="Show_Num"/>
+		<result property="ClickUsers" column="Click_Users"/>
+		<result property="ClickNum" column="Click_Num"/>
+		<result property="CloseUsers" column="Close_Users"/>
+		<result property="CloseNum" column="Close_Num"/>
+		<result property="ReceiveRatio" column="Receive_Ratio"/>
+		<result property="ShowRatio" column="Show_Ratio"/>
+		<result property="ClickRatio" column="Click_Ratio"/>
+		<result property="CloseRatio" column="Close_Ratio"/>
+		<result property="showLimit" column="Show_Limit"/>
+		<result property="hitLimit" column="Hit_Limit"/>
+		<result property="startTime" column="Start_Time"/>
+		<result property="endTime" column="End_Time"/>
+		<result property="buyType" column="buy_type"/>
+		<result property="unitPrice" column="unit_price"/>
+	</resultMap>
+
+	<sql id="Policyinfo1">
+		Report_Id,r.Policy_Id,r.Policy_Name,concat(i.Province_Name) as
+		Province_City,r.Report_Date,r.Target_Users,r.Push_Users,r.Push_Num,r.Receive_Users,r.Receive_Num,r.Click_Num,r.Show_Num,r.Close_Num,r.Show_Users,r.Click_Users,r.Close_Users,r.Receive_Ratio,r.Show_Ratio,r.Click_Ratio,r.Close_Ratio,b.buy_type,b.unit_price,b.Show_Limit,b.Hit_Limit
+	</sql>
+
+	<sql id="Policyinfo2">
+		Report_Id,r.Policy_Id,r.Policy_Name,concat(i.Province_Name,ifnull(c.City_Name,'')) as Province_City,r.Report_Date,r.Target_Users,r.Push_Users,r.Push_Num,
+		r.Receive_Users,r.Receive_Num,r.Click_Num,r.Show_Num,r.Close_Num,r.Show_Users,r.Click_Users,r.Close_Users,r.Receive_Ratio,r.Show_Ratio,r.Click_Ratio,r.Close_Ratio,b.buy_type,b.unit_price,b.Show_Limit,b.Hit_Limit
+	</sql>
+
+
+	<!--包含活动广告主-->
+	<select id="showReportIncludeActivityInfo" parameterType="hashmap" resultMap="PolicyinfoMapperResult">
+		SELECT * FROM (
+		SELECT re.Policy_Id,re.Push_Num AS Push_Num,re.Push_Users AS Push_Users,re.Receive_Num AS Receive_Num,re.Receive_Users AS Receive_Users,re.Show_Num AS Show_Num,
+		re.Show_Users AS Show_Users,re.Click_Num AS Click_Num,re.Click_Users AS Click_Users,re.Close_Num AS Close_Num,re.Close_Users AS Close_Users, re.Policy_Name AS Policy_Name,
+		re.buy_type,re.unit_price,ac.Activity_Name AS Activity_Name,ac.Customer_Name AS Customer_Name,su.User_Name AS Create_Name,sp.Province_Name  AS Province_City,
+		pg.Group_Users AS Target_Users,pt.Start_Time AS Start_Time,pt.End_Time AS End_Time
+		FROM
+		(SELECT rt.Policy_Id,p_t.Policy_Name,p_t.Create_User,p_t.buy_type,p_t.unit_price,SUM(rt.Push_Num) AS Push_Num,SUM(rt.Push_Users) AS
+		Push_Users,SUM(rt.Receive_Num) AS Receive_Num,SUM(rt.Receive_Users) AS Receive_Users,SUM(rt.Show_Num) AS
+		Show_Num,SUM(rt.Show_Users) AS Show_Users,SUM(rt.Click_Num) AS Click_Num,SUM(rt.Click_Users) AS
+		Click_Users,SUM(rt.Close_Num) AS Close_Num,SUM(rt.Close_Users) AS Close_Users FROM report_push_day_t rt,policy_business_t p_t
+		WHERE rt.Policy_Id=p_t.Policy_Id
+		<if test="startTime==endTime">AND rt.Report_Date =#{startTime}</if>
+		<if test="startTime!=endTime">AND rt.Report_Date <![CDATA[>=]]> #{startTime} AND rt.Report_Date <![CDATA[<=]]> #{endTime}</if>
+		GROUP BY Policy_Id) re
+		LEFT JOIN
+		(SELECT pbt.Policy_Id AS Policy_Id,SUM(pgt.Group_Users) AS Group_Users FROM policy_business_t pbt,
+		policy_group_t pgt,policy_group_relation_t pgr WHERE pbt.Policy_Id=pgr.Policy_Id AND pgr.Group_Id=pgt.Group_Id
+		GROUP BY pbt.Policy_Id) pg ON re.Policy_Id = pg.Policy_Id
+		LEFT JOIN
+		(SELECT Policy_Id,DATE_FORMAT(Start_Time,'%Y-%m-%d %H:%i:%s') AS Start_Time,DATE_FORMAT(End_Time,'%Y-%m-%d %H:%i:%s') AS End_Time FROM policy_time_t GROUP BY Policy_Id) pt
+		ON re.Policy_Id = pt.Policy_Id
+		LEFT JOIN
+		(SELECT par.Policy_Id AS Policy_Id,pat.Activity_Name,sci.Customer_Name FROM policy_activity_info_t pat,policy_activity_relation_t par,customer_activity_relation_t car,sys_customer_info_t sci
+		WHERE pat.Activity_Id=par.Activity_Id AND par.Activity_Id=car.Activity_Id AND car.Customer_Id=sci.Customer_Id) ac ON re.Policy_Id=ac.Policy_Id
+		LEFT JOIN sys_user_info_t su ON re.Create_User=su.User_Id
+		LEFT JOIN sys_province_info_t sp ON su.Province_Id=sp.Province_Id
+		<where>
+			su.Show_Status=#{showStatus} AND (re.Create_User IN (SELECT User_Id FROM sys_user_info_t WHERE Create_User=#{userId}) OR re.Create_User=#{userId}) AND su.City_Id IS NULL
+			<if test="policyName!=null">
+				AND re.Policy_Name LIKE '%${policyName}%'
+			</if>
+			<if test="activityName!=null">
+				AND ac.Activity_Name LIKE '%${activityName}%'
+			</if>
+			<if test="customerName!=null">
+				AND ac.Customer_Name LIKE '%${customerName}%'
+			</if>
+		</where>
+		UNION ALL
+		SELECT re.Policy_Id,re.Push_Num AS Push_Num,re.Push_Users AS Push_Users,re.Receive_Num AS Receive_Num,re.Receive_Users AS Receive_Users,re.Show_Num AS Show_Num,
+		re.Show_Users AS Show_Users,re.Click_Num AS Click_Num,re.Click_Users AS Click_Users,re.Close_Num AS Close_Num,re.Close_Users AS Close_Users, re.Policy_Name AS Policy_Name,
+		re.buy_type,re.unit_price,ac.Activity_Name AS Activity_Name,ac.Customer_Name AS Customer_Name,su.User_Name AS Create_Name,sp.Province_Name  AS Province_City,
+		pg.Group_Users AS Target_Users,pt.Start_Time AS Start_Time,pt.End_Time AS End_Time
+		FROM
+		(SELECT rt.Policy_Id,p_t.Policy_Name,p_t.Create_User,p_t.buy_type,p_t.unit_price,SUM(rt.Push_Num) AS Push_Num,SUM(rt. Push_Users) AS Push_Users,
+		SUM(rt.Receive_Num) AS Receive_Num,SUM(rt.Receive_Users) AS Receive_Users,SUM(rt. Show_Num) AS Show_Num,
+		SUM(rt.Show_Users) AS Show_Users,SUM(rt.Click_Num) AS Click_Num,SUM(rt. Click_Users) AS Click_Users,SUM(rt.Close_Num) AS Close_Num,SUM(rt.Close_Users) AS Close_Users FROM
+		report_push_day_t rt,policy_business_t p_t
+		WHERE rt.Policy_Id= p_t.Policy_Id
+		<if test="startTime==endTime">AND rt.Report_Date =#{startTime}
+		</if><if test="startTime!=endTime">AND rt.Report_Date <![CDATA[>=]]> #{startTime} AND rt.Report_Date <![CDATA[<=]]> #{endTime}</if>
+		GROUP BY Policy_Id) re
+		LEFT JOIN
+		(SELECT pbt.Policy_Id AS Policy_Id,SUM(pgt.Group_Users) AS Group_Users FROM policy_business_t pbt,
+		policy_group_t pgt,policy_group_relation_t pgr WHERE pbt.Policy_Id=pgr.Policy_Id AND pgr.Group_Id=pgt.Group_Id GROUP BY pbt.Policy_Id) pg
+		ON re.Policy_Id = pg.Policy_Id
+		LEFT JOIN
+		(SELECT Policy_Id,DATE_FORMAT(Start_Time,'%Y-%m-%d %H:%i:%s') AS Start_Time,DATE_FORMAT(
+		End_Time,'%Y-%m-%d %H:%i:%s') AS End_Time FROM policy_time_t GROUP BY Policy_Id) pt
+		ON re.Policy_Id = pt.Policy_Id
+		LEFT JOIN
+		(SELECT par.Policy_Id AS Policy_Id,pat.Activity_Name,sci.Customer_Name FROM policy_activity_info_t pat,policy_activity_relation_t par,customer_activity_relation_t car,sys_customer_info_t sci
+		WHERE pat.Activity_Id=par.Activity_Id AND par.Activity_Id=car.Activity_Id AND car.Customer_Id=sci.Customer_Id) ac ON re.Policy_Id=ac.Policy_Id
+		LEFT JOIN sys_user_info_t su ON re.Create_User=su.User_Id
+		LEFT JOIN sys_province_info_t sp ON su.Province_Id=sp.Province_Id
+		LEFT JOIN sys_city_info_t sc ON su.City_Id = sc.City_Id
+		<where>
+			su.Show_Status=#{showStatus} AND (re.Create_User IN (SELECT User_Id FROM sys_user_info_t WHERE Create_User=#{userId}) OR re.Create_User=#{userId}) AND su.City_Id IS NOT NULL
+			<if test="cityId!=null">
+				AND su.City_Id=#{cityId}
+			</if>
+			<if test="policyName!=null">
+				AND re.Policy_Name LIKE '%${policyName}%'
+			</if>
+			<if test="activityName!=null">
+				AND ac.Activity_Name LIKE '%${activityName}%'
+			</if>
+			<if test="customerName!=null">
+				AND ac.Customer_Name LIKE '%${customerName}%'
+			</if>
+		</where>
+		)t
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+	<!--包含活动广告主总数-->
+	<select id="showReportIncludeActivityCount" parameterType="hashmap" resultType="int">
+		select count(*) from (
+		SELECT re.Policy_Id,re.Push_Num AS Push_Num,re.Push_Users AS Push_Users,re.Receive_Num AS Receive_Num,re.Receive_Users AS Receive_Users,re.Show_Num AS Show_Num,
+		re.Show_Users AS Show_Users,re.Click_Num AS Click_Num,re.Click_Users AS Click_Users,re.Close_Num AS Close_Num,re.Close_Users AS Close_Users, re.Policy_Name AS Policy_Name,
+		re.buy_type,re.unit_price,ac.Activity_Name AS Activity_Name,ac.Customer_Name AS Customer_Name,su.User_Name AS Create_Name,sp.Province_Name  AS Province_City,
+		pg.Group_Users AS Target_Users,pt.Start_Time AS Start_Time,pt.End_Time AS End_Time
+		FROM
+		(SELECT rt.Policy_Id,p_t.Policy_Name,p_t.Create_User,p_t.buy_type,p_t.unit_price,SUM(rt.Push_Num) AS Push_Num,SUM(rt.Push_Users) AS
+		Push_Users,SUM(rt.Receive_Num) AS Receive_Num,SUM(rt.Receive_Users) AS Receive_Users,SUM(rt.Show_Num) AS
+		Show_Num,SUM(rt.Show_Users) AS Show_Users,SUM(rt.Click_Num) AS Click_Num,SUM(rt.Click_Users) AS
+		Click_Users,SUM(rt.Close_Num) AS Close_Num,SUM(rt.Close_Users) AS Close_Users FROM report_push_day_t rt,policy_business_t p_t
+		WHERE rt.Policy_Id=p_t.Policy_Id
+		<if test="startTime==endTime">AND rt.Report_Date =#{startTime}</if>
+		<if test="startTime!=endTime">AND rt.Report_Date <![CDATA[>=]]> #{startTime} AND rt.Report_Date <![CDATA[<=]]> #{endTime}</if>
+		GROUP BY Policy_Id) re
+		LEFT JOIN
+		(SELECT pbt.Policy_Id AS Policy_Id,SUM(pgt.Group_Users) AS Group_Users FROM policy_business_t pbt,
+		policy_group_t pgt,policy_group_relation_t pgr WHERE pbt.Policy_Id=pgr.Policy_Id AND pgr.Group_Id=pgt.Group_Id
+		GROUP BY pbt.Policy_Id) pg ON re.Policy_Id = pg.Policy_Id
+		LEFT JOIN
+		(SELECT Policy_Id,DATE_FORMAT(Start_Time,'%Y-%m-%d %H:%i:%s') AS Start_Time,DATE_FORMAT(End_Time,'%Y-%m-%d %H:%i:%s') AS End_Time FROM policy_time_t GROUP BY Policy_Id) pt
+		ON re.Policy_Id = pt.Policy_Id
+		LEFT JOIN
+		(SELECT par.Policy_Id AS Policy_Id,pat.Activity_Name,sci.Customer_Name FROM policy_activity_info_t pat,policy_activity_relation_t par,customer_activity_relation_t car,sys_customer_info_t sci
+		WHERE pat.Activity_Id=par.Activity_Id AND par.Activity_Id=car.Activity_Id AND car.Customer_Id=sci.Customer_Id) ac ON re.Policy_Id=ac.Policy_Id
+		LEFT JOIN sys_user_info_t su ON re.Create_User=su.User_Id
+		LEFT JOIN sys_province_info_t sp ON su.Province_Id=sp.Province_Id
+		<where>
+			su.Show_Status=#{showStatus} AND (re.Create_User IN (SELECT User_Id FROM sys_user_info_t WHERE Create_User=#{userId}) OR re.Create_User=#{userId}) AND su.City_Id IS NULL
+			<if test="policyName!=null">
+				AND re.Policy_Name LIKE '%${policyName}%'
+			</if>
+			<if test="activityName!=null">
+				AND ac.Activity_Name LIKE '%${activityName}%'
+			</if>
+			<if test="customerName!=null">
+				AND ac.Customer_Name LIKE '%${customerName}%'
+			</if>
+		</where>
+		UNION ALL
+		SELECT re.Policy_Id,re.Push_Num AS Push_Num,re.Push_Users AS Push_Users,re.Receive_Num AS Receive_Num,re.Receive_Users AS Receive_Users,re.Show_Num AS Show_Num,
+		re.Show_Users AS Show_Users,re.Click_Num AS Click_Num,re.Click_Users AS Click_Users,re.Close_Num AS Close_Num,re.Close_Users AS Close_Users, re.Policy_Name AS Policy_Name,
+		re.buy_type,re.unit_price,ac.Activity_Name AS Activity_Name,ac.Customer_Name AS Customer_Name,su.User_Name AS Create_Name,sp.Province_Name  AS Province_City,
+		pg.Group_Users AS Target_Users,pt.Start_Time AS Start_Time,pt.End_Time AS End_Time
+		FROM
+		(SELECT rt.Policy_Id,p_t.Policy_Name,p_t.Create_User,p_t.buy_type,p_t.unit_price,SUM(rt.Push_Num) AS Push_Num,SUM(rt. Push_Users) AS Push_Users,
+		SUM(rt.Receive_Num) AS Receive_Num,SUM(rt.Receive_Users) AS Receive_Users,SUM(rt. Show_Num) AS Show_Num,
+		SUM(rt.Show_Users) AS Show_Users,SUM(rt.Click_Num) AS Click_Num,SUM(rt. Click_Users) AS Click_Users,SUM(rt.Close_Num) AS Close_Num,SUM(rt.Close_Users) AS Close_Users FROM
+		report_push_day_t rt,policy_business_t p_t
+		WHERE rt.Policy_Id= p_t.Policy_Id
+		<if test="startTime==endTime">AND rt.Report_Date =#{startTime}
+		</if><if test="startTime!=endTime">AND rt.Report_Date <![CDATA[>=]]> #{startTime} AND rt.Report_Date <![CDATA[<=]]> #{endTime}</if>
+		GROUP BY Policy_Id) re
+		LEFT JOIN
+		(SELECT pbt.Policy_Id AS Policy_Id,SUM(pgt.Group_Users) AS Group_Users FROM policy_business_t pbt,
+		policy_group_t pgt,policy_group_relation_t pgr WHERE pbt.Policy_Id=pgr.Policy_Id AND pgr.Group_Id=pgt.Group_Id GROUP BY pbt.Policy_Id) pg
+		ON re.Policy_Id = pg.Policy_Id
+		LEFT JOIN
+		(SELECT Policy_Id,DATE_FORMAT(Start_Time,'%Y-%m-%d %H:%i:%s') AS Start_Time,DATE_FORMAT(
+		End_Time,'%Y-%m-%d %H:%i:%s') AS End_Time FROM policy_time_t GROUP BY Policy_Id) pt
+		ON re.Policy_Id = pt.Policy_Id
+		LEFT JOIN
+		(SELECT par.Policy_Id AS Policy_Id,pat.Activity_Name,sci.Customer_Name FROM policy_activity_info_t pat,policy_activity_relation_t par,customer_activity_relation_t car,sys_customer_info_t sci
+		WHERE pat.Activity_Id=par.Activity_Id AND par.Activity_Id=car.Activity_Id AND car.Customer_Id=sci.Customer_Id) ac ON re.Policy_Id=ac.Policy_Id
+		LEFT JOIN sys_user_info_t su ON re.Create_User=su.User_Id
+		LEFT JOIN sys_province_info_t sp ON su.Province_Id=sp.Province_Id
+		LEFT JOIN sys_city_info_t sc ON su.City_Id = sc.City_Id
+		<where>
+			su.Show_Status=#{showStatus} AND (re.Create_User IN (SELECT User_Id FROM sys_user_info_t WHERE Create_User=#{userId}) OR re.Create_User=#{userId}) AND su.City_Id IS NOT NULL
+			<if test="cityId!=null">
+				AND su.City_Id=#{cityId}
+			</if>
+			<if test="policyName!=null">
+				AND re.Policy_Name LIKE '%${policyName}%'
+			</if>
+			<if test="activityName!=null">
+				AND ac.Activity_Name LIKE '%${activityName}%'
+			</if>
+			<if test="customerName!=null">
+				AND ac.Customer_Name LIKE '%${customerName}%'
+			</if>
+		</where>
+		) as total
+	</select>
+
+	<!--不包含活动广告主-->
+	<select id="showReport" parameterType="hashmap" resultMap="PolicyinfoMapperResult">
+		SELECT * FROM (
+		SELECT re.Policy_Id,re.Push_Num AS Push_Num,re.Push_Users AS Push_Users,re.Receive_Num AS Receive_Num,re.Receive_Users AS Receive_Users,re.Show_Num AS Show_Num,
+		re.Show_Users AS Show_Users,re.Click_Num AS Click_Num,re.Click_Users AS Click_Users,re.Close_Num AS Close_Num,re.Close_Users AS Close_Users, re.Policy_Name AS Policy_Name,
+		re.buy_type,re.unit_price,su.User_Name AS Create_Name,sp.Province_Name  AS Province_City,pg.Group_Users AS Target_Users,pt.Start_Time AS Start_Time,pt.End_Time AS End_Time
+		FROM
+		(SELECT rt.Policy_Id,p_t.Policy_Name,p_t.Create_User,p_t.buy_type,p_t.unit_price,SUM(rt.Push_Num) AS Push_Num,SUM(rt.Push_Users) AS
+		Push_Users,SUM(rt.Receive_Num) AS Receive_Num,SUM(rt.Receive_Users) AS Receive_Users,SUM(rt.Show_Num) AS
+		Show_Num,SUM(rt.Show_Users) AS Show_Users,SUM(rt.Click_Num) AS Click_Num,SUM(rt.Click_Users) AS
+		Click_Users,SUM(rt.Close_Num) AS Close_Num,SUM(rt.Close_Users) AS Close_Users FROM report_push_day_t rt,policy_business_t p_t
+		WHERE rt.Policy_Id=p_t.Policy_Id
+		<if test="startTime==endTime">AND rt.Report_Date =#{startTime}</if>
+		<if test="startTime!=endTime">AND rt.Report_Date <![CDATA[>=]]> #{startTime} AND rt.Report_Date <![CDATA[<=]]> #{endTime}</if>
+		GROUP BY Policy_Id) re
+		LEFT JOIN
+		(SELECT pbt.Policy_Id AS Policy_Id,SUM(pgt.Group_Users) AS Group_Users FROM policy_business_t pbt,
+		policy_group_t pgt,policy_group_relation_t pgr WHERE pbt.Policy_Id=pgr.Policy_Id AND pgr.Group_Id=pgt.Group_Id
+		GROUP BY pbt.Policy_Id) pg ON re.Policy_Id = pg.Policy_Id
+		LEFT JOIN
+		(SELECT Policy_Id,DATE_FORMAT(Start_Time,'%Y-%m-%d %H:%i:%s') AS Start_Time,DATE_FORMAT(End_Time,'%Y-%m-%d %H:%i:%s') AS End_Time FROM policy_time_t GROUP BY Policy_Id) pt
+		ON re.Policy_Id = pt.Policy_Id
+		LEFT JOIN sys_user_info_t su ON re.Create_User=su.User_Id
+		LEFT JOIN sys_province_info_t sp ON su.Province_Id=sp.Province_Id
+		<where>
+			su.Show_Status=#{showStatus} AND (re.Create_User IN (SELECT User_Id FROM sys_user_info_t WHERE Create_User=#{userId}) OR re.Create_User=#{userId}) AND su.City_Id IS NULL
+			<if test="policyName!=null">
+				AND re.Policy_Name LIKE '%${policyName}%'
+			</if>
+		</where>
+		UNION ALL
+		SELECT re.Policy_Id,re.Push_Num AS Push_Num,re.Push_Users AS Push_Users,re.Receive_Num AS Receive_Num,re.Receive_Users AS Receive_Users,re.Show_Num AS Show_Num,
+		re.Show_Users AS Show_Users,re.Click_Num AS Click_Num,re.Click_Users AS Click_Users,re. Close_Num AS Close_Num,re.Close_Users AS Close_Users,
+		re.Policy_Name AS Policy_Name,re.buy_type,re.unit_price,su.User_Name AS Create_Name,CONCAT(sp.Province_Name,'-',sc.City_Name) AS Province_City,pg.
+		Group_Users AS Target_Users,pt.Start_Time AS Start_Time,pt.End_Time AS End_Time
+		FROM
+		(SELECT rt.Policy_Id,p_t.Policy_Name,p_t.Create_User,p_t.buy_type,p_t.unit_price,SUM(rt.Push_Num) AS Push_Num,SUM(rt. Push_Users) AS Push_Users,
+		SUM(rt.Receive_Num) AS Receive_Num,SUM(rt.Receive_Users) AS Receive_Users,SUM(rt. Show_Num) AS Show_Num,
+		SUM(rt.Show_Users) AS Show_Users,SUM(rt.Click_Num) AS Click_Num,SUM(rt. Click_Users) AS Click_Users,SUM(rt.Close_Num) AS Close_Num,SUM(rt.Close_Users) AS Close_Users FROM
+		report_push_day_t rt,policy_business_t p_t
+		WHERE rt.Policy_Id= p_t.Policy_Id
+		<if test="startTime==endTime">AND rt.Report_Date =#{startTime}
+		</if><if test="startTime!=endTime">AND rt.Report_Date <![CDATA[>=]]> #{startTime} AND rt.Report_Date <![CDATA[<=]]> #{endTime}</if>
+		GROUP BY Policy_Id) re
+		LEFT JOIN
+		(SELECT pbt.Policy_Id AS Policy_Id,SUM(pgt.Group_Users) AS Group_Users FROM policy_business_t pbt,
+		policy_group_t pgt,policy_group_relation_t pgr WHERE pbt.Policy_Id=pgr.Policy_Id AND pgr.Group_Id=pgt.Group_Id GROUP BY pbt.Policy_Id) pg
+		ON re.Policy_Id = pg.Policy_Id
+		LEFT JOIN
+		(SELECT Policy_Id,DATE_FORMAT(Start_Time,'%Y-%m-%d %H:%i:%s') AS Start_Time,DATE_FORMAT(
+		End_Time,'%Y-%m-%d %H:%i:%s') AS End_Time FROM policy_time_t GROUP BY Policy_Id) pt
+		ON re.Policy_Id = pt.Policy_Id
+		LEFT JOIN sys_user_info_t su ON re.Create_User=su.User_Id
+		LEFT JOIN sys_province_info_t sp ON su.Province_Id=sp.Province_Id
+		LEFT JOIN sys_city_info_t sc ON su.City_Id = sc.City_Id
+		<where>
+			su.Show_Status=#{showStatus} AND (re.Create_User IN (SELECT User_Id FROM
+			sys_user_info_t WHERE Create_User=#{userId}) OR re.Create_User=#{userId}) AND su.City_Id IS NOT NULL
+			<if test="cityId!=null">
+				AND su.City_Id=#{cityId}
+			</if>
+			<if test="policyName!=null">
+				AND re.Policy_Name LIKE '%${policyName}%'
+			</if>
+		</where>
+		)t
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+	<!--不包含活动广告主总数-->
+	<select id="showReportcount" parameterType="hashmap" resultType="int">
+		select count(*) from (
+		SELECT re.Policy_Id,re.Push_Num AS Push_Num,re.Push_Users AS Push_Users,re.Receive_Num AS Receive_Num,re.Receive_Users AS Receive_Users,re.Show_Num AS Show_Num,
+		re.Show_Users AS Show_Users,re.Click_Num AS Click_Num,re.Click_Users AS Click_Users,re.Close_Num AS Close_Num,re.Close_Users AS Close_Users, re.Policy_Name AS Policy_Name,
+		re.buy_type,re.unit_price,su.User_Name AS Create_Name,sp.Province_Name  AS Province_City,pg.Group_Users AS Target_Users,pt.Start_Time AS Start_Time,pt.End_Time AS End_Time
+		FROM
+		(SELECT rt.Policy_Id,p_t.Policy_Name,p_t.Create_User,p_t.buy_type,p_t.unit_price,SUM(rt.Push_Num) AS Push_Num,SUM(rt.Push_Users) AS
+		Push_Users,SUM(rt.Receive_Num) AS Receive_Num,SUM(rt.Receive_Users) AS Receive_Users,SUM(rt.Show_Num) AS
+		Show_Num,SUM(rt.Show_Users) AS Show_Users,SUM(rt.Click_Num) AS Click_Num,SUM(rt.Click_Users) AS
+		Click_Users,SUM(rt.Close_Num) AS Close_Num,SUM(rt.Close_Users) AS Close_Users FROM report_push_day_t
+		rt,policy_business_t p_t
+		WHERE rt.Policy_Id=p_t.Policy_Id
+		<if test="startTime==endTime">AND rt.Report_Date =#{startTime}</if>
+		<if test="startTime!=endTime">AND rt.Report_Date <![CDATA[>=]]> #{startTime} AND rt.Report_Date <![CDATA[<=]]> #{endTime}</if>
+		GROUP BY Policy_Id) re
+		LEFT JOIN
+		(SELECT pbt.Policy_Id AS Policy_Id,SUM(pgt.Group_Users) AS Group_Users FROM policy_business_t pbt,
+		policy_group_t pgt,policy_group_relation_t pgr WHERE pbt.Policy_Id=pgr.Policy_Id AND pgr.Group_Id=pgt.Group_Id
+		GROUP BY pbt.Policy_Id) pg ON re.Policy_Id = pg.Policy_Id
+		LEFT JOIN
+		(SELECT Policy_Id,DATE_FORMAT(Start_Time,'%Y-%m-%d %H:%i:%s') AS Start_Time,DATE_FORMAT(End_Time,'%Y-%m-%d %H:%i:%s') AS End_Time FROM policy_time_t GROUP BY Policy_Id) pt
+		ON re.Policy_Id = pt.Policy_Id
+		LEFT JOIN sys_user_info_t su ON re.Create_User=su.User_Id
+		LEFT JOIN sys_province_info_t sp ON su.Province_Id=sp.Province_Id
+		<where>
+			su.Show_Status=#{showStatus} AND (re.Create_User IN (SELECT User_Id FROM sys_user_info_t WHERE Create_User=#{userId}) OR re.Create_User=#{userId}) AND su.City_Id IS NULL
+			<if test="policyName!=null">
+				AND re.Policy_Name LIKE '%${policyName}%'
+			</if>
+		</where>
+		UNION ALL
+		SELECT re.Policy_Id,re.Push_Num AS Push_Num,re.Push_Users AS Push_Users,re.Receive_Num AS Receive_Num,re.Receive_Users AS Receive_Users,re.Show_Num AS Show_Num,
+		re.Show_Users AS Show_Users,re.Click_Num AS Click_Num,re.Click_Users AS Click_Users,re. Close_Num AS Close_Num,re.Close_Users AS Close_Users,
+		re.Policy_Name AS Policy_Name,re.buy_type,re.unit_price,su.User_Name AS Create_Name,CONCAT(sp.Province_Name,'-',sc.City_Name) AS Province_City,pg.
+		Group_Users AS Target_Users,pt.Start_Time AS Start_Time,pt.End_Time AS End_Time
+		FROM
+		(SELECT rt.Policy_Id,p_t.Policy_Name,p_t.Create_User,p_t.buy_type,p_t.unit_price,SUM(rt.Push_Num) AS Push_Num,SUM(rt. Push_Users) AS Push_Users,
+		SUM(rt.Receive_Num) AS Receive_Num,SUM(rt.Receive_Users) AS Receive_Users,SUM(rt. Show_Num) AS Show_Num,
+		SUM(rt.Show_Users) AS Show_Users,SUM(rt.Click_Num) AS Click_Num,SUM(rt. Click_Users) AS Click_Users,SUM(rt.Close_Num) AS Close_Num,SUM(rt.Close_Users) AS Close_Users FROM
+		report_push_day_t rt,policy_business_t p_t
+		WHERE rt.Policy_Id= p_t.Policy_Id
+		<if test="startTime==endTime">AND rt.Report_Date =#{startTime}
+		</if><if test="startTime!=endTime">AND rt.Report_Date <![CDATA[>=]]> #{startTime} AND rt.Report_Date <![CDATA[<=]]> #{endTime}</if>
+		GROUP BY Policy_Id) re
+		LEFT JOIN
+		(SELECT pbt.Policy_Id AS Policy_Id,SUM(pgt.Group_Users) AS Group_Users FROM policy_business_t pbt,
+		policy_group_t pgt,policy_group_relation_t pgr WHERE pbt.Policy_Id=pgr.Policy_Id AND pgr.Group_Id=pgt.
+		Group_Id GROUP BY pbt.Policy_Id) pg
+		ON re.Policy_Id = pg.Policy_Id
+		LEFT JOIN
+		(SELECT Policy_Id,DATE_FORMAT(Start_Time,'%Y-%m-%d %H:%i:%s') AS Start_Time,DATE_FORMAT(
+		End_Time,'%Y-%m-%d %H:%i:%s') AS End_Time FROM policy_time_t GROUP BY Policy_Id) pt
+		ON re.Policy_Id = pt.Policy_Id
+		LEFT JOIN sys_user_info_t su ON re.Create_User=su.User_Id
+		LEFT JOIN sys_province_info_t sp ON su.Province_Id=sp.Province_Id
+		LEFT JOIN sys_city_info_t sc ON su.City_Id = sc.City_Id
+		<where>
+			su.Show_Status=#{showStatus} AND (re.Create_User IN (SELECT User_Id FROM
+			sys_user_info_t WHERE Create_User=#{userId}) OR re.Create_User=#{userId}) AND su.City_Id IS NOT NULL
+			<if test="cityId!=null">
+				AND su.City_Id=#{cityId}
+			</if>
+			<if test="policyName!=null">
+				AND re.Policy_Name LIKE '%${policyName}%'
+			</if>
+		</where>
+		) as total
+	</select>
+
+	<!--导出不含活动和广告主信息的数据-->
+	<select id="reportDataExcel" parameterType="hashmap" resultMap="PolicyinfoMapperResult">
+		SELECT * FROM (
+		SELECT ROUND(re.Receive_Users*100/re.Push_Users,2) AS Receive_Ratio,ROUND(re.Show_Users*100/re.Receive_Users,2) AS Show_Ratio,ROUND(re.Click_Users*100/re.Show_Users,2) AS Click_Ratio,
+		ROUND(re.Click_Users*100/re.Show_Users,2) AS Close_Ratio,
+		re.Policy_Id,re.Push_Num AS Push_Num,re.Push_Users AS Push_Users,re.Receive_Num AS Receive_Num,re.Receive_Users AS Receive_Users,re.Show_Num AS Show_Num,
+		re.Show_Users AS Show_Users,re.Click_Num AS Click_Num,re.Click_Users AS Click_Users,re.Close_Num AS Close_Num,re.Close_Users AS Close_Users, re.Policy_Name AS Policy_Name,re.Terminal_Type AS Terminal_Type,re.Check_Status AS Check_Status,
+		re.buy_type,re.unit_price,su.User_Name AS Create_Name,sp.Province_Name  AS Province_City,pg.Group_Users AS Target_Users,pt.Start_Time AS Start_Time,pt.End_Time AS End_Time
+		FROM
+		(SELECT rt.Policy_Id,p_t.Policy_Name,p_t.Terminal_Type,p_t.Check_Status,p_t.Create_User,p_t.buy_type,p_t.unit_price,SUM(rt.Push_Num) AS Push_Num,SUM(rt.Push_Users) AS
+		Push_Users,SUM(rt.Receive_Num) AS Receive_Num,SUM(rt.Receive_Users) AS Receive_Users,SUM(rt.Show_Num) AS
+		Show_Num,SUM(rt.Show_Users) AS Show_Users,SUM(rt.Click_Num) AS Click_Num,SUM(rt.Click_Users) AS
+		Click_Users,SUM(rt.Close_Num) AS Close_Num,SUM(rt.Close_Users) AS Close_Users FROM report_push_day_t rt,policy_business_t p_t
+		WHERE rt.Policy_Id=p_t.Policy_Id
+		<if test="startTime==endTime">AND rt.Report_Date =#{startTime}</if>
+		<if test="startTime!=endTime">AND rt.Report_Date <![CDATA[>=]]> #{startTime} AND rt.Report_Date <![CDATA[<=]]> #{endTime}</if>
+		GROUP BY Policy_Id) re
+		LEFT JOIN
+		(SELECT pbt.Policy_Id AS Policy_Id,SUM(pgt.Group_Users) AS Group_Users FROM policy_business_t pbt, policy_group_t pgt,policy_group_relation_t pgr
+		WHERE pbt.Policy_Id=pgr.Policy_Id AND pgr.Group_Id=pgt.Group_Id GROUP BY pbt.Policy_Id) pg ON re.Policy_Id = pg.Policy_Id
+		LEFT JOIN
+		(SELECT Policy_Id,DATE_FORMAT(Start_Time,'%Y-%m-%d %H:%i:%s') AS Start_Time,DATE_FORMAT(End_Time,'%Y-%m-%d %H:%i:%s') AS End_Time FROM policy_time_t GROUP BY Policy_Id) pt
+		ON re.Policy_Id = pt.Policy_Id
+		LEFT JOIN sys_user_info_t su ON re.Create_User=su.User_Id
+		LEFT JOIN sys_province_info_t sp ON su.Province_Id=sp.Province_Id
+		<where>
+			re.Policy_Id IN
+			<foreach collection="LIST" item="item" index="index" open="(" separator="," close=")">
+				#{item.policyIds}
+			</foreach>
+			AND su.City_Id IS NULL
+		</where>
+		UNION ALL
+		SELECT ROUND(re.Receive_Users*100/re.Push_Users,2) AS Receive_Ratio,ROUND(re.Show_Users*100/re.Receive_Users,2) AS Show_Ratio,ROUND(re.Click_Users*100/re.Show_Users,2) AS Click_Ratio,
+		ROUND(re.Click_Users*100/re.Show_Users,2) AS Close_Ratio,
+		re.Policy_Id,re.Push_Num AS Push_Num,re.Push_Users AS Push_Users,re.Receive_Num AS Receive_Num,re.Receive_Users AS Receive_Users,re.Show_Num AS Show_Num,
+		re.Show_Users AS Show_Users,re.Click_Num AS Click_Num,re.Click_Users AS Click_Users,re. Close_Num AS Close_Num,re.Close_Users AS Close_Users,
+		re.Policy_Name AS Policy_Name,re.Terminal_Type AS Terminal_Type,re.Check_Status AS Check_Status,re.buy_type,re.unit_price,su.User_Name AS Create_Name,CONCAT(sp.Province_Name,'-',sc.City_Name) AS Province_City,pg.
+		Group_Users AS Target_Users,pt.Start_Time AS Start_Time,pt.End_Time AS End_Time
+		FROM
+		(SELECT rt.Policy_Id,p_t.Policy_Name,p_t.Terminal_Type,p_t.Check_Status,p_t.Create_User,p_t.buy_type,p_t.unit_price,SUM(rt.Push_Num) AS Push_Num,SUM(rt. Push_Users) AS Push_Users,
+		SUM(rt.Receive_Num) AS Receive_Num,SUM(rt.Receive_Users) AS Receive_Users,SUM(rt. Show_Num) AS Show_Num,
+		SUM(rt.Show_Users) AS Show_Users,SUM(rt.Click_Num) AS Click_Num,SUM(rt. Click_Users) AS Click_Users,SUM(rt.Close_Num) AS Close_Num,SUM(rt.Close_Users) AS Close_Users FROM
+		report_push_day_t rt,policy_business_t p_t
+		WHERE rt.Policy_Id= p_t.Policy_Id
+		<if test="startTime==endTime">AND rt.Report_Date =#{startTime}</if>
+		<if test="startTime!=endTime">AND rt.Report_Date <![CDATA[>=]]> #{startTime} AND rt.Report_Date <![CDATA[<=]]> #{endTime}</if>
+		GROUP BY Policy_Id) re
+		LEFT JOIN
+		(SELECT pbt.Policy_Id AS Policy_Id,SUM(pgt.Group_Users) AS Group_Users FROM policy_business_t pbt,
+		policy_group_t pgt,policy_group_relation_t pgr WHERE pbt.Policy_Id=pgr.Policy_Id AND pgr.Group_Id=pgt.Group_Id GROUP BY pbt.Policy_Id) pg
+		ON re.Policy_Id = pg.Policy_Id
+		LEFT JOIN
+		(SELECT Policy_Id,DATE_FORMAT(Start_Time,'%Y-%m-%d %H:%i:%s') AS Start_Time,DATE_FORMAT(
+		End_Time,'%Y-%m-%d %H:%i:%s') AS End_Time FROM policy_time_t GROUP BY Policy_Id) pt
+		ON re.Policy_Id = pt.Policy_Id
+		LEFT JOIN sys_user_info_t su ON re.Create_User=su.User_Id
+		LEFT JOIN sys_province_info_t sp ON su.Province_Id=sp.Province_Id
+		LEFT JOIN sys_city_info_t sc ON su.City_Id = sc.City_Id
+		<where>
+			re.Policy_Id IN
+			<foreach collection="LIST" item="item" index="index" open="(" separator="," close=")">
+				#{item.policyIds}
+			</foreach>
+			AND su.City_Id IS NOT NULL
+		</where>
+		)t
+	</select>
+	<!--导出含活动和广告主信息的数据-->
+	<select id="reportIncludeActivityDataExcel" parameterType="hashmap" resultMap="PolicyinfoMapperResult">
+		SELECT * FROM (
+		SELECT ROUND(re.Receive_Users*100/re.Push_Users,2) AS Receive_Ratio,ROUND(re.Show_Users*100/re.Receive_Users,2) AS Show_Ratio,ROUND(re.Click_Users*100/re.Show_Users,2) AS Click_Ratio,
+		ROUND(re.Click_Users*100/re.Show_Users,2) AS Close_Ratio,
+		re.Policy_Id,re.Push_Num AS Push_Num,re.Push_Users AS Push_Users,re.Receive_Num AS Receive_Num,re.Receive_Users AS Receive_Users,re.Show_Num AS Show_Num,
+		re.Show_Users AS Show_Users,re.Click_Num AS Click_Num,re.Click_Users AS Click_Users,re.Close_Num AS Close_Num,re.Close_Users AS Close_Users, re.Policy_Name AS Policy_Name,re.Terminal_Type AS Terminal_Type,re.Check_Status AS Check_Status,
+		re.buy_type,re.unit_price,ac.Activity_Name AS Activity_Name,ac.Customer_Name AS Customer_Name,su.User_Name AS Create_Name,sp.Province_Name  AS Province_City,pg.Group_Users AS Target_Users,pt.Start_Time AS Start_Time,pt.End_Time AS End_Time
+		FROM
+		(SELECT rt.Policy_Id,p_t.Policy_Name,p_t.Terminal_Type,p_t.Check_Status,p_t.Create_User,p_t.buy_type,p_t.unit_price,SUM(rt.Push_Num) AS Push_Num,SUM(rt.Push_Users) AS
+		Push_Users,SUM(rt.Receive_Num) AS Receive_Num,SUM(rt.Receive_Users) AS Receive_Users,SUM(rt.Show_Num) AS
+		Show_Num,SUM(rt.Show_Users) AS Show_Users,SUM(rt.Click_Num) AS Click_Num,SUM(rt.Click_Users) AS
+		Click_Users,SUM(rt.Close_Num) AS Close_Num,SUM(rt.Close_Users) AS Close_Users FROM report_push_day_t rt,policy_business_t p_t
+		WHERE rt.Policy_Id=p_t.Policy_Id
+		<if test="startTime==endTime">AND rt.Report_Date =#{startTime}</if>
+		<if test="startTime!=endTime">AND rt.Report_Date <![CDATA[>=]]> #{startTime} AND rt.Report_Date <![CDATA[<=]]> #{endTime}</if>
+		GROUP BY Policy_Id) re
+		LEFT JOIN
+		(SELECT pbt.Policy_Id AS Policy_Id,SUM(pgt.Group_Users) AS Group_Users FROM policy_business_t pbt, policy_group_t pgt,policy_group_relation_t pgr
+		WHERE pbt.Policy_Id=pgr.Policy_Id AND pgr.Group_Id=pgt.Group_Id GROUP BY pbt.Policy_Id) pg ON re.Policy_Id = pg.Policy_Id
+		LEFT JOIN
+		(SELECT Policy_Id,DATE_FORMAT(Start_Time,'%Y-%m-%d %H:%i:%s') AS Start_Time,DATE_FORMAT(End_Time,'%Y-%m-%d %H:%i:%s') AS End_Time FROM policy_time_t GROUP BY Policy_Id) pt
+		ON re.Policy_Id = pt.Policy_Id
+		LEFT JOIN
+		(SELECT par.Policy_Id AS Policy_Id,pat.Activity_Name,sci.Customer_Name FROM policy_activity_info_t pat,policy_activity_relation_t par,customer_activity_relation_t car,sys_customer_info_t sci
+		WHERE pat.Activity_Id=par.Activity_Id AND par.Activity_Id=car.Activity_Id AND car.Customer_Id=sci.Customer_Id) ac ON re.Policy_Id=ac.Policy_Id
+		LEFT JOIN sys_user_info_t su ON re.Create_User=su.User_Id
+		LEFT JOIN sys_province_info_t sp ON su.Province_Id=sp.Province_Id
+		<where>
+			re.Policy_Id IN
+			<foreach collection="LIST" item="item" index="index" open="(" separator="," close=")">
+				#{item.policyIds}
+			</foreach>
+			AND su.City_Id IS NULL
+		</where>
+		UNION ALL
+		SELECT ROUND(re.Receive_Users*100/re.Push_Users,2) AS Receive_Ratio,ROUND(re.Show_Users*100/re.Receive_Users,2) AS Show_Ratio,ROUND(re.Click_Users*100/re.Show_Users,2) AS Click_Ratio,
+		ROUND(re.Click_Users*100/re.Show_Users,2) AS Close_Ratio,
+		re.Policy_Id,re.Push_Num AS Push_Num,re.Push_Users AS Push_Users,re.Receive_Num AS Receive_Num,re.Receive_Users AS Receive_Users,re.Show_Num AS Show_Num,
+		re.Show_Users AS Show_Users,re.Click_Num AS Click_Num,re.Click_Users AS Click_Users,re. Close_Num AS Close_Num,re.Close_Users AS Close_Users,
+		re.Policy_Name AS Policy_Name,re.Terminal_Type AS Terminal_Type,re.Check_Status AS Check_Status,re.buy_type,re.unit_price,ac.Activity_Name AS Activity_Name,ac.Customer_Name AS Customer_Name,
+		su.User_Name AS Create_Name,CONCAT(sp.Province_Name,'-',sc.City_Name) AS Province_City,pg.Group_Users AS Target_Users,pt.Start_Time AS Start_Time,pt.End_Time AS End_Time
+		FROM
+		(SELECT rt.Policy_Id,p_t.Policy_Name,p_t.Terminal_Type,p_t.Check_Status,p_t.Create_User,p_t.buy_type,p_t.unit_price,SUM(rt.Push_Num) AS Push_Num,SUM(rt. Push_Users) AS Push_Users,
+		SUM(rt.Receive_Num) AS Receive_Num,SUM(rt.Receive_Users) AS Receive_Users,SUM(rt. Show_Num) AS Show_Num,
+		SUM(rt.Show_Users) AS Show_Users,SUM(rt.Click_Num) AS Click_Num,SUM(rt. Click_Users) AS Click_Users,SUM(rt.Close_Num) AS Close_Num,SUM(rt.Close_Users) AS Close_Users FROM
+		report_push_day_t rt,policy_business_t p_t
+		WHERE rt.Policy_Id= p_t.Policy_Id
+		<if test="startTime==endTime">AND rt.Report_Date =#{startTime}</if>
+		<if test="startTime!=endTime">AND rt.Report_Date <![CDATA[>=]]> #{startTime} AND rt.Report_Date <![CDATA[<=]]> #{endTime}</if>
+		GROUP BY Policy_Id) re
+		LEFT JOIN
+		(SELECT pbt.Policy_Id AS Policy_Id,SUM(pgt.Group_Users) AS Group_Users FROM policy_business_t pbt,
+		policy_group_t pgt,policy_group_relation_t pgr WHERE pbt.Policy_Id=pgr.Policy_Id AND pgr.Group_Id=pgt.Group_Id GROUP BY pbt.Policy_Id) pg
+		ON re.Policy_Id = pg.Policy_Id
+		LEFT JOIN
+		(SELECT Policy_Id,DATE_FORMAT(Start_Time,'%Y-%m-%d %H:%i:%s') AS Start_Time,DATE_FORMAT(
+		End_Time,'%Y-%m-%d %H:%i:%s') AS End_Time FROM policy_time_t GROUP BY Policy_Id) pt
+		ON re.Policy_Id = pt.Policy_Id
+		LEFT JOIN
+		(SELECT par.Policy_Id AS Policy_Id,pat.Activity_Name,sci.Customer_Name FROM policy_activity_info_t pat,policy_activity_relation_t par,customer_activity_relation_t car,sys_customer_info_t sci
+		WHERE pat.Activity_Id=par.Activity_Id AND par.Activity_Id=car.Activity_Id AND car.Customer_Id=sci.Customer_Id) ac ON re.Policy_Id=ac.Policy_Id
+		LEFT JOIN sys_user_info_t su ON re.Create_User=su.User_Id
+		LEFT JOIN sys_province_info_t sp ON su.Province_Id=sp.Province_Id
+		LEFT JOIN sys_city_info_t sc ON su.City_Id = sc.City_Id
+		<where>
+			re.Policy_Id IN
+			<foreach collection="LIST" item="item" index="index" open="(" separator="," close=")">
+				#{item.policyIds}
+			</foreach>
+			AND su.City_Id IS NOT NULL
+		</where>
+		)t
+	</select>
+
+
+	<select id="nameListBak" parameterType="hashmap" resultMap="PolicyinfoMapperResult">
+		SELECT Report_Id,r.Policy_Id,r.Policy_Name,concat(i.Province_Name,ifnull(c.City_Name,'')) as Province_City,r.Report_Date,r.Target_Users,r.Push_Users,r.Push_Num,
+		r.Receive_Users,r.Receive_Num,r.Click_Num,r.Show_Num,r.Close_Num,r.Show_Users,r.Click_Users,r.Close_Users,r.Receive_Ratio,r.Show_Ratio,r.Click_Ratio,r.Close_Ratio,b.buy_type,b.unit_price,b.Show_Limit,b.Hit_Limit,pt.Start_Time,pt.End_Time
+		FROM report_push_day_t r
+		left join policy_position_relation_t p on r.Policy_Id=p.Policy_Id
+		left join policy_business_t b on r.Policy_Id=b.Policy_Id
+		left join sys_city_info_t c on p.City_Id=c.City_Id
+		left join sys_province_info_t i on p.Province_Id=i.Province_Id
+		left join sys_user_info_t u on b.Create_User=u.User_Id
+		left join (SELECT Policy_Id,DATE_FORMAT(Start_Time,'%Y-%m-%d %H:%i:%s') AS Start_Time,DATE_FORMAT(End_Time,'%Y-%m-%d %H:%i:%s') AS End_Time FROM policy_time_t GROUP BY Policy_Id) pt
+		ON r.Policy_Id=pt.Policy_Id
+		WHERE 1=1
+		<if test="userId!=null">
+			and (b.`Create_User` in (select u.`User_Id` from sys_user_info_t u
+			where u.Create_User=#{userId} and u.`Show_Status`=#{showStatus} ) or
+			b.`Create_User`=#{userId})
+		</if>
+		<if test="showStatus!=null">
+			and u.Show_Status=#{showStatus}
+		</if>
+		<if test="create_time!=null">
+			and r.Report_Date LIKE '${create_time}%'
+		</if>
+		<if test="PolicyId!=null">
+			and r.Policy_Id = #{PolicyId}
+		</if>
+		ORDER BY r.Report_Date DESC
+	</select>
+
+	<select id="reportExcel" parameterType="hashmap" resultMap="PolicyinfoMapperResult">
+		(SELECT
+		<include refid="Policyinfo1"></include>
+		FROM report_push_day_t r,policy_position_relation_t p,sys_province_info_t i,policy_business_t b,sys_user_info_t u
+		<where>
+			r.Policy_Id=p.Policy_Id and r.Policy_Id=b.Policy_Id and
+			p.Province_Id=i.Province_Id and (p.City_Id=0 or p.City_Id is NULL)
+			and b.Create_User=u.User_Id
+		</where>
+		<if test="showStatus!=null">
+			and u.Show_Status=#{showStatus}
+		</if>
+		<if test="create_time!=null">
+			and r.Report_Date LIKE '${create_time}%'
+		</if>
+		<if test="PolicyName!=null">
+			and r.Policy_Name = #{PolicyName}
+		</if>
+		)
+		UNION ALL
+		(SELECT
+		<include refid="Policyinfo2"></include>
+		FROM report_push_day_t r,policy_position_relation_t p,sys_city_info_t c,sys_province_info_t i,policy_business_t b,sys_user_info_t u
+		<where>
+			r.Policy_Id=p.Policy_Id and r.Policy_Id=b.Policy_Id and
+			p.Province_Id=i.Province_Id and p.City_Id=c.City_Id and
+			b.Create_User=u.User_Id
+		</where>
+		<if test="showStatus!=null">
+			and u.Show_Status=#{showStatus}
+		</if>
+		<if test="create_time!=null">
+			and r.Report_Date LIKE '${create_time}%'
+		</if>
+		<if test="PolicyName!=null">
+			and r.Policy_Name = #{PolicyName}
+		</if>
+		<if test="cityId!=null">
+			AND p.City_Id = #{cityId}
+		</if>
+		)
+		ORDER BY Report_Date DESC
+	</select>
+
+	<!-- 展现用户明细 -->
+	<resultMap
+		type="hashmap"
+		id="pushUserInfo">
+		<result
+			property="PushUser"
+			column="Push_User" />
+		<result
+			property="ShowTime"
+			column="Show_Time" />
+		<result
+			property="PushIp"
+			column="Push_Ip" />
+		<result
+			property="PushUa"
+			column="Push_Ua" />
+	</resultMap>
+	<sql id="showDetailsInfo">
+		Push_User,date_format(Show_Time,'%Y-%m-%d %H:%i:%s')as Show_Time,Push_Ip,Push_Ua
+	</sql>
+	<select id="showDetails" parameterType="hashmap" resultMap="pushUserInfo">
+		SELECT <include refid="showDetailsInfo"></include> FROM ${pushtableName}
+		<where>
+			Show_Status IS NOT NULL AND Show_Status=0
+			<if test="policyId!=null">
+				and Policy_Id=#{policyId}
+			</if>
+			<if test="pushUser!=null">
+				and Push_User LIKE '%${pushUser}%'
+			</if>
+			<if test="startTime==endTime">
+				AND Push_Time LIKE '%${startTime}%'
+			</if>
+			<if test="startTime!=endTime">
+				AND Push_Time <![CDATA[>=]]> #{startTime} AND Push_Time <![CDATA[<=]]> #{endTime}
+			</if>
+		</where>
+		GROUP BY Push_User
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+	<select id="showDetailscount" parameterType="hashmap" resultType="int">
+		SELECT count(*) FROM
+		(SELECT * FROM ${pushtableName}
+		<where>
+			Show_Status IS NOT NULL AND Show_Status=0
+			<if test="policyId!=null">
+				and Policy_Id=#{policyId}
+			</if>
+			<if test="pushUser!=null">
+				and Push_User LIKE '%${pushUser}%'
+			</if>
+			<if test="startTime==endTime">
+				AND Push_Time LIKE '%${startTime}%'
+			</if>
+			<if test="startTime!=endTime">
+				AND Push_Time <![CDATA[>=]]> #{startTime} AND Push_Time <![CDATA[<=]]> #{endTime}
+			</if>
+		</where>
+		GROUP BY Push_User
+		) as total
+	</select>
+	<select id="detailsExcel" parameterType="hashmap" resultMap="pushUserInfo">
+		SELECT <include refid="showDetailsInfo"></include> FROM ${pushtableName}
+		<where>
+			Show_Status IS NOT NULL AND Show_Status=0
+			<if test="policyId!=null">
+				and Policy_Id=#{policyId}
+			</if>
+			<if test="pushUser!=null">
+				and Push_User LIKE '%${pushUser}%'
+			</if>
+			<if test="startTime==endTime">
+				AND Push_Time LIKE '%${startTime}%'
+			</if>
+			<if test="startTime!=endTime">
+				AND Push_Time <![CDATA[>=]]> #{startTime} AND Push_Time <![CDATA[<=]]> #{endTime}
+			</if>
+		</where>
+		GROUP BY Push_User
+	</select>
+	<select id="detailsExcelUser" parameterType="hashmap" resultMap="pushUserInfo">
+		SELECT Push_User FROM ${pushtableName}
+		<where>
+			Show_Status IS NOT NULL AND Show_Status=0
+			<if test="policyId!=null">
+				and Policy_Id=#{policyId}
+			</if>
+			<if test="pushUser!=null">
+				and Push_User LIKE '%${pushUser}%'
+			</if>
+			<if test="startTime==endTime">
+				AND Push_Time LIKE '%${startTime}%'
+			</if>
+			<if test="startTime!=endTime">
+				AND Push_Time <![CDATA[>=]]> #{startTime} AND Push_Time <![CDATA[<=]]> #{endTime}
+			</if>
+		</where>
+		GROUP BY Push_User
+	</select>
+
+	<!-- 点击用户明细 -->
+	<resultMap type="hashmap" id="clickUserInfo">
+		<result property="PushUser" column="Push_User"/>
+		<result property="ClickTime" column="Click_Time"/>
+		<result property="ClickUrl" column="Click_Url"/>
+		<result property="ClickName" column="Click_Name"/>
+		<result property="PushUa" column="Push_Ua"/>
+	</resultMap>
+	<sql id="clickDetailsInfo">
+		ct.Push_User,date_format(ct.Click_Time,'%Y-%m-%d %H:%i:%s')as Click_Time,ct.Click_Url,ct.Click_Name,pt.Push_Ua
+	</sql>
+	<select id="clickDetails" parameterType="hashmap" resultMap="clickUserInfo">
+		SELECT <include refid="clickDetailsInfo"></include> FROM ${clicktableName} ct,${pushtableName} pt
+		<where>
+			ct.Ips_Id = pt.Ips_Id AND ct.Ips_Seq=pt.Ips_Seq AND ct.Policy_Id=pt.Policy_Id AND ct.Push_Time=pt.Push_Time AND ct.Click_Url!='close'
+			<if test="policyId!=null">
+				and ct.Policy_Id=#{policyId}
+			</if>
+			<if test="pushUser!=null">
+				and ct.Push_User LIKE '%${pushUser}%'
+			</if>
+			<if test="startTime==endTime">
+				AND ct.Click_Time LIKE '%${startTime}%'
+			</if>
+			<if test="startTime!=endTime">
+				AND ct.Click_Time <![CDATA[>=]]> #{startTime} AND ct.Click_Time <![CDATA[<=]]> #{endTime}
+			</if>
+		</where>
+		GROUP BY ct.Push_User
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+	<select id="clickDetailscount" parameterType="hashmap" resultType="int">
+		SELECT count(*) FROM (
+		SELECT <include refid="clickDetailsInfo"></include> FROM ${clicktableName} ct,${pushtableName} pt
+		<where>
+			ct.Ips_Id = pt.Ips_Id AND ct.Ips_Seq=pt.Ips_Seq AND ct.Policy_Id=pt.Policy_Id AND ct.Push_Time=pt.Push_Time AND ct.Click_Url!='close'
+			<if test="policyId!=null">
+				and ct.Policy_Id=#{policyId}
+			</if>
+			<if test="pushUser!=null">
+				and ct.Push_User LIKE '%${pushUser}%'
+			</if>
+			<if test="startTime==endTime">
+				AND ct.Click_Time LIKE '%${startTime}%'
+			</if>
+			<if test="startTime!=endTime">
+				AND ct.Click_Time <![CDATA[>=]]> #{startTime} AND ct.Click_Time <![CDATA[<=]]> #{endTime}
+			</if>
+		</where>
+		GROUP BY ct.Push_User
+		) as total
+	</select>
+	<select id="clickExcel" parameterType="hashmap" resultMap="clickUserInfo">
+		SELECT <include refid="clickDetailsInfo"></include> FROM ${clicktableName} ct,${pushtableName} pt
+		<where>
+			ct.Ips_Id = pt.Ips_Id AND ct.Ips_Seq=pt.Ips_Seq AND ct.Policy_Id=pt.Policy_Id AND ct.Push_Time=pt.Push_Time AND ct.Click_Url!='close'
+			<if test="policyId!=null">
+				and ct.Policy_Id=#{policyId}
+			</if>
+			<if test="pushUser!=null">
+				and ct.Push_User LIKE '%${pushUser}%'
+			</if>
+			<if test="startTime==endTime">
+				AND ct.Click_Time LIKE '%${startTime}%'
+			</if>
+			<if test="startTime!=endTime">
+				AND ct.Click_Time <![CDATA[>=]]> #{startTime} AND ct.Click_Time <![CDATA[<=]]> #{endTime}
+			</if>
+		</where>
+		GROUP BY ct.Push_User
+	</select>
+
+	<select id="clickExcelUser" parameterType="hashmap" resultMap="clickUserInfo">
+		SELECT <include refid="clickDetailsInfo"></include> FROM ${clicktableName} ct,${pushtableName} pt
+		<where>
+			ct.Ips_Id = pt.Ips_Id AND ct.Ips_Seq=pt.Ips_Seq AND ct.Policy_Id=pt.Policy_Id AND ct.Push_Time=pt.Push_Time AND ct.Click_Url!='close'
+			<if test="policyId!=null">
+				and ct.Policy_Id=#{policyId}
+			</if>
+			<if test="pushUser!=null">
+				and ct.Push_User LIKE '%${pushUser}%'
+			</if>
+			<if test="startTime==endTime">
+				AND ct.Click_Time LIKE '%${startTime}%'
+			</if>
+			<if test="startTime!=endTime">
+				AND ct.Click_Time <![CDATA[>=]]> #{startTime} AND ct.Click_Time <![CDATA[<=]]> #{endTime}
+			</if>
+		</where>
+		GROUP BY ct.Push_User
+	</select>
+
+	<!-- 关闭用户明细 -->
+	<resultMap type="hashmap" id="closeUserInfo">
+		<result property="FilterUser" column="Filter_User" />
+		<result property="EffectTime" column="Effect_Time" />
+		<result property="UserStatus" column="User_Status" />
+	</resultMap>
+	<sql id="closeDetailsInfo">
+		Filter_User,date_format(Effect_Time,'%Y-%m-%d %H:%i:%s')as Effect_Time,
+		CASE User_Status
+		WHEN 1 THEN 'Shielding one day'
+		WHEN 2 THEN 'Shielding one week'
+		WHEN 3 THEN 'Shielding one month'
+		WHEN 4 THEN 'Permanent shielding'
+		END as User_Status
+	</sql>
+	<select id="closeDetails" parameterType="hashmap" resultMap="closeUserInfo">
+		select <include refid="closeDetailsInfo"></include> from policy_filter_user_t
+		<where>
+			Create_User=0
+			<if test="policyId!=null">
+				and Policy_Id=#{policyId}
+			</if>
+			<if test="startTime==endTime">
+				AND Effect_Time LIKE '%${startTime}%'
+			</if>
+			<if test="startTime!=endTime">
+				AND Effect_Time <![CDATA[>=]]> #{startTime} AND Effect_Time <![CDATA[<=]]> #{endTime}
+			</if>
+			<if test="pushUser!=null">
+				and Filter_User = #{pushUser}
+			</if>
+		</where>
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+	<select id="closeDetailscount" parameterType="hashmap" resultType="int">
+		SELECT count(*) FROM (
+		select <include refid="closeDetailsInfo"></include> from policy_filter_user_t
+		<where>
+			Create_User=0
+			<if test="policyId!=null">
+				and Policy_Id=#{policyId}
+			</if>
+			<if test="startTime==endTime">
+				AND Effect_Time LIKE '%${startTime}%'
+			</if>
+			<if test="startTime!=endTime">
+				AND Effect_Time <![CDATA[>=]]> #{startTime} AND Effect_Time <![CDATA[<=]]> #{endTime}
+			</if>
+			<if test="pushUser!=null">
+				and Filter_User = #{pushUser}
+			</if>
+		</where>
+		) as total
+	</select>
+	<select id="closeExcel" parameterType="hashmap" resultMap="closeUserInfo">
+		select <include refid="closeDetailsInfo"></include> from policy_filter_user_t
+		<where>
+			Create_User=0
+			<if test="policyId!=null">
+				and Policy_Id=#{policyId}
+			</if>
+			<if test="startTime==endTime">
+				AND Effect_Time LIKE '%${startTime}%'
+			</if>
+			<if test="startTime!=endTime">
+				AND Effect_Time <![CDATA[>=]]> #{startTime} AND Effect_Time <![CDATA[<=]]> #{endTime}
+			</if>
+			<if test="pushUser!=null">
+				and Filter_User = #{pushUser}
+			</if>
+		</where>
+	</select>
+	<select id="closeExcelUser" parameterType="hashmap" resultMap="closeUserInfo">
+		select <include refid="closeDetailsInfo"></include> from policy_filter_user_t
+		<where>
+			Create_User=0
+			<if test="policyId!=null">
+				and Policy_Id=#{policyId}
+			</if>
+			<if test="startTime==endTime">
+				AND Effect_Time LIKE '%${startTime}%'
+			</if>
+			<if test="startTime!=endTime">
+				AND Effect_Time <![CDATA[>=]]> #{startTime} AND Effect_Time <![CDATA[<=]]> #{endTime}
+			</if>
+			<if test="pushUser!=null">
+				and Filter_User = #{pushUser}
+			</if>
+		</where>
+	</select>
+	<!-- 推送走势 -->
+	<resultMap type="hashmap" id="hourInfo">
+		<result property="PolicyId" column="Policy_Id" />
+		<result property="PolicyName" column="Policy_Name" />
+		<result property="TargetUsers" column="Target_Users" />
+		<result property="PushUsers" column="Push_Users" />
+		<result property="ReceiveUsers" column="Receive_Users" />
+		<result property="ShowUsers" column="Show_Users" />
+		<result property="ClickUsers" column="Click_Users" />
+		<result property="ReportPeriod" column="Report_Period" />
+	</resultMap>
+
+	<sql id="singlePolicyShowInfo">
+		Target_Users,Push_Users,Receive_Users,Show_Users,Click_Users,Report_Period
+	</sql>
+	<!--单个策略一天的数据-->
+	<select id="singlePolicyShow" parameterType="hashmap" resultMap="hourInfo">
+		select <include refid="singlePolicyShowInfo"></include> from report_push_hour_t
+		<where>
+            <if test="condition!=null">
+                <foreach collection="condition" index="key"  item="value" separator="and">
+                    ${key}=#{value}
+                </foreach>
+            </if>
+        </where>
+        order by Report_Period
+	</select>
+	<!--单个策略多天的数据-->
+	<select id="policyEveryData" parameterType="hashmap" resultMap="hourInfo">
+		select rp.Policy_Id,pb.Policy_Name,rp.Target_Users,rp.Push_Users,rp.Receive_Users,rp.Show_Users,rp.Click_Users,CAST(right(rp.Report_date,2) AS CHAR) AS Report_Period
+		from report_push_day_t rp LEFT JOIN policy_business_t pb ON rp.Policy_Id=pb.Policy_Id
+		<where>
+			rp.Report_Date <![CDATA[>=]]> #{startTime} AND rp.Report_Date <![CDATA[<=]]> #{endTime}
+			<if test="policyId!=null">
+				AND rp.Policy_Id = #{policyId}
+			</if>
+			<if test="policyIds!=null">
+				AND rp.Policy_Id IN
+				<foreach collection="policyList" item="item" index="index" open="(" separator="," close=")">
+					#{item.policyIds}
+				</foreach>
+			</if>
+		</where>
+		GROUP BY rp.Report_date,rp.Policy_Id
+	</select>
+
+	<!--单个策略多天的数据统计-->
+	<select id="policyShowTotalData" parameterType="hashmap" resultMap="PolicyinfoMapperResult">
+		SELECT * FROM (
+		SELECT ROUND(re.Receive_Users/re.Push_Users,4) AS Receive_Ratio,ROUND(re.Show_Users/re.Receive_Users,4) AS Show_Ratio,ROUND(re.Click_Users/re.Show_Users,4) AS Click_Ratio,
+		ROUND(re.Click_Users/re.Show_Users,4) AS Close_Ratio,
+		re.Policy_Id,re.Push_Num AS Push_Num,re.Push_Users AS Push_Users,re.Receive_Num AS Receive_Num,re.Receive_Users AS Receive_Users,re.Show_Num AS Show_Num,
+		re.Show_Users AS Show_Users,re.Click_Num AS Click_Num,re.Click_Users AS Click_Users,re.Close_Num AS Close_Num,re.Close_Users AS Close_Users, re.Policy_Name AS Policy_Name,re.Terminal_Type AS Terminal_Type,re.Check_Status AS Check_Status,
+		re.buy_type,re.unit_price,su.User_Name AS Create_Name,sp.Province_Name  AS Province_City,pg.Group_Users AS Target_Users,pt.Start_Time AS Start_Time,pt.End_Time AS End_Time
+		FROM
+		(SELECT rt.Policy_Id,p_t.Policy_Name,p_t.Terminal_Type,p_t.Check_Status,p_t.Create_User,p_t.buy_type,p_t.unit_price,SUM(rt.Push_Num) AS Push_Num,SUM(rt.Push_Users) AS
+		Push_Users,SUM(rt.Receive_Num) AS Receive_Num,SUM(rt.Receive_Users) AS Receive_Users,SUM(rt.Show_Num) AS
+		Show_Num,SUM(rt.Show_Users) AS Show_Users,SUM(rt.Click_Num) AS Click_Num,SUM(rt.Click_Users) AS
+		Click_Users,SUM(rt.Close_Num) AS Close_Num,SUM(rt.Close_Users) AS Close_Users FROM report_push_day_t rt,policy_business_t p_t
+		WHERE rt.Policy_Id=p_t.Policy_Id
+		<if test="startTime==endTime">AND rt.Report_Date =#{startTime}</if>
+		<if test="startTime!=endTime">AND rt.Report_Date <![CDATA[>=]]> #{startTime} AND rt.Report_Date <![CDATA[<=]]> #{endTime}</if>
+		GROUP BY Policy_Id) re
+		LEFT JOIN
+		(SELECT pbt.Policy_Id AS Policy_Id,SUM(pgt.Group_Users) AS Group_Users FROM policy_business_t pbt, policy_group_t pgt,policy_group_relation_t pgr
+		WHERE pbt.Policy_Id=pgr.Policy_Id AND pgr.Group_Id=pgt.Group_Id GROUP BY pbt.Policy_Id) pg ON re.Policy_Id = pg.Policy_Id
+		LEFT JOIN
+		(SELECT Policy_Id,DATE_FORMAT(Start_Time,'%Y-%m-%d %H:%i:%s') AS Start_Time,DATE_FORMAT(End_Time,'%Y-%m-%d %H:%i:%s') AS End_Time FROM policy_time_t GROUP BY Policy_Id) pt
+		ON re.Policy_Id = pt.Policy_Id
+		LEFT JOIN sys_user_info_t su ON re.Create_User=su.User_Id
+		LEFT JOIN sys_province_info_t sp ON su.Province_Id=sp.Province_Id
+		<where>
+			su.City_Id IS NULL
+			<if test="LIST!=null">
+				AND re.Policy_Id IN
+				<foreach collection="LIST" item="item" index="index" open="(" separator="," close=")">
+					#{item.policyIds}
+				</foreach>
+			</if>
+			<if test="policyId!=null">
+				AND re.Policy_Id=#{policyId}
+			</if>
+		</where>
+		UNION ALL
+		SELECT ROUND(re.Receive_Users/re.Push_Users,4) AS Receive_Ratio,ROUND(re.Show_Users/re.Receive_Users,4) AS Show_Ratio,ROUND(re.Click_Users/re.Show_Users,4) AS Click_Ratio,
+		ROUND(re.Click_Users/re.Show_Users,4) AS Close_Ratio,
+		re.Policy_Id,re.Push_Num AS Push_Num,re.Push_Users AS Push_Users,re.Receive_Num AS Receive_Num,re.Receive_Users AS Receive_Users,re.Show_Num AS Show_Num,
+		re.Show_Users AS Show_Users,re.Click_Num AS Click_Num,re.Click_Users AS Click_Users,re. Close_Num AS Close_Num,re.Close_Users AS Close_Users,
+		re.Policy_Name AS Policy_Name,re.Terminal_Type AS Terminal_Type,re.Check_Status AS Check_Status,re.buy_type,re.unit_price,su.User_Name AS Create_Name,CONCAT(sp.Province_Name,'-',sc.City_Name) AS Province_City,pg.
+		Group_Users AS Target_Users,pt.Start_Time AS Start_Time,pt.End_Time AS End_Time
+		FROM
+		(SELECT rt.Policy_Id,p_t.Policy_Name,p_t.Terminal_Type,p_t.Check_Status,p_t.Create_User,p_t.buy_type,p_t.unit_price,SUM(rt.Push_Num) AS Push_Num,SUM(rt. Push_Users) AS Push_Users,
+		SUM(rt.Receive_Num) AS Receive_Num,SUM(rt.Receive_Users) AS Receive_Users,SUM(rt. Show_Num) AS Show_Num,
+		SUM(rt.Show_Users) AS Show_Users,SUM(rt.Click_Num) AS Click_Num,SUM(rt. Click_Users) AS Click_Users,SUM(rt.Close_Num) AS Close_Num,SUM(rt.Close_Users) AS Close_Users FROM
+		report_push_day_t rt,policy_business_t p_t
+		WHERE rt.Policy_Id= p_t.Policy_Id
+		<if test="startTime==endTime">AND rt.Report_Date =#{startTime}</if>
+		<if test="startTime!=endTime">AND rt.Report_Date <![CDATA[>=]]> #{startTime} AND rt.Report_Date <![CDATA[<=]]> #{endTime}</if>
+		GROUP BY Policy_Id) re
+		LEFT JOIN
+		(SELECT pbt.Policy_Id AS Policy_Id,SUM(pgt.Group_Users) AS Group_Users FROM policy_business_t pbt,
+		policy_group_t pgt,policy_group_relation_t pgr WHERE pbt.Policy_Id=pgr.Policy_Id AND pgr.Group_Id=pgt.Group_Id GROUP BY pbt.Policy_Id) pg
+		ON re.Policy_Id = pg.Policy_Id
+		LEFT JOIN
+		(SELECT Policy_Id,DATE_FORMAT(Start_Time,'%Y-%m-%d %H:%i:%s') AS Start_Time,DATE_FORMAT(
+		End_Time,'%Y-%m-%d %H:%i:%s') AS End_Time FROM policy_time_t GROUP BY Policy_Id) pt
+		ON re.Policy_Id = pt.Policy_Id
+		LEFT JOIN sys_user_info_t su ON re.Create_User=su.User_Id
+		LEFT JOIN sys_province_info_t sp ON su.Province_Id=sp.Province_Id
+		LEFT JOIN sys_city_info_t sc ON su.City_Id = sc.City_Id
+		<where>
+			su.City_Id IS NOT NULL
+			<if test="LIST!=null">
+				AND re.Policy_Id IN
+				<foreach collection="LIST" item="item" index="index" open="(" separator="," close=")">
+					#{item.policyIds}
+				</foreach>
+			</if>
+			<if test="policyId!=null">
+				AND re.Policy_Id=#{policyId}
+			</if>
+		</where>
+		)t
+	</select>
+
+	<sql id="Policyinfo3">
+		Report_Id,r.Policy_Id,r.Policy_Name,r.Report_Date,r.Target_Users,r.Push_Users,r.Push_Num,r.Receive_Users,r.Receive_Num,r.Click_Num,r.Show_Num,r.Close_Num,r.Show_Users,
+		r.Click_Users,r.Close_Users,r.Receive_Ratio,r.Show_Ratio,r.Click_Ratio,r.Close_Ratio,b.buy_type,b.unit_price,b.Show_Limit,b.Hit_Limit,
+		DATE_FORMAT(pt.Start_Time,'%Y-%m-%d %H:%i:%s') AS Start_Time,DATE_FORMAT(pt.End_Time,'%Y-%m-%d %H:%i:%s') AS End_Time
+	</sql>
+
+	<select id="policyEveryDayData" parameterType="hashmap" resultMap="PolicyinfoMapperResult">
+		SELECT <include refid="Policyinfo3"></include> FROM report_push_day_t r
+		LEFT JOIN policy_business_t b ON r.Policy_Id=b.Policy_Id
+		LEFT JOIN policy_time_t pt ON r.Policy_Id=pt.Policy_Id
+		<where>
+			<if test="startTime==endTime">
+				r.Report_Date =#{startTime}
+			</if>
+			<if test="startTime!=endTime">
+				AND r.Report_Date <![CDATA[>=]]> #{startTime} AND r.Report_Date <![CDATA[<=]]> #{endTime}
+			</if>
+			<if test="LIST!=null">
+				AND r.Policy_Id IN
+				<foreach collection="LIST" item="item" index="index" open="(" separator="," close=")">
+					#{item.policyIds}
+				</foreach>
+			</if>
+			<if test="policyId!=null">
+				AND r.Policy_Id=#{policyId}
+			</if>
+		</where>
+		GROUP BY r.Report_Date,r.Policy_Id
+	</select>
+
+	<!--多策略一天的数据-->
+	<select id="policyOneDayInfo" parameterType="hashmap" resultMap="hourInfo">
+		SELECT rp.Policy_Id,pb.Policy_Name,rp.Target_Users,rp.Push_Users,rp.Receive_Users,rp.Show_Users,rp.Click_Users,rp.Report_Period
+		FROM report_push_hour_t rp LEFT JOIN policy_business_t pb ON rp.Policy_Id=pb.Policy_Id
+		<where>
+			<if test="startTime==endTime">
+				rp.Report_Date =#{startTime}
+			</if>
+			<if test="LIST!=null">
+				AND rp.Policy_Id IN
+				<foreach collection="LIST" item="item" index="index" open="(" separator="," close=")">
+					#{item.policyIds}
+				</foreach>
+			</if>
+		</where>
+		GROUP BY rp.Report_Period,rp.Policy_Id
+	</select>
+	<!--多策略多天的数据-->
+	<select id="policyEveryDayInfo" parameterType="hashmap" resultMap="hourInfo">
+		select rp.Policy_Id,pb.Policy_Name,rp.Target_Users,rp.Push_Users,rp.Receive_Users,rp.Show_Users,rp.Click_Users,CAST(right(rp.Report_date,2) AS CHAR) AS Report_Period
+		from report_push_day_t rp LEFT JOIN policy_business_t pb ON rp.Policy_Id=pb.Policy_Id
+		<where>
+			<if test="startTime==endTime">
+				rp.Report_Date =#{startTime}
+			</if>
+			<if test="startTime!=endTime">
+				AND rp.Report_Date <![CDATA[>=]]> #{startTime} AND rp.Report_Date <![CDATA[<=]]> #{endTime}
+			</if>
+			<if test="LIST!=null">
+				AND rp.Policy_Id IN
+				<foreach collection="LIST" item="item" index="index" open="(" separator="," close=")">
+					#{item.policyIds}
+				</foreach>
+			</if>
+			<if test="policyId!=null">
+				AND rp.Policy_Id=#{policyId}
+			</if>
+		</where>
+		GROUP BY rp.Report_date,rp.Policy_Id
+	</select>
+
+</mapper>

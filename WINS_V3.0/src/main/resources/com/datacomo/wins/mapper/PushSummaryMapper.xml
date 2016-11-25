@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.PushSummaryMapper">
+
+	<resultMap
+		type="hashmap"
+		id="PushSummaryMapperResult">
+		<result
+			property="onlineUsers"
+			column="Online_Users" />
+		<result
+			property="radiusUsers"
+			column="Radius_Users" />
+		<result
+			property="reportId"
+			column="Report_Id" />
+		<result
+			property="reportDate"
+			column="Report_Date" />
+		<result
+			property="policyId"
+			column="Policy_Id" />
+		<result
+			property="policyName"
+			column="Policy_Name" />
+		<result
+			property="targetUsers"
+			column="Target_Users" />
+		<result
+			property="pushUsers"
+			column="Push_Users" />
+		<result
+			property="pushNum"
+			column="Push_Num" />
+		<result
+			property="receiveUsers"
+			column="Receive_Users" />
+		<result
+			property="receiveNum"
+			column="Receive_Num" />
+		<result
+			property="showUsers"
+			column="Show_Users" />
+		<result
+			property="showNum"
+			column="Show_Num" />
+		<result
+			property="closeUsers"
+			column="Close_Users" />
+		<result
+			property="closeNum"
+			column="Close_Num" />
+		<result
+			property="pushRatio"
+			column="Push_Ratio" />
+		<result
+			property="receiveRatio"
+			column="Receive_Ratio" />
+		<result
+			property="showRatio"
+			column="Show_Ratio" />
+		<result
+			property="closeRatio"
+			column="Close_Ratio" />
+		<result
+			property="createTime"
+			column="Create_Time" />
+		<result
+			property="clickNum"
+			column="Click_Num" />
+		<result
+			property="clickUsers"
+			column="Click_Users" />
+		<result
+			property="clickRatio"
+			column="Click_Ratio" />
+	</resultMap>
+
+	<sql id="navInfoInfo">
+		Menu_Id,Menu_Name,Menu_CSS
+	</sql>
+
+	<select
+		id="getPushBaseDataByCondition"
+		parameterType="hashmap"
+		resultMap="PushSummaryMapperResult">
+
+
+		SELECT
+		t1.Online_Users,t1.Radius_Users,t1.push_users,t1.push_num,t1.Show_Users,t1.Show_Num,t1.Click_Users,t1.Click_Num,t1.Receive_Ratio,t1.Show_Ratio,t1.Click_Ratio
+		FROM report_data_overview_t t1
+		WHERE t1.show_status=#{showStatus} AND t1.report_date=#{reportDate} AND
+		t1.province_id=#{provinceId}
+		<if test="cityId ==null">
+			AND t1.`City_Id` =0
+		</if>
+		<if test="cityId !=null">
+			AND t1.`City_Id` =#{cityId}
+		</if>
+	</select>
+
+	<select
+		id="findPushAndShowAndClickNumByCondition"
+		parameterType="hashmap"
+		resultMap="PushSummaryMapperResult">
+		SELECT t1.report_date,t1.`Policy_Id`,t1.policy_name,
+		t1.`Report_Period`,t1.push_users,t1.show_users,t1.Click_Users
+		FROM
+		report_push_hour_t t1 ,policy_business_t t2,sys_user_info_t t3 WHERE
+		t1.policy_id=t2.policy_id AND t2.create_user=t3.user_id AND
+		t3.show_status=#{showStatus} AND
+		report_date=#{reportDate} AND
+		t3.province_id=#{provinceId}
+		<if test="cityId !=null">
+			AND t3.`City_Id` =#{cityId}
+		</if>
+		ORDER BY policy_id,report_period
+	</select>
+
+</mapper>

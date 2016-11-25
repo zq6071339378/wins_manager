@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.AccountManageMapper">
+	<resultMap
+		type="hashmap"
+		id="userInfoMapperResult">
+		<result
+			property="userId"
+			column="User_Id" />
+		<result
+			property="roleId"
+			column="Role_Id" />
+		<result
+			property="userName"
+			column="User_Name" />
+		<result
+			property="userPwd"
+			column="User_Pwd" />
+		<result
+			property="realName"
+			column="Real_Name" />
+		<result
+			property="headPath"
+			column="Head_Path" />
+		<result
+			property="userPhone"
+			column="User_Phone" />
+		<result
+			property="userEmail"
+			column="User_Email" />
+		<result
+			property="userRemark"
+			column="User_Remark" />
+		<result
+			property="userStatus"
+			column="User_Status" />
+		<result
+			property="loginTime"
+			column="Login_Time" />
+		<result
+			property="loginIp"
+			column="Login_Ip" />
+		<result
+			property="createUser"
+			column="Create_User" />
+		<result
+			property="createTime"
+			column="Create_Time" />
+		<result
+			property="updateUser"
+			column="Update_User" />
+		<result
+			property="updateTime"
+			column="Update_Time" />
+		<result
+			property="provinceId"
+			column="Province_Id" />
+		<result
+			property="provinceName"
+			column="Province_Name" />
+		<result
+			property="cityId"
+			column="City_Id" />
+		<result
+			property="cityName"
+			column="City_Name" />
+		<result
+			property="roleId"
+			column="Role_Id" />
+		<result
+			property="roleName"
+			column="Role_Name" />
+		<result
+			property="createName"
+			column="Create_Name" />
+		<result
+			property="showStatus"
+			column="Show_Status" />
+		<result
+				property="userOffice"
+				column="user_office" />
+		<result
+				property="userAddr"
+				column="user_addr" />
+	</resultMap>
+
+	<sql id="userInfo">
+		User_Id,Role_Id,User_Name,User_Pwd,Real_Name,Head_Path,User_Phone,User_Email,User_Remark,User_Status,Login_Time,Login_Ip,Create_User,Create_Time,Update_User,Update_Time
+	</sql>
+
+	<select
+		id="getInfo"
+		parameterType="int"
+		resultMap="userInfoMapperResult">
+		select User_Name,Real_Name,City_Id,Province_Id FROM sys_user_info_t where
+		User_Id = #{userId}
+	</select>
+
+	<insert
+		id="insertInfo"
+		parameterType="hashmap"
+		useGeneratedKeys="true"
+		keyProperty="id">
+		insert into sys_user_info_t
+		(Role_Id,City_Id,Province_Id,User_Name,User_Email,User_Pwd,Real_Name,User_Phone,User_Status,Login_Ip,Show_Status,Create_User,Create_Time,user_office,user_addr)
+		values(#{roleId},#{cityId},#{provinceId},#{userName},#{userEmail},#{userPwd},#{realName},#{userPhone},#{userStatus},#{loginIp},#{showStatus},#{createUser},#{createTime},#{userOffice},#{userAddr})
+	</insert>
+
+	<select id="getInfoByCondition" parameterType="hashmap" resultMap="userInfoMapperResult">
+		SELECT * FROM (
+				select u.User_Id,u.User_Name,u.User_Email,u.Real_Name,u.User_Phone,u.User_Pwd,u.Login_Ip,u.Login_Time,u.Create_Time,u.Province_Id,u.City_Id,u.Role_Id,u.Show_Status,u.user_office,user_addr,p.province_name,r.Role_Name,concat(p.province_name,'-',ci.city_name) as City_Name
+				from sys_user_info_t u ,sys_province_info_t p,sys_city_info_t ci,sys_role_info_t r
+				<where>
+					u.city_id IS NOT NULL and u.province_id = p.province_id AND u.city_id = ci.city_id and u.role_id = r.role_id
+					<if test="userId!=null">
+						AND u.User_Id=#{userId}
+					</if>
+				</where>
+			UNION ALL
+				select u.User_Id,u.User_Name,u.User_Email,u.Real_Name,u.User_Phone,u.User_Pwd,u.Login_Ip,u.Login_Time,u.Create_Time,u.Province_Id,u.City_Id,u.Role_Id,u.Show_Status,u.user_office,user_addr,p.province_name,r.Role_Name,p.province_name as City_Name
+				from sys_user_info_t u ,sys_province_info_t p,sys_role_info_t r
+				<where>
+					u.city_id IS NULL AND u.province_id = p.province_id and u.role_id = r.role_id
+					<if test="userId!=null">
+						AND u.User_Id=#{userId}
+					</if>
+				</where>
+		) as total
+	</select>
+
+
+	<update
+		id="updateInfo"
+		parameterType="java.util.HashMap">
+		update sys_user_info_t
+		<set>
+			<if test="roleId != null">
+				Role_Id=#{roleId},
+			</if>
+			<if test="userName != null">
+				User_Name=#{userName},
+			</if>
+			<if test="userEmail != null">
+				User_Email=#{userEmail},
+			</if>
+			<if test="userPwd != null">
+				User_Pwd=#{userPwd},
+			</if>
+			<if test="realName != null">
+				Real_Name=#{realName},
+			</if>
+			<if test="headPath != null">
+				Head_Path=#{headPath},
+			</if>
+			<if test="userPhone != null">
+				User_Phone=#{userPhone},
+			</if>
+			<if test="userOffice != null">
+				user_office=#{userOffice},
+			</if>
+			<if test="userAddr != null">
+				user_addr=#{userAddr},
+			</if>
+			<if test="userRemark != null">
+				User_Remark=#{userRemark},
+			</if>
+			<if test="userStatus != null">
+				User_Status=#{userStatus},
+			</if>
+			<if test="loginTime != null">
+				Login_Time=#{loginTime},
+			</if>
+			<if test="loginIp !=  null">
+				Login_Ip=#{loginIp},
+			</if>
+			<if test="updateUser != null">
+				Update_User=#{updateUser},
+			</if>
+			<if test="updateTime != null">
+				Update_Time=#{updateTime},
+			</if>
+			<if test="provinceId!=null">
+				Province_Id = #{provinceId},
+			</if>
+			<if test="cityId!=null">
+				City_Id = #{cityId}
+			</if>
+		</set>
+		where User_Id = #{userId}
+	</update>
+
+	<delete
+		id="deleteById"
+		parameterType="int">
+		delete from sys_user_info_t
+		<where>
+			User_Id=#{userId}
+		</where>
+	</delete>
+
+
+	<select
+		id="countByCondition"
+		parameterType="hashmap"
+		resultType="int">
+		select count(1) from(
+		select concat(province_name,'-',city_name)
+		City_Name,b.User_Id,b.User_Name,b.Real_Name,b.User_Phone,b.Login_Ip,b.Create_Time,r.Role_Id,r.Role_Name,d.User_Name
+		as Create_Name
+		from sys_city_info_t a,sys_user_info_t b,sys_province_info_t
+		c,sys_user_info_t d,sys_role_info_t r
+		<where>
+			b.Role_Id = r.Role_Id and a.province_id=c.province_id and
+			a.city_id=b.city_id and b.create_user = d.user_id and b.city_id is
+			not null
+			<if test="userName!=null">
+				AND b.User_Name like '%${userName}%'
+			</if>
+			<if test="cityId!=null">
+				AND b.City_Id = #{cityId}
+			</if>
+			<if test="provinceId!=null">
+				AND b.Province_Id = #{provinceId}
+			</if>
+			<if test="roleId!=null">
+				AND b.Role_Id = #{roleId}
+			</if>
+			<if test="showStatus!=null">
+				AND b.Show_Status = #{showStatus}
+			</if>
+		</where>
+		union all
+		select province_name as
+		City_Name,b.User_Id,b.User_Name,b.Real_Name,b.User_Phone,b.Login_Ip,b.Create_Time,r.Role_Id,r.Role_Name,d.User_Name
+		as Create_Name
+		from sys_province_info_t a,sys_user_info_t b,sys_user_info_t
+		d,sys_role_info_t r
+		<where>
+			b.Role_Id = r.Role_Id and a.province_id=b.province_id and
+			b.create_user = d.user_id and b.city_id is null
+			<if test="userName!=null">
+				AND b.User_Name like '%${userName}%'
+			</if>
+			<if test="cityId!=null">
+				AND b.City_Id = #{cityId}
+			</if>
+			<if test="provinceId!=null">
+				AND b.Province_Id = #{provinceId}
+			</if>
+			<if test="roleId!=null">
+				AND b.Role_Id = #{roleId}
+			</if>
+			<if test="showStatus!=null">
+				AND b.Show_Status = #{showStatus}
+			</if>
+		</where>
+		)t
+	</select>
+
+	<select
+		id="findByCondition"
+		parameterType="hashmap"
+		resultMap="userInfoMapperResult">
+		select * from(
+		select concat(province_name,'-',city_name)
+		City_Name,b.User_Id,b.User_Name,b.Real_Name,b.User_Phone,b.Login_Ip,b.Create_Time,r.Role_Id,r.Role_Name,d.User_Name
+		as Create_Name
+		from sys_city_info_t a,sys_user_info_t b,sys_province_info_t
+		c,sys_user_info_t d,sys_role_info_t r
+		<where>
+			b.Role_Id = r.Role_Id and a.province_id=c.province_id and
+			a.city_id=b.city_id and b.create_user = d.user_id and b.city_id is
+			not null
+			<if test="userName!=null">
+				AND b.User_Name like '%${userName}%'
+			</if>
+			<if test="cityId!=null">
+				AND b.City_Id = #{cityId}
+			</if>
+			<if test="provinceId!=null">
+				AND b.Province_Id = #{provinceId}
+			</if>
+			<if test="roleId!=null">
+				AND b.Role_Id = #{roleId}
+			</if>
+			<if test="showStatus!=null">
+				AND b.Show_Status = #{showStatus}
+			</if>
+		</where>
+		union all
+		select province_name as
+		City_Name,b.User_Id,b.User_Name,b.Real_Name,b.User_Phone,b.Login_Ip,b.Create_Time,r.Role_Id,r.Role_Name,d.User_Name
+		as Create_Name
+		from sys_province_info_t a,sys_user_info_t b,sys_user_info_t
+		d,sys_role_info_t r
+		<where>
+			b.Role_Id = r.Role_Id and a.province_id=b.province_id and
+			b.create_user = d.user_id and b.city_id is null
+			<if test="userName!=null">
+				AND b.User_Name like '%${userName}%'
+			</if>
+			<if test="cityId!=null">
+				AND b.City_Id = #{cityId}
+			</if>
+			<if test="provinceId!=null">
+				AND b.Province_Id = #{provinceId}
+			</if>
+			<if test="roleId!=null">
+				AND b.Role_Id = #{roleId}
+			</if>
+			<if test="showStatus!=null">
+				AND b.Show_Status = #{showStatus}
+			</if>
+		</where>
+		)t order by t.create_time DESC
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+
+	<select
+		id="getCountByCondition"
+		parameterType="hashmap"
+		resultType="int">
+		select count(1) from sys_user_info_t
+		<where>
+			<if test="userName != null">
+				User_Name = #{userName}
+			</if>
+			<if test="userPwd != null">
+				AND User_Pwd = #{userPwd}
+			</if>
+			<if test="userId != null">
+				AND User_Id = #{userId}
+			</if>
+			<if test="createUser != null">
+				AND Create_User = #{createUser}
+			</if>
+		</where>
+	</select>
+
+	<!--根据角色类型查询所有角色的用户名 -->
+	<select
+		id="getInfoByRoleId"
+		parameterType="int"
+		resultMap="userInfoMapperResult">
+		select User_Id,User_Name from sys_user_info_t
+		<where>
+			Role_Id =#{Role_Id}
+		</where>
+	</select>
+
+	<!-- 查询所有账户名 -->
+	<select
+		id="getAllInfo"
+		parameterType="int"
+		resultMap="userInfoMapperResult">
+		select User_Id,User_Name from sys_user_info_t where Show_Status =
+		#{showStatus}
+	</select>
+
+	<select
+		id="getBelongCityInfo"
+		parameterType="hashmap"
+		resultMap="userInfoMapperResult">
+		select u.User_Id,u.Province_Id,City_Id,p.Province_name,'NULL'
+		City_Name from sys_user_info_t u,sys_province_info_t p
+		<where>
+			u.Province_Id=p.Province_Id AND u.City_Id is null
+			<if test="userId!=null">
+				AND u.User_Id = #{userId}
+			</if>
+		</where>
+		union all
+		select u.User_Id,u.Province_Id,u.City_Id,p.Province_name,ci.City_Name from
+		sys_user_info_t u,sys_province_info_t p,sys_city_info_t ci
+		<where>
+			u.Province_Id=p.Province_Id AND u.City_Id=ci.City_id AND u.City_Id is
+			not null
+			<if test="userId!=null">
+				AND u.User_Id = #{userId}
+			</if>
+		</where>
+	</select>
+
+
+</mapper>

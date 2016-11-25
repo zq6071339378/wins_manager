@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<title>点击用户数明细</title>
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<meta name="description" content="">
+<meta name="author" content="">
+<!--CSS-->
+<link rel="stylesheet" type="text/css" href="css/cloud-admin.css">
+<link rel="stylesheet" type="text/css" href="css/themes/default.css"
+	id="skin-switcher">
+<link rel="stylesheet" type="text/css" href="css/responsive.css">
+<link rel="stylesheet" type="text/css" href="css/toolbar_global.css">
+<link href="font-awesome/css/font-awesome.min.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css"
+	href="js/bootstrap-daterangepicker/daterangepicker-bs3.css" />
+<link rel="stylesheet" type="text/css"
+	href="js/uniform/css/uniform.default.min.css" />
+<link rel="stylesheet" href="css/inbox.css">
+<!--CSS END-->
+</head>
+<body>
+	<!-- HEADER -->
+	<header class="navbar clearfix navbar-fixed-top" id="header">
+		<div class="container">
+			<div class="navbar-brand">
+				<!-- COMPANY LOGO -->
+				<a href="index.html"> <img src="img/logo/logo.png"
+					alt="Cloud Admin Logo" class="img-responsive">
+				</a>
+				<!-- /COMPANY LOGO -->
+				<!-- TEAM STATUS FOR MOBILE -->
+				<div class="visible-xs">
+					<a href="#" class="team-status-toggle switcher btn dropdown-toggle">
+						<i class="fa fa-users"></i>
+					</a>
+				</div>
+				<!-- /TEAM STATUS FOR MOBILE -->
+				<!-- SIDEBAR COLLAPSE -->
+				<div id="sidebar-collapse" class="sidebar-collapse btn">
+					<i class="fa fa-bars" data-icon1="fa fa-bars"
+						data-icon2="fa fa-bars"></i>
+				</div>
+				<!-- /SIDEBAR COLLAPSE -->
+			</div>
+			<!-- NAVBAR LEFT -->
+			<ul class="nav navbar-nav pull-left hidden-xs" id="navbar-left">
+				<li class="dropdown"><a href="#"
+					class="dropdown-toggle city_font" data-toggle="dropdown" id="city">
+						<i class="fa fa-map-marker"></i> <span class="name">广东省</span> <i
+						class="fa fa-angle-down"></i>
+				</a></li>
+			</ul>
+			<!-- /NAVBAR LEFT -->
+			<!-- BEGIN TOP NAVIGATION MENU -->
+			<ul class="nav navbar-nav pull-right">
+				<!-- BEGIN NOTIFICATION DROPDOWN -->
+				<li class="dropdown" id="header-notification"><a href="#"
+					class="dropdown-toggle" data-toggle="dropdown"> <i
+						class="fa fa-bell"></i> <span class="badge">7</span>
+
+				</a>
+					<ul class="dropdown-menu notification">
+						<li class="dropdown-title"><span><i class="fa fa-bell"></i>系统通知</span>
+						</li>
+						<li><a href="#"> <span class="label label-success"><i
+									class="fa fa-user"></i></span> <span class="body"> <span
+									class="message">最新推广活动公告 </span> <span class="time"> <i
+										class="fa fa-clock-o"></i> <span>Just now</span>
+								</span>
+							</span>
+						</a></li>
+						<li><a href="#"> <span class="label label-primary"><i
+									class="fa fa-comment"></i></span> <span class="body"> <span
+									class="message">近期升级安排</span> <span class="time"> <i
+										class="fa fa-clock-o"></i> <span>19 mins</span>
+								</span>
+							</span>
+						</a></li>
+						<li><a href="#"> <span class="label label-danger"><i
+									class="fa fa-heart"></i></span> <span class="body"> <span
+									class="message">请尽快续费！ </span> <span class="time"> <i
+										class="fa fa-clock-o"></i> <span>2 hrs</span>
+								</span>
+							</span>
+						</a></li>
+						<li><a href="#"> <span class="label label-warning"><i
+									class="fa fa-exclamation-triangle"></i></span> <span class="body">
+									<span class="message">您的账户存在安全风险！</span> <span class="time">
+										<i class="fa fa-clock-o"></i> <span>6 hrs</span>
+								</span>
+							</span>
+						</a></li>
+						<li class="footer"><a href="#">查看所有<i
+								class="fa fa-arrow-circle-right"></i></a></li>
+					</ul></li>
+				<!-- BEGIN TODO DROPDOWN -->
+				<!-- BEGIN USER LOGIN DROPDOWN -->
+				<li class="dropdown user" id="header-user"><a href="#"
+					class="dropdown-toggle" data-toggle="dropdown"> <img alt=""
+						src="img/avatars/avatar3.jpg" /> <span class="username">张三</span>
+						<i class="fa fa-angle-down"></i>
+				</a>
+					<ul class="dropdown-menu">
+						<li><a href="#"><i class="fa fa-user"></i> 账户信息</a></li>
+						<li><a href="#"><i class="fa fa-cog"></i> 账户安全</a></li>
+						<li><a href="login.html"><i class="fa fa-power-off"></i>
+								退出系统</a></li>
+					</ul></li>
+				<!-- END USER LOGIN DROPDOWN -->
+			</ul>
+			<!-- END TOP NAVIGATION MENU -->
+		</div>
+
+		<!-- TEAM STATUS -->
+		<div class="container team-status" id="team-status">
+			<div id="scrollbar">
+				<div class="handle"></div>
+			</div>
+			<div id="teamslider">
+				<ul class="team-list">
+					<li class="current"><a href="javascript:void(0);"> <span
+							class="image"> <img src="img/avatars/avatar3.jpg" alt="" />
+						</span> <span class="title"> You </span>
+							<div class="progress">
+								<div class="progress-bar progress-bar-success"
+									style="width: 35%">
+									<span class="sr-only">35% Complete (success)</span>
+								</div>
+								<div class="progress-bar progress-bar-warning"
+									style="width: 20%">
+									<span class="sr-only">20% Complete (warning)</span>
+								</div>
+								<div class="progress-bar progress-bar-danger" style="width: 10%">
+									<span class="sr-only">10% Complete (danger)</span>
+								</div>
+							</div> <span class="status">
+								<div class="field">
+									<span class="badge badge-green">6</span> completed <span
+										class="pull-right fa fa-check"></span>
+								</div>
+								<div class="field">
+									<span class="badge badge-orange">3</span> in-progress <span
+										class="pull-right fa fa-adjust"></span>
+								</div>
+								<div class="field">
+									<span class="badge badge-red">1</span> pending <span
+										class="pull-right fa fa-list-ul"></span>
+								</div>
+						</span>
+					</a></li>
+					<li><a href="javascript:void(0);"> <span class="image">
+								<img src="img/avatars/avatar1.jpg" alt="" />
+						</span> <span class="title"> Max Doe </span>
+							<div class="progress">
+								<div class="progress-bar progress-bar-success"
+									style="width: 15%">
+									<span class="sr-only">35% Complete (success)</span>
+								</div>
+								<div class="progress-bar progress-bar-warning"
+									style="width: 40%">
+									<span class="sr-only">20% Complete (warning)</span>
+								</div>
+								<div class="progress-bar progress-bar-danger" style="width: 20%">
+									<span class="sr-only">10% Complete (danger)</span>
+								</div>
+							</div> <span class="status">
+								<div class="field">
+									<span class="badge badge-green">2</span> completed <span
+										class="pull-right fa fa-check"></span>
+								</div>
+								<div class="field">
+									<span class="badge badge-orange">8</span> in-progress <span
+										class="pull-right fa fa-adjust"></span>
+								</div>
+								<div class="field">
+									<span class="badge badge-red">4</span> pending <span
+										class="pull-right fa fa-list-ul"></span>
+								</div>
+						</span>
+					</a></li>
+					<li><a href="javascript:void(0);"> <span class="image">
+								<img src="img/avatars/avatar2.jpg" alt="" />
+						</span> <span class="title"> Jane Doe </span>
+							<div class="progress">
+								<div class="progress-bar progress-bar-success"
+									style="width: 65%">
+									<span class="sr-only">35% Complete (success)</span>
+								</div>
+								<div class="progress-bar progress-bar-warning"
+									style="width: 10%">
+									<span class="sr-only">20% Complete (warning)</span>
+								</div>
+								<div class="progress-bar progress-bar-danger" style="width: 15%">
+									<span class="sr-only">10% Complete (danger)</span>
+								</div>
+							</div> <span class="status">
+								<div class="field">
+									<span class="badge badge-green">10</span> completed <span
+										class="pull-right fa fa-check"></span>
+								</div>
+								<div class="field">
+									<span class="badge badge-orange">3</span> in-progress <span
+										class="pull-right fa fa-adjust"></span>
+								</div>
+								<div class="field">
+									<span class="badge badge-red">4</span> pending <span
+										class="pull-right fa fa-list-ul"></span>
+								</div>
+						</span>
+					</a></li>
+					<li><a href="javascript:void(0);"> <span class="image">
+								<img src="img/avatars/avatar4.jpg" alt="" />
+						</span> <span class="title"> Ellie Doe </span>
+							<div class="progress">
+								<div class="progress-bar progress-bar-success" style="width: 5%">
+									<span class="sr-only">35% Complete (success)</span>
+								</div>
+								<div class="progress-bar progress-bar-warning"
+									style="width: 48%">
+									<span class="sr-only">20% Complete (warning)</span>
+								</div>
+								<div class="progress-bar progress-bar-danger" style="width: 27%">
+									<span class="sr-only">10% Complete (danger)</span>
+								</div>
+							</div> <span class="status">
+								<div class="field">
+									<span class="badge badge-green">1</span> completed <span
+										class="pull-right fa fa-check"></span>
+								</div>
+								<div class="field">
+									<span class="badge badge-orange">6</span> in-progress <span
+										class="pull-right fa fa-adjust"></span>
+								</div>
+								<div class="field">
+									<span class="badge badge-red">2</span> pending <span
+										class="pull-right fa fa-list-ul"></span>
+								</div>
+						</span>
+					</a></li>
+					<li><a href="javascript:void(0);"> <span class="image">
+								<img src="img/avatars/avatar5.jpg" alt="" />
+						</span> <span class="title"> Lisa Doe </span>
+							<div class="progress">
+								<div class="progress-bar progress-bar-success"
+									style="width: 21%">
+									<span class="sr-only">35% Complete (success)</span>
+								</div>
+								<div class="progress-bar progress-bar-warning"
+									style="width: 20%">
+									<span class="sr-only">20% Complete (warning)</span>
+								</div>
+								<div class="progress-bar progress-bar-danger" style="width: 40%">
+									<span class="sr-only">10% Complete (danger)</span>
+								</div>
+							</div> <span class="status">
+								<div class="field">
+									<span class="badge badge-green">4</span> completed <span
+										class="pull-right fa fa-check"></span>
+								</div>
+								<div class="field">
+									<span class="badge badge-orange">5</span> in-progress <span
+										class="pull-right fa fa-adjust"></span>
+								</div>
+								<div class="field">
+									<span class="badge badge-red">9</span> pending <span
+										class="pull-right fa fa-list-ul"></span>
+								</div>
+						</span>
+					</a></li>
+					<li><a href="javascript:void(0);"> <span class="image">
+								<img src="img/avatars/avatar6.jpg" alt="" />
+						</span> <span class="title"> Kelly Doe </span>
+							<div class="progress">
+								<div class="progress-bar progress-bar-success"
+									style="width: 45%">
+									<span class="sr-only">35% Complete (success)</span>
+								</div>
+								<div class="progress-bar progress-bar-warning"
+									style="width: 21%">
+									<span class="sr-only">20% Complete (warning)</span>
+								</div>
+								<div class="progress-bar progress-bar-danger" style="width: 10%">
+									<span class="sr-only">10% Complete (danger)</span>
+								</div>
+							</div> <span class="status">
+								<div class="field">
+									<span class="badge badge-green">6</span> completed <span
+										class="pull-right fa fa-check"></span>
+								</div>
+								<div class="field">
+									<span class="badge badge-orange">3</span> in-progress <span
+										class="pull-right fa fa-adjust"></span>
+								</div>
+								<div class="field">
+									<span class="badge badge-red">1</span> pending <span
+										class="pull-right fa fa-list-ul"></span>
+								</div>
+						</span>
+					</a></li>
+					<li><a href="javascript:void(0);"> <span class="image">
+								<img src="img/avatars/avatar7.jpg" alt="" />
+						</span> <span class="title"> Jessy Doe </span>
+							<div class="progress">
+								<div class="progress-bar progress-bar-success" style="width: 7%">
+									<span class="sr-only">35% Complete (success)</span>
+								</div>
+								<div class="progress-bar progress-bar-warning"
+									style="width: 30%">
+									<span class="sr-only">20% Complete (warning)</span>
+								</div>
+								<div class="progress-bar progress-bar-danger" style="width: 10%">
+									<span class="sr-only">10% Complete (danger)</span>
+								</div>
+							</div> <span class="status">
+								<div class="field">
+									<span class="badge badge-green">1</span> completed <span
+										class="pull-right fa fa-check"></span>
+								</div>
+								<div class="field">
+									<span class="badge badge-orange">6</span> in-progress <span
+										class="pull-right fa fa-adjust"></span>
+								</div>
+								<div class="field">
+									<span class="badge badge-red">2</span> pending <span
+										class="pull-right fa fa-list-ul"></span>
+								</div>
+						</span>
+					</a></li>
+					<li><a href="javascript:void(0);"> <span class="image">
+								<img src="img/avatars/avatar8.jpg" alt="" />
+						</span> <span class="title"> Debby Doe </span>
+							<div class="progress">
+								<div class="progress-bar progress-bar-success"
+									style="width: 70%">
+									<span class="sr-only">35% Complete (success)</span>
+								</div>
+								<div class="progress-bar progress-bar-warning"
+									style="width: 20%">
+									<span class="sr-only">20% Complete (warning)</span>
+								</div>
+								<div class="progress-bar progress-bar-danger" style="width: 5%">
+									<span class="sr-only">10% Complete (danger)</span>
+								</div>
+							</div> <span class="status">
+								<div class="field">
+									<span class="badge badge-green">13</span> completed <span
+										class="pull-right fa fa-check"></span>
+								</div>
+								<div class="field">
+									<span class="badge badge-orange">7</span> in-progress <span
+										class="pull-right fa fa-adjust"></span>
+								</div>
+								<div class="field">
+									<span class="badge badge-red">1</span> pending <span
+										class="pull-right fa fa-list-ul"></span>
+								</div>
+						</span>
+					</a></li>
+				</ul>
+			</div>
+		</div>
+		<!-- /TEAM STATUS -->
+	</header>
+	<!--/HEADER -->
+	<!-- PAGE -->
+	<section id="page">
+		<!--侧导航-->
+		<div class="sidebar sidebar-fixed" id="sidebar" style="">
+			<div class="sidebar-menu nav-collapse">
+				<!-- SIDEBAR MENU -->
+				<ul>
+					<li class=""><a href="index.html"> <i
+							class="fa fa-tachometer"></i> <span class="menu-text">推送概览</span>
+							<span class="selected"></span>
+					</a></li>
+					<li class="has-sub"><a class="" href="javascript:;"> <i
+							class="fa fa-bullhorn"></i> <span class="menu-text">推送管理</span> <span
+							class="arrow"></span>
+					</a>
+						<ul class="sub">
+							<li><a href="strategy.html" class=""><span
+									class="sub-menu-text">策略管理</span></a></li>
+							<li class="has-sub-sub"><a class="" href="javascript:;"><span
+									class="sub-menu-text">素材管理</span> </a>
+								<ul class="sub-sub">
+									<li><a href="template.html" class=""><span
+											class="sub-sub-menu-text">模板管理</span></a></li>
+									<li><a href="pageManage.html" class=""><span
+											class="sub-sub-menu-text">页面管理</span></a></li>
+								</ul></li>
+							<li class=""><a href="groups.html"><span
+									class="sub-menu-text">群组管理</span></a></li>
+							<li><a href="area.html" class=""><span
+									class="sub-menu-text">地域管理</span></a></li>
+						</ul></li>
+					<li class="has-sub open"><a class="" href="javascript:;">
+							<i class="fa fa-user"></i> <span class="menu-text">运营管理</span> <span
+							class="arrow"></span>
+					</a>
+						<ul class="sub" style="display: block;">
+							<li class="current"><a href="reportManage.html" class=""><span
+									class="sub-menu-text">推送报表管理</span></a></li>
+							<li><a href="complaint.html" class=""><span
+									class="sub-menu-text">用户投诉管理</span></a></li>
+							<li class="has-sub-sub"><a class="" href="javascript:;"><span
+									class="sub-menu-text">黑名单管理</span> </a>
+								<ul class="sub-sub">
+									<li><a href="blackUser.html" class=""><span
+											class="sub-sub-menu-text">用户黑名单管理</span></a></li>
+									<li><a href="blackUrl.html" class=""><span
+											class="sub-sub-menu-text">网址黑名单管理</span></a></li>
+								</ul></li>
+						</ul></li>
+					<li class="has-sub"><a class="" href="javascript:;"> <i
+							class="fa fa-th-large"></i> <span class="menu-text">系统管理</span> <span
+							class="arrow"></span>
+					</a>
+						<ul class="sub">
+							<li><a href="accountsManage.html" class=""><span
+									class="sub-menu-text">账号管理</span></a></li>
+							<li><a href="monitorManage.html" class=""><span
+									class="sub-menu-text">监控管理</span></a></li>
+							<li class=""><a href="journalManage.html" class=""><span
+									class="sub-menu-text">日志管理</span></a></li>
+							<li class=""><a href="msgManage.html" class=""><span
+									class="sub-menu-text">消息管理</span></a></li>
+						</ul></li>
+					<li class="has-sub"><a class="" href="javascript:;"> <i
+							class="fa fa-users"></i> <span class="menu-text">账户设置</span> <span
+							class="arrow"></span>
+					</a>
+						<ul class="sub">
+							<li><a href="accountInfo.html" class=""><span
+									class="sub-menu-text">账户信息</span></a></li>
+							<li class=""><a href="systemMsg.html" class=""><span
+									class="sub-menu-text">系统消息</span></a></li>
+							<li><a href="accountSecurity.html" class=""><span
+									class="sub-menu-text">账户安全</span></a></li>
+							<li><a href="operationLog.html" class=""><span
+									class="sub-menu-text">操作记录</span></a></li>
+						</ul></li>
+				</ul>
+				<!-- /SIDEBAR MENU -->
+			</div>
+		</div>
+		<!--侧导航 -->
+		<!--main_container-->
+		<div id="main-content" class="margin-top-50">
+			<div class="container">
+				<div class="row">
+					<div id="content" class="col-lg-12">
+						<!-- PAGE HEADER-->
+						<div class="row">
+							<div class="col-sm-12">
+								<div class="page-header">
+									<!-- STYLER -->
+
+									<!-- /STYLER -->
+									<!-- BREADCRUMBS -->
+									<ul class="breadcrumb">
+										<li><i class="fa fa-home"></i> <a href="#">运营管理</a></li>
+										<li><a href="reportManage.html">报表管理</a></li>
+									</ul>
+									<!-- /BREADCRUMBS -->
+									<div class="clearfix">
+										<h3 class="content-title pull-left">点击用户数明细</h3>
+									</div>
+									<div class="description">Simple Tables with exclusive UI
+										experience</div>
+								</div>
+							</div>
+						</div>
+						<!-- /PAGE HEADER -->
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-4 form_input login-box row_left">
+									<form>
+										<div class="form-group col-md-10 row_left search_icon">
+											<a href="#"><i class="fa fa-search"></i></a> <input
+												type="search" id="exampleInputSearch" class="form-control"
+												placeholder="请输入策略名称">
+										</div>
+									</form>
+								</div>
+								<div class="col-md-3">
+									<div id="datetimepicker5" class="input-group date">
+										<input type="text" class="form-control"> <span
+											class="input-group-addon"><span class="fa fa-calendar"></span>
+										</span>
+									</div>
+								</div>
+								<div class="col-md-4 pull-right">
+									<div class="from-group col-md-6 pull-right">
+										<button type="button" class="btn btn-primary"
+											onclick="javascript:window.location.href='#'">导出用户</button>
+									</div>
+									<div class="from-group col-md-4">
+										<button type="button" class="btn btn-danger"
+											onclick="javascript:window.location.href='#'">导出明细</button>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="divide-10"></div>
+						<!--群租管理TABLE-->
+						<div class="tables" class="row tab-pane fade in active">
+							<div class="col-md-12 row_left">
+								<!-- BOX -->
+								<div class="box border purple">
+									<table
+										class="datatable table table-striped table-bordered table-hover dataTable">
+										<thead>
+											<tr>
+												<th>序号</th>
+												<th>帐号</th>
+												<th>展现时间</th>
+												<th>用户IP</th>
+												<th>用户UA</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>1</td>
+												<td>admin123</td>
+												<td>2016.2.14-2016.3.12</td>
+												<td>192.168.163</td>
+												<td>admin121</td>
+											</tr>
+											<tr>
+												<td>2</td>
+												<td>admin123</td>
+												<td>2016.2.14-2016.3.12</td>
+												<td>192.168.163</td>
+												<td>admin121</td>
+											</tr>
+											<tr>
+												<td>3</td>
+												<td>admin123</td>
+												<td>2016.2.14-2016.3.12</td>
+												<td>192.168.163</td>
+												<td>admin121</td>
+											</tr>
+											<tr>
+												<td>4</td>
+												<td>admin123</td>
+												<td>2016.2.14-2016.3.12</td>
+												<td>192.168.163</td>
+												<td>admin121</td>
+											</tr>
+											<tr>
+												<td>5</td>
+												<td>admin123</td>
+												<td>2016.2.14-2016.3.12</td>
+												<td>192.168.163</td>
+												<td>admin121</td>
+											</tr>
+											<tr>
+												<td>6</td>
+												<td>admin123</td>
+												<td>2016.2.14-2016.3.12</td>
+												<td>192.168.163</td>
+												<td>admin121</td>
+											</tr>
+											<tr>
+												<td>7</td>
+												<td>admin123</td>
+												<td>2016.2.14-2016.3.12</td>
+												<td>192.168.163</td>
+												<td>admin121</td>
+											</tr>
+											<tr>
+												<td>8</td>
+												<td>admin123</td>
+												<td>2016.2.14-2016.3.12</td>
+												<td>192.168.163</td>
+												<td>admin121</td>
+											</tr>
+											<tr>
+												<td>9</td>
+												<td>admin123</td>
+												<td>2016.2.14-2016.3.12</td>
+												<td>192.168.163</td>
+												<td>admin121</td>
+											</tr>
+											<tr>
+												<td>10</td>
+												<td>admin123</td>
+												<td>2016.2.14-2016.3.12</td>
+												<td>192.168.163</td>
+												<td>admin121</td>
+											</tr>
+										</tbody>
+									</table>
+									<div class="row">
+										<div class="dataTables_footer clearfix">
+											<div class="col-md-12">
+												<div class="pull-right">
+													<div class="dataTables_paginate paging_bs_full"
+														id="datatable1_paginate">
+														<ul class="pagination">
+															<li class="disabled"><a
+																class="paginate_button first" tabindex="0"
+																id="datatable1_first"> <i
+																	class="fa fa-angle-double-left"></i>
+															</a></li>
+															<li class="disabled"><a
+																class="paginate_button previous" tabindex="0"
+																id="datatable1_previous"> <i
+																	class="fa fa-angle-left"></i>
+															</a></li>
+															<li class="active"><a tabindex="0">1</a></li>
+															<li><a tabindex="0">2</a></li>
+															<li><a tabindex="0">3</a></li>
+															<li><a tabindex="0">4</a></li>
+															<li><a tabindex="0">5</a></li>
+															<li><a class="paginate_button next" tabindex="0"
+																id="datatable1_next"> <i class="fa fa-angle-right"></i>
+															</a></li>
+															<li><a class="paginate_button last" tabindex="0"
+																id="datatable1_last"> <i
+																	class="fa fa-angle-double-right"></i>
+															</a></li>
+														</ul>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<!-- /BOX -->
+							</div>
+						</div>
+						<!--群组管理TABLE END-->
+						<!--<div aria-hidden="false" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" id="box-config" class="modal fade in" style="display: block;">
+									<div class="modal-dialog">
+									  <div class="modal-content">
+										<div class="modal-header">
+										  <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+										  <h4 class="modal-title">Box Settings</h4>
+										</div>
+										<div class="modal-body">
+										  Here goes box setting content.
+										</div>
+										<div class="modal-footer">
+										  <button data-dismiss="modal" class="btn btn-default" type="button">Close</button>
+										  <button class="btn btn-primary" type="button">Save changes</button>
+										</div>
+									  </div>
+									</div>
+							  	</div>-->
+						<div class="footer-tools">
+							<span class="go-top"> <i class="fa fa-chevron-up"></i> Top
+							</span>
+						</div>
+					</div>
+					<!-- /CONTENT END-->
+				</div>
+			</div>
+		</div>
+		<!--main_container-->
+	</section>
+	<!--/PAGE -->
+	<!-- JAVASCRIPTS -->
+	<!-- Placed at the end of the document so the pages load faster -->
+	<!-- JQUERY -->
+	<script src="js/jquery/jquery-2.0.3.min.js"></script>
+	<!-- JQUERY UI-->
+	<script
+		src="js/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js"></script>
+	<!-- BOOTSTRAP -->
+	<script src="bootstrap-dist/js/bootstrap.min.js"></script>
+	<!-- LESS CSS -->
+	<script src="js/lesscss/less-1.4.1.min.js" type="text/javascript"></script>
+	<!-- DATE RANGE PICKER -->
+	<script src="js/bootstrap-daterangepicker/moment.min.js"></script>
+	<script src="js/bootstrap-daterangepicker/daterangepicker.min.js"></script>
+	<!-- SLIMSCROLL -->
+	<script type="text/javascript"
+		src="js/jQuery-slimScroll-1.3.0/jquery.slimscroll.min.js"></script>
+	<script type="text/javascript"
+		src="js/jQuery-slimScroll-1.3.0/slimScrollHorizontal.min.js"></script>
+	<!-- BLOCK UI -->
+	<script type="text/javascript"
+		src="js/jQuery-BlockUI/jquery.blockUI.min.js"></script>
+	<!-- UNIFORM -->
+	<script type="text/javascript" src="js/uniform/jquery.uniform.min.js"></script>
+	<!-- BOOTSTRAP WYSIWYG -->
+	<script type="text/javascript"
+		src="js/bootstrap-wysiwyg/jquery.hotkeys.min.js"></script>
+	<script type="text/javascript"
+		src="js/bootstrap-wysiwyg/bootstrap-wysiwyg.min.js"></script>
+	<!-- COOKIE -->
+	<script type="text/javascript"
+		src="js/jQuery-Cookie/jquery.cookie.min.js"></script>
+	<!-- CUSTOM SCRIPT -->
+	<script src="js/script.js"></script>
+	<script src="js/inbox.js"></script>
+
+	<script src="js/jquery-1.11.3.min.js"></script>
+	<script src="js/Popt.js"></script>
+	<script src="js/cityJson.js"></script>
+	<script src="js/citySet.js"></script>
+	<script>
+		jQuery(document).ready(function() {		
+			App.setPage("inbox");  //Set current page
+			App.init(); //Initialise plugins and elements
+			Inbox.init();
+		});
+	</script>
+	<script type="text/javascript">
+	$("#city").click(function (e) {
+		SelCity(this,e);
+	});
+	</script>
+	<!-- /JAVASCRIPTS -->
+</body>
+</html>

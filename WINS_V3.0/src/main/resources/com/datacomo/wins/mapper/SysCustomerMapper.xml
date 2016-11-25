@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.SysCustomerMapper">
+	<resultMap type="hashmap" id="customerMapperResult">
+		<result property="customerId" column="Customer_Id"/>
+		<result property="contractCode" column="contract_code"/>
+		<result property="customerName" column="Customer_Name"/>
+		<result property="customerPhone" column="Customer_Phone"/>
+		<result property="customerEmail" column="Customer_Email"/>
+		<result property="customerCompany" column="Customer_Company"/>
+		<result property="customerOffice" column="Customer_office"/>
+		<result property="customerAddress" column="Customer_Address"/>
+		<result property="accountBalance" column="Account_Balance"/>
+		<result property="createUser" column="Create_User"/>
+		<result property="createName" column="User_Name"/>
+		<result property="createTime" column="Create_Time"/>
+		<result property="remarks" column="Remarks"/>
+		<result property="tradeNo" column="Trade_No"/>
+		<result property="tradeType" column="Trade_Type"/>
+		<result property="tradeAmount" column="Trade_Amount"/>
+		<result property="tradeRemark" column="Trade_Remark"/>
+		<result property="tradeTime" column="Trade_Time"/>
+	</resultMap>
+	
+	<select id="searchCustomer" parameterType="hashmap" resultMap="customerMapperResult">
+	    SELECT Customer_Id,Customer_Name,Account_Balance FROM sys_customer_info_t
+		<where>
+			(Create_User IN (SELECT User_Id FROM sys_user_info_t WHERE Create_User=#{userId}) OR Create_User=#{userId})
+			<if test="searchCustomer!=null">
+				and Customer_Name like "%${searchCustomer}%"
+			</if>
+		</where>
+	</select>
+
+	<select id="findByCondition" parameterType="hashmap" resultMap="customerMapperResult">
+		SELECT cu.Customer_Id,cu.contract_code,cu.Customer_Name,cu.Customer_Phone,cu.Customer_Email,cu.Customer_Company,cu.Customer_office,cu.Customer_Address,
+		cm.Account_Balance,cm.Trade_Time,cu.Create_Time,u.User_Name
+		FROM sys_customer_info_t cu LEFT JOIN sys_user_info_t u ON cu.Create_User = u.User_Id
+		LEFT JOIN
+		(SELECT mcu.Customer_Id,mcu.Trade_Time,ctr.Account_Balance FROM (SELECT Customer_Id,MAX(Trade_Time) AS Trade_Time FROM customer_trade_record GROUP BY Customer_Id) mcu LEFT JOIN customer_trade_record ctr
+		ON mcu.Customer_Id=ctr.Customer_Id AND ctr.Trade_Time=mcu.Trade_Time) cm ON cu.Customer_Id=cm.Customer_Id
+		<where>
+			(cu.Create_User IN (SELECT User_Id FROM sys_user_info_t WHERE Create_User=#{userId}) OR cu.Create_User=#{userId})
+			<if test="customerName!=null">
+				AND cu.Customer_Name LIKE '%${customerName}%'
+			</if>
+		</where>
+		ORDER BY cu.Create_Time DESC
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+
+	<select id="countByCondition" parameterType="hashmap" resultType="int">
+		SELECT count(*) FROM sys_customer_info_t cu LEFT JOIN sys_user_info_t u ON cu.Create_User = u.User_Id
+		LEFT JOIN
+		(SELECT mcu.Customer_Id,mcu.Trade_Time,ctr.Account_Balance FROM (SELECT Customer_Id,MAX(Trade_Time) AS Trade_Time FROM customer_trade_record GROUP BY Customer_Id) mcu LEFT JOIN customer_trade_record ctr
+		ON mcu.Customer_Id=ctr.Customer_Id AND ctr.Trade_Time=mcu.Trade_Time) cm ON cu.Customer_Id=cm.Customer_Id
+		<where>
+			(cu.Create_User IN (SELECT User_Id FROM sys_user_info_t WHERE Create_User=#{userId}) OR cu.Create_User=#{userId})
+			<if test="customerName!=null">
+				AND cu.Customer_Name LIKE '%${customerName}%'
+			</if>
+		</where>
+	</select>
+
+	<select id="getInfoByCondition" parameterType="hashmap" resultMap="customerMapperResult">
+		SELECT cu.Customer_Id,cu.contract_code,cu.Customer_Name,cu.Customer_Phone,cu.Customer_Email,cu.Customer_Company,cu.Customer_office,cu.Customer_Address,
+		cu.Create_Time,cu.Remarks,cm.Account_Balance
+		FROM sys_customer_info_t cu LEFT JOIN
+		(SELECT mcu.Customer_Id,mcu.Trade_Time,ctr.Account_Balance FROM (SELECT Customer_Id,MAX(Trade_Time) AS Trade_Time FROM customer_trade_record GROUP BY Customer_Id) mcu LEFT JOIN customer_trade_record ctr
+		ON mcu.Customer_Id=ctr.Customer_Id AND ctr.Trade_Time=mcu.Trade_Time) cm ON cu.Customer_Id=cm.Customer_Id
+		<where>
+			cu.Customer_Id = #{customerId}
+		</where>
+	</select>
+
+	<delete id="deleteById" parameterType="int">
+		delete from sys_customer_info_t WHERE Customer_Id=#{customerId}
+	</delete>
+
+	<delete id="deleteInfoById" parameterType="int">
+		delete from policy_customer_relation_t WHERE Policy_Id=#{policyId}
+	</delete>
+
+	<update id="updateInfo" parameterType="java.util.HashMap">
+		update sys_customer_info_t
+		<set>
+			<if test="contractCode!=null">
+				contract_code=#{contractCode},
+			</if>
+			<if test="customerName != null">
+				Customer_Name=#{customerName},
+			</if>
+			<if test="accountBalance != null">
+				Account_Balance=#{accountBalance},
+			</if>
+			<if test="customerPhone != null">
+				Customer_Phone=#{customerPhone},
+			</if>
+			<if test="customerEmail != null">
+				Customer_Email=#{customerEmail},
+			</if>
+			<if test="customerCompany != null">
+				Customer_Company=#{customerCompany},
+			</if>
+			<if test="customerOffice != null">
+				Customer_office=#{customerOffice},
+			</if>
+			<if test="customerAddress != null">
+				Customer_Address=#{customerAddress},
+			</if>
+			<if test="remarks != null">
+				Remarks=#{remarks},
+			</if>
+		 	<if test="accountBalance != null">
+				Account_Balance=#{"accountBalance"},
+			</if>
+		</set>
+		WHERE Customer_Id=#{customerId}
+	</update>
+	
+	<update id="updateRechargenfo" parameterType="java.util.HashMap">
+		update sys_customer_info_t
+		<set>
+			<if test="accountBalance != null">
+				Account_Balance=#{accountBalance}
+			</if>
+		</set>
+		WHERE Customer_Id=#{customerId}
+	</update>
+	
+	<insert id="insertInfo" parameterType="hashmap" useGeneratedKeys="true" keyProperty="id">
+		INSERT sys_customer_info_t (contract_code,Customer_Name,Customer_Phone,Customer_Email,Customer_Company,Customer_office,Customer_Address,Remarks,Create_User,Create_Time)
+		VALUES (#{contractCode},#{customerName},#{customerPhone},#{customerEmail},#{customerCompany},#{customerOffice},#{customerAddress},#{remarks},#{createUser},#{createTime})
+	</insert>
+
+	<insert id="insertTradeInfo" parameterType="hashmap" useGeneratedKeys="true" keyProperty="id">
+		INSERT customer_trade_record (Customer_Id,Trade_Type,Trade_Amount,Account_Balance,Trade_Remark,Trade_Time,Create_User,Create_Time)
+		VALUES (#{customerId},#{tradeType},#{tradeAmount},#{accountBalance},#{tradeRemark},#{tradeTime},#{createUser},#{createTime})
+	</insert>
+
+	<select id="findAllByCondition" parameterType="hashmap" resultMap="customerMapperResult">
+		SELECT * FROM (
+			SELECT cu.Customer_Id,cu.contract_code,cu.Customer_Name,cu.Customer_Phone,cu.Customer_Email,cu.Customer_Company,cu.Customer_office,cu.Customer_Address,
+			cm.Account_Balance,cm.Trade_Time,cu.Create_Time,u.User_Name
+			FROM sys_customer_info_t cu LEFT JOIN sys_user_info_t u ON cu.Create_User = u.User_Id
+			LEFT JOIN
+			(SELECT mcu.Customer_Id,mcu.Trade_Time,ctr.Account_Balance FROM (SELECT Customer_Id,MAX(Trade_Time) AS
+			Trade_Time FROM customer_trade_record GROUP BY Customer_Id) mcu LEFT JOIN customer_trade_record ctr
+			ON mcu.Customer_Id=ctr.Customer_Id AND ctr.Trade_Time=mcu.Trade_Time) cm ON cu.Customer_Id=cm.Customer_Id
+			<where>
+				(u.City_Id IS NULL OR u.City_Id=0) AND u.province_id=#{provinceId}
+				<if test="contractCode!=null">
+					AND cu.contract_code LIKE '%${contractCode}%'
+				</if>
+			</where>
+			UNION ALL
+			SELECT
+			cu.Customer_Id,cu.contract_code,cu.Customer_Name,cu.Customer_Phone,cu.Customer_Email,cu.Customer_Company,cu.Customer_office,cu.Customer_Address,
+			cm.Account_Balance,cm.Trade_Time,cu.Create_Time,u.User_Name
+			FROM sys_customer_info_t cu LEFT JOIN sys_user_info_t u ON cu.Create_User = u.User_Id
+			LEFT JOIN
+			(SELECT mcu.Customer_Id,mcu.Trade_Time,ctr.Account_Balance FROM (SELECT Customer_Id,MAX(Trade_Time) AS
+			Trade_Time FROM customer_trade_record GROUP BY Customer_Id) mcu LEFT JOIN customer_trade_record ctr
+			ON mcu.Customer_Id=ctr.Customer_Id AND ctr.Trade_Time=mcu.Trade_Time) cm ON cu.Customer_Id=cm.Customer_Id
+			<where>
+				u.City_Id IS NOT NULL AND u.City_Id=#{cityId}
+				<if test="contractCode!=null">
+					AND cu.contract_code LIKE '%${contractCode}%'
+				</if>
+			</where>
+		)t ORDER BY t.Create_Time DESC
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+
+	<select id="countAllByCondition" parameterType="hashmap" resultType="int">
+		SELECT count(*) FROM (
+			SELECT cu.Customer_Id,cu.contract_code,cu.Customer_Name,cu.Customer_Phone,cu.Customer_Email,cu.Customer_Company,cu.Customer_office,cu.Customer_Address,
+			cm.Account_Balance,cm.Trade_Time,cu.Create_Time,u.User_Name
+			FROM sys_customer_info_t cu LEFT JOIN sys_user_info_t u ON cu.Create_User = u.User_Id
+			LEFT JOIN
+			(SELECT mcu.Customer_Id,mcu.Trade_Time,ctr.Account_Balance FROM (SELECT Customer_Id,MAX(Trade_Time) AS
+			Trade_Time FROM customer_trade_record GROUP BY Customer_Id) mcu LEFT JOIN customer_trade_record ctr
+			ON mcu.Customer_Id=ctr.Customer_Id AND ctr.Trade_Time=mcu.Trade_Time) cm ON cu.Customer_Id=cm.Customer_Id
+			<where>
+				(u.City_Id IS NULL OR u.City_Id=0) AND u.province_id=#{provinceId}
+				<if test="contractCode!=null">
+					AND cu.contract_code LIKE '%${contractCode}%'
+				</if>
+			</where>
+			UNION ALL
+			SELECT
+			cu.Customer_Id,cu.contract_code,cu.Customer_Name,cu.Customer_Phone,cu.Customer_Email,cu.Customer_Company,cu.Customer_office,cu.Customer_Address,
+			cm.Account_Balance,cm.Trade_Time,cu.Create_Time,u.User_Name
+			FROM sys_customer_info_t cu LEFT JOIN sys_user_info_t u ON cu.Create_User = u.User_Id
+			LEFT JOIN
+			(SELECT mcu.Customer_Id,mcu.Trade_Time,ctr.Account_Balance FROM (SELECT Customer_Id,MAX(Trade_Time) AS
+			Trade_Time FROM customer_trade_record GROUP BY Customer_Id) mcu LEFT JOIN customer_trade_record ctr
+			ON mcu.Customer_Id=ctr.Customer_Id AND ctr.Trade_Time=mcu.Trade_Time) cm ON cu.Customer_Id=cm.Customer_Id
+			<where>
+				u.City_Id IS NOT NULL AND u.City_Id=#{cityId}
+				<if test="contractCode!=null">
+					AND cu.contract_code LIKE '%${contractCode}%'
+				</if>
+			</where>
+		)t
+	</select>
+
+
+	<select id="selectAllInfo" parameterType="hashmap" resultMap="customerMapperResult">
+		SELECT cr.Customer_Id,cr.Trade_No,cr.Trade_Type,cr.Trade_Amount,cr.Account_Balance,cr.Trade_Remark,cr.Trade_Time,cr.Create_User,cr.Create_Time,
+		cu.Customer_Name,cu.Customer_Phone,cu.Customer_Email,cu.Customer_Company,cu.contract_code,cu.Customer_office,cu.Customer_Address,su.User_Name
+		FROM customer_trade_record cr LEFT JOIN sys_customer_info_t cu ON cr.Customer_Id=cu.Customer_Id
+		LEFT JOIN sys_user_info_t su ON cr.Create_User=su.User_Id
+		<where>
+			cr.Create_User IS NOT NULL AND cr.Create_User!=0 AND cr.Customer_Id=#{customerId}
+			<if test="tradeType!=null">
+				AND cr.Trade_Type =#{tradeType}
+			</if>
+			<if test="startTime==endTime">
+				AND cr.Trade_Time LIKE '%${startTime}%'
+			</if>
+			<if test="startTime!=endTime">
+				AND cr.Trade_Time <![CDATA[>=]]> #{startTime} AND cr.Trade_Time <![CDATA[<=]]> #{endTime}
+			</if>
+		</where>
+
+
+		ORDER BY cr.Trade_Time DESC
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+
+	<select id="countAllInfo" parameterType="hashmap" resultType="int">
+		SELECT count(*) FROM customer_trade_record cr LEFT JOIN sys_customer_info_t cu ON cr.Customer_Id=cu.Customer_Id
+		<where>
+			cr.Customer_Id=#{customerId}
+			<if test="tradeType!=null">
+				AND cr.Trade_Type =#{tradeType}
+			</if>
+			<if test="startTime==endTime">
+				AND cr.Trade_Time LIKE '%${startTime}%'
+			</if>
+			<if test="startTime!=endTime">
+				AND cr.Trade_Time <![CDATA[>=]]> #{startTime} AND cr.Trade_Time <![CDATA[<=]]> #{endTime}
+			</if>
+		</where>
+	</select>
+
+
+</mapper>

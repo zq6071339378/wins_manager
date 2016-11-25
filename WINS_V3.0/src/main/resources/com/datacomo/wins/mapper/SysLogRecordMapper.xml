@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.SysLogRecordMapper">
+	<resultMap
+		type="hashmap"
+		id="logRecordMapperResult">
+		<result
+			property="logId"
+			column="Log_Id" />
+		<result
+			property="userName"
+			column="User_Name" />
+		<result
+			property="logTitle"
+			column="Log_Title" />
+		<result
+			property="logType"
+			column="Log_Type" />
+		<result
+			property="logCont"
+			column="Log_Cont" />
+		<result
+			property="logTime"
+			column="Log_Time" />
+		<result
+			property="roleName"
+			column="Role_Name" />
+		<result
+			property="cityName"
+			column="City_Name" />
+	</resultMap>
+
+	<insert
+		id="insertInfo"
+		parameterType="hashmap"
+		useGeneratedKeys="true"
+		keyProperty="id">
+		insert into sys_log_record_t
+		(User_Id,Log_Title,Log_Type,Log_Cont,Log_Ip,Log_Time)
+		VALUES (#{userId},#{logTitle},#{logType},#{logCont},#{logIp},#{logTime})
+	</insert>
+
+	<select
+		id="countByCondition"
+		parameterType="hashmap"
+		resultType="int">
+		select count(1) from(
+		select concat(province_name,'-',city_name) as
+		City_Name,l.Log_Time,l.Log_Cont,l.Log_Type,u.User_Name,r.Role_Name
+		FROM sys_log_record_t l,sys_city_info_t ci,sys_province_info_t
+		p,sys_user_info_t u,sys_role_info_t r
+		<where>
+			l.User_Id = u.User_Id and u.Role_Id = r.Role_Id and
+			u.city_id=ci.city_id and ci.province_id=p.province_id and u.city_id
+			is not null
+			<if test="logType!=null">
+				and l.Log_Type = #{logType}
+			</if>
+			<if test="userName!=null">
+				and u.User_Name like '%${userName}%'
+			</if>
+			<if test="logTime!=null">
+				and l.Log_Time like '%${logTime}%'
+			</if>
+			<if test="userId != null">
+				AND l.User_Id = #{userId}
+			</if>
+			<if test="cityId != null">
+				AND u.City_Id = #{cityId}
+			</if>
+			<if test="provinceId!=null">
+				AND u.Province_Id = #{provinceId}
+			</if>
+			<if test="showStatus!=null">
+				AND u.Show_Status = #{showStatus}
+			</if>
+		</where>
+		union all
+		select province_name as
+		City_Name,l.Log_Time,l.Log_Cont,l.Log_Type,u.User_Name,r.Role_Name
+		FROM sys_log_record_t l,sys_province_info_t p,sys_user_info_t
+		u,sys_role_info_t r
+		<where>
+			l.User_Id = u.User_Id and u.Role_Id = r.Role_Id and
+			u.province_id=p.province_id and u.city_id is null
+			<if test="logType!=null">
+				and l.Log_Type = #{logType}
+			</if>
+			<if test="userName!=null">
+				and u.User_Name like '%${userName}%'
+			</if>
+			<if test="logTime!=null">
+				and l.Log_Time like '%${logTime}%'
+			</if>
+			<if test="userId != null">
+				AND l.User_Id = #{userId}
+			</if>
+			<if test="cityId != null">
+				AND u.City_Id = #{cityId}
+			</if>
+			<if test="provinceId!=null">
+				AND u.Province_Id = #{provinceId}
+			</if>
+			<if test="showStatus!=null">
+				AND u.Show_Status = #{showStatus}
+			</if>
+		</where>
+		)t
+	</select>
+
+	<select
+		id="findByCondition"
+		parameterType="hashmap"
+		resultMap="logRecordMapperResult">
+		select * from(
+		select concat(province_name,'-',city_name) as
+		City_Name,l.Log_Time,l.Log_Cont,l.Log_Type,u.User_Name,r.Role_Name
+		FROM sys_log_record_t l,sys_city_info_t ci,sys_province_info_t
+		p,sys_user_info_t u,sys_role_info_t r
+		<where>
+			l.User_Id = u.User_Id and u.Role_Id = r.Role_Id and
+			u.city_id=ci.city_id and ci.province_id=p.province_id and u.city_id
+			is not null
+			<if test="logType!=null">
+				and l.Log_Type = #{logType}
+			</if>
+			<if test="userName!=null">
+				and u.User_Name like '%${userName}%'
+			</if>
+			<if test="logTime!=null">
+				and l.Log_Time like '%${logTime}%'
+			</if>
+			<if test="userId != null">
+				AND l.User_Id = #{userId}
+			</if>
+			<if test="cityId != null">
+				AND u.City_Id = #{cityId}
+			</if>
+			<if test="provinceId!=null">
+				AND u.Province_Id = #{provinceId}
+			</if>
+			<if test="showStatus!=null">
+				AND u.Show_Status = #{showStatus}
+			</if>
+		</where>
+		union all
+		select province_name as
+		City_Name,l.Log_Time,l.Log_Cont,l.Log_Type,u.User_Name,r.Role_Name
+		FROM sys_log_record_t l,sys_province_info_t p,sys_user_info_t
+		u,sys_role_info_t r
+		<where>
+			l.User_Id = u.User_Id and u.Role_Id = r.Role_Id and
+			u.province_id=p.province_id and u.city_id is null
+			<if test="logType!=null">
+				and l.Log_Type = #{logType}
+			</if>
+			<if test="userName!=null">
+				and u.User_Name like '%${userName}%'
+			</if>
+			<if test="logTime!=null">
+				and l.Log_Time like '%${logTime}%'
+			</if>
+			<if test="userId != null">
+				AND l.User_Id = #{userId}
+			</if>
+			<if test="cityId != null">
+				AND u.City_Id = #{cityId}
+			</if>
+			<if test="provinceId!=null">
+				AND u.Province_Id = #{provinceId}
+			</if>
+			<if test="showStatus!=null">
+				AND u.Show_Status = #{showStatus}
+			</if>
+		</where>
+		)t order by t.Log_Time DESC
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+
+
+</mapper>

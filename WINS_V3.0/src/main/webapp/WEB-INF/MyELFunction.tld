@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taglib
+	version="2.0"
+	xmlns="http://java.sun.com/xml/ns/j2ee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd">
+	<description>my functions library</description>
+	<display-name>my functions</display-name>
+	<tlib-version>1.0</tlib-version>
+	<short-name>myEl</short-name>
+	<uri>http://hotdata.com/functions</uri>
+	<!-- 自定义jstl函数库 -->
+	<function>
+		<name>mathAnd</name>
+		<function-class>com.datacomo.wins.util.ElFunctionUtil</function-class>
+		<function-signature>java.lang.String mathAnd(int,int)</function-signature>
+	</function>
+
+	<function>
+		<name>subStr</name>
+		<function-class>com.datacomo.wins.util.ElFunctionUtil</function-class>
+		<function-signature>java.lang.String subStr(java.lang.String,int)</function-signature>
+	</function>
+	<function>
+		<name>yunSuan</name>
+		<function-class>com.datacomo.wins.util.ElFunctionUtil</function-class>
+		<function-signature>java.lang.String yunSuan(int,int)</function-signature>
+	</function>
+
+</taglib>

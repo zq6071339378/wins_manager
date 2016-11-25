@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.PolicyGroupMngMapper">
+	<resultMap
+			type="hashmap"
+			id="policyGroupMngMapperResult">
+		<result
+				property="groupId"
+				column="Group_Id" />
+		<result
+				property="groupName"
+				column="Group_Name" />
+		<result
+				property="groupType"
+				column="Group_Type" />
+		<result
+				property="logoPath"
+				column="Logo_Path" />
+		<result
+				property="logoName"
+				column="Logo_Name" />
+		<result
+				property="createUser"
+				column="Create_User" />
+		<result
+				property="userName"
+				column="user_name" />
+		<result
+				property="createTime"
+				column="Create_Time" />
+		<result
+				property="updateUser"
+				column="Update_User" />
+		<result
+				property="updateTime"
+				column="Update_Time" />
+		<result
+				property="descption"
+				column="Description" />
+		<result
+				property="memberNum"
+				column="memberNum" />
+	</resultMap>
+	<resultMap
+			type="hashmap"
+			id="groupMemMapperResult">
+		<result
+				property="groupId"
+				column="Group_Id" />
+		<result
+				property="userId"
+				column="User_Id" />
+		<result
+				property="createUser"
+				column="Create_User" />
+		<result
+				property="createTime"
+				column="Create_Time" />
+		<result
+				property="dynamicDes"
+				column="Dynamic_Des" />
+	</resultMap>
+
+	<select id="isExist" parameterType="hashmap" resultType="int">
+		select count(1) from policy_group_detail_t
+		<where>
+			<if test="GroupId_Id!=null">
+				Group_Id=#{GroupId_Id}
+			</if>
+		</where>
+	</select>
+
+	<select id="countByCondition" parameterType="hashmap" resultType="int">
+		select count(1) from policy_group_t t1
+		<where>
+			<if test="userId!=null">
+				(t1.`Create_User` in (select u.`User_Id` from sys_user_info_t u where u.Create_User=#{userId} and u.`Show_Status`=#{showStatus} ) or t1.`Create_User`=#{userId})
+			</if>
+			<if test="groupName!=null">
+				AND t1.group_name like '%${groupName}%'
+			</if>
+			<if test="GroupId_Id!=null">
+				AND t1.Group_Id=#{GroupId_Id}
+			</if>
+		</where>
+	</select>
+
+	<insert id="insertGroupMember" parameterType="hashmap">
+		<if test="flag==1">
+			replace into policy_group_detail_t(group_id,user_id,create_user,create_time)
+			values
+			(#{groupId},#{userId},#{createUser},#{createTime})
+		</if>
+		<if test="flag==2">
+			replace into policy_group_detail_t(Dynamic_Des,Create_Time,Group_Id,User_Id,Create_User)
+			values
+			<foreach collection="LIST" separator="," item="item" index="index">
+				(#{item.Dynamic_Des},#{item.Create_Time},#{item.Group_Id},#{item.User_Id},#{item.Create_User})
+			</foreach>
+		</if>
+	</insert>
+
+	<delete
+			id="deleteById"
+			parameterType="int">
+		delete from policy_group_detail_t
+		where group_id=#{id}
+	</delete>
+
+	<delete
+			id="deleteGroupById"
+			parameterType="int">
+		delete from policy_group_t
+		where group_id=#{id}
+	</delete>
+
+	<insert
+			id="insertInfo"
+			parameterType="hashmap"
+			useGeneratedKeys="true"
+			keyProperty="groupId">
+		replace into
+		policy_group_t(group_name,group_type,logo_path,create_user,create_time,group_users)
+		values(#{groupName},#{groupType},#{logoPath},#{createUser},#{createTime},#{groupUsers})
+	</insert>
+
+
+
+	<select
+			id="findByCondition"
+			parameterType="hashmap"
+			resultMap="policyGroupMngMapperResult">
+		SELECT
+		t1.`Group_Id`,t1.`Group_Name`,t1.`Group_Type`,t1.`Logo_Path`,t1.`Logo_Name`,t1.`Create_User`,t1.`Create_Time`,t1.`Update_User`,t1.`Update_Time`,t1.`Description`,t3.user_name,
+		(SELECT COUNT(1) FROM policy_group_detail_t t2 WHERE
+		t2.group_id=t1.group_ID) AS memberNum
+		FROM policy_group_t t1 ,sys_user_info_t t3 WHERE
+		t1.`Create_User`=t3.`User_Id` AND t3.Show_Status=#{showStatus}
+		and (t1.`Create_User` in (select u.`User_Id` from sys_user_info_t u
+		where u.Create_User=#{userId} and u.`Show_Status`=#{showStatus} ) or
+		t1.`Create_User`=#{userId})
+		<if test="groupName!=null">
+			and group_name like '%${groupName}%'
+		</if>
+		GROUP BY t1.`Group_Id` ORDER BY create_time DESC
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+
+	<select id="findGroupMemByGroupId" parameterType="hashmap" resultMap="groupMemMapperResult">
+		SELECT Group_Id,User_Id,Create_User,Create_Time,Dynamic_Des FROM
+		policy_group_detail_t t1
+		WHERE t1.`Group_Id`=#{groupId}
+	</select>
+
+
+	<!-- <insert id="insertData" parameterType="hashmap"> insert into policy_group_detail_t
+		(<foreach collection="condition" separator="," index="key">${key}</foreach>)
+		values(<foreach collection="condition" separator="," item="value" close="">#{value}</foreach>)
+		</insert> -->
+
+
+
+	<insert
+			id="insertData"
+			parameterType="hashmap">
+		insert into policy_group_detail_t
+		(Dynamic_Des,Create_Time,Group_Id,User_Id,Create_User)
+		values
+		<foreach
+				collection="users"
+				item="items"
+				index="index"
+				separator=",">
+
+			<foreach
+					collection="items"
+					item="item"
+					separator=","
+					open="("
+					close=")">
+				#{item}
+			</foreach>
+
+		</foreach>
+
+	</insert>
+
+	<update id="updateGroupById" parameterType="hashmap">
+		update policy_group_t set group_users=#{groupUsers}
+		where  group_id=#{groupId}
+	</update>
+</mapper>

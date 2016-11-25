@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.SysMediaLabelMapper">
+	<resultMap type="hashmap" id="mediaLabelMapper">
+		<result property="mediaId" column="Media_Id" />
+		<result property="industryId" column="Industry_Id" />
+		<result property="mediaUrl" column="Media_Url" />
+		<result property="mediaPrice" column="Media_Price" />
+		<result property="createTime" column="Create_Time" />
+	</resultMap>
+	
+	<delete id="deleteAll">
+		DELETE FROM sys_media_label_t;
+	</delete>
+
+	<insert id="insertInfo" parameterType="hashmap" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO sys_media_label_t (Industry_Id,Media_Url,Media_Price,Create_Time) VALUES
+		<foreach collection="list" separator="," item="item" index="index">
+			(#{item.industryId},#{item.mediaUrl},#{item.mediaPrice},#{createTime})
+		</foreach>
+	</insert>
+
+	<select id="searchMedia" parameterType="hashmap" resultMap="mediaLabelMapper">
+      SELECT Industry_Id,Media_Id,Media_Url,Media_Price FROM sys_media_label_t
+      <where>
+		  <if test="industryId!=null">
+			  Industry_Id=#{industryId}
+		  </if>
+	  </where>
+	</select>
+	
+	<select id="searchPrice" parameterType="hashmap" resultMap="mediaLabelMapper">
+      SELECT Media_Price FROM sys_media_label_t  where Media_Id=#{mediaId}
+	</select>
+
+	<select id="getInfoByCondition" parameterType="hashmap" resultMap="mediaLabelMapper">
+		SELECT Media_Id,Media_Url,Media_Price FROM sys_media_label_t  where Media_Id=#{mediaId}
+	</select>
+
+</mapper>

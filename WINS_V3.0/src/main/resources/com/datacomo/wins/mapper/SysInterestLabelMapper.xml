@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.SysInterestLabelMapper">
+
+	<resultMap type="hashmap" id="industryMapperResult">
+		<result property="groupId" column="Group_Id" />
+		<result property="groupName" column="Group_Name" />
+		<result property="groupType" column="Group_Type" />
+		<result property="groupUsers" column="Group_Users" />
+		<result property="logoPath" column="Logo_Path" />
+		<result property="logoName" column="Logo_Name" />
+		<result property="createUser" column="Create_User" />
+		<result property="createTime" column="Create_Time" />
+	</resultMap>
+
+	<!-- 删除所有人群标签群组 -->
+	<delete id="deleteAllInfo" parameterType="int">
+		DELETE FROM policy_Group_t WHERE Group_Type = 2
+	</delete>
+
+	<!-- 删除所有人群标签群组用户 -->
+	<delete id="deleteAll" parameterType="int">
+		DELETE FROM policy_group_detail_t WHERE Dynamic_Des = 'label'
+	</delete>
+
+	<!-- 插入人群标签群组 -->
+	<insert id="insertOneInfo" parameterType="hashmap" useGeneratedKeys="true" keyProperty="Group_Id" >
+		INSERT INTO policy_Group_t (Group_Name,Group_Type,Create_User,Create_Time)
+		VALUES (#{groupName},#{groupType},#{createUser},#{createTime})
+	</insert>
+
+	<!-- 插入人群标签群组用户 -->
+	<insert id="insertInfo" parameterType="hashmap" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO policy_group_detail_t (Group_Id,User_Id,Create_User,Create_Time,Dynamic_Des) VALUES
+		<foreach collection="list" separator="," item="item" index="index">
+			(#{item.groupId},#{item.userId},#{createUser},#{createTime},#{dynamicDes})
+		</foreach>
+	</insert>
+
+
+</mapper>

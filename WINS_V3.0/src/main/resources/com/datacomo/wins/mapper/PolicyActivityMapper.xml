@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.PolicyActivityMapper">
+	<resultMap type="hashmap" id="activityMapperResult">
+		<result property="customerId" column="Customer_Id"/>
+		<result property="customerIds" column="Customer_Ids" javaType="string" jdbcType="VARCHAR"/>
+		<result property="customerName" column="Customer_Name"/>
+		<result property="activityId" column="Activity_Id"/>
+		<result property="activityName" column="Activity_Name"/>
+		<result property="activityDesc" column="Activity_Desc"/>
+		<result property="policyId" column="Policy_Id"/>
+		<result property="policyIds" column="Policy_Ids" javaType="string" jdbcType="VARCHAR"/>
+		<result property="policyNum" column="Policy_Num"/>
+		<result property="createUser" column="Create_User"/>
+		<result property="createName" column="User_Name"/>
+		<result property="createTime" column="Create_Time"/>
+	</resultMap>
+	
+	<select id="searchActivityCustomer" parameterType="hashmap" resultMap="activityMapperResult">
+	    SELECT car.Activity_Id,sc.Customer_Id,sc.Customer_Name FROM customer_activity_relation_t car LEFT JOIN sys_customer_info_t sc ON car.Customer_Id=sc.Customer_Id
+		<where>
+			<if test="activityId!=null">
+				AND car.Activity_Id=#{activityId}
+			</if>
+		</where>
+	</select>
+
+	<select id="findByCondition" parameterType="hashmap" resultMap="activityMapperResult">
+		SELECT pa.Activity_Id,pa.Activity_Name,pa.Create_Time,cu.Customer_Ids,cu.Customer_Name,pt.Policy_Ids,pt.Policy_Num,su.User_Name
+		FROM policy_activity_info_t pa LEFT JOIN
+		(SELECT car.Activity_Id,group_concat(sci.Customer_Id) AS Customer_Ids,group_concat(sci.Customer_Name) AS Customer_Name FROM customer_activity_relation_t car,sys_customer_info_t sci WHERE car.Customer_Id=sci.Customer_Id GROUP BY car.Activity_Id) cu
+		ON pa.Activity_Id=cu.Activity_Id
+		LEFT JOIN (SELECT Activity_Id,count(Policy_Id) AS Policy_Num,group_concat(Policy_Id) AS Policy_Ids FROM policy_activity_relation_t GROUP BY Activity_Id) pt
+		ON pa.Activity_Id=pt.Activity_Id
+		LEFT JOIN sys_user_info_t su ON pa.Create_User=su.User_Id
+		<where>
+			(pa.Create_User IN (SELECT User_Id FROM sys_user_info_t WHERE Create_User=#{userId}) OR pa.Create_User=#{userId})
+			<if test="activityName!=null">
+				AND pa.Activity_Name LIKE '%${activityName}%'
+			</if>
+		</where>
+		ORDER BY pa.Create_Time DESC
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+
+	<select id="countByCondition" parameterType="hashmap" resultType="int">
+		SELECT count(*) FROM (
+		SELECT pa.Activity_Id,pa.Activity_Name,pa.Create_Time,cu.Customer_Ids,cu.Customer_Name,pt.Policy_Ids,pt.Policy_Num,su.User_Name
+		FROM policy_activity_info_t pa LEFT JOIN
+		(SELECT car.Activity_Id,group_concat(sci.Customer_Id) AS Customer_Ids,group_concat(sci.Customer_Name) AS Customer_Name FROM customer_activity_relation_t car,sys_customer_info_t sci WHERE car.Customer_Id=sci.Customer_Id GROUP BY car.Activity_Id) cu
+		ON pa.Activity_Id=cu.Activity_Id
+		LEFT JOIN (SELECT Activity_Id,count(Policy_Id) AS Policy_Num,group_concat(Policy_Id) AS Policy_Ids FROM policy_activity_relation_t GROUP BY Activity_Id) pt
+		ON pa.Activity_Id=pt.Activity_Id
+		LEFT JOIN sys_user_info_t su ON pa.Create_User=su.User_Id
+		<where>
+			(pa.Create_User IN (SELECT User_Id FROM sys_user_info_t WHERE Create_User=#{userId}) OR pa.Create_User=#{userId})
+			<if test="activityName!=null">
+				AND pa.Activity_Name LIKE '%${activityName}%'
+			</if>
+		</where>
+		) as total
+	</select>
+
+	<select id="getInfoByCondition" parameterType="hashmap" resultMap="activityMapperResult">
+		SELECT Activity_Id,Activity_Name,Activity_Desc FROM policy_activity_info_t
+		<where>
+			Activity_Id = #{activityId}
+		</where>
+	</select>
+
+	<delete id="deleteById" parameterType="int">
+		delete from policy_activity_info_t WHERE Activity_Id=#{activityId}
+	</delete>
+
+	<delete id="deleteInfoById" parameterType="int">
+		delete from customer_activity_relation_t WHERE Activity_Id=#{activityId}
+	</delete>
+
+	<update id="updateInfo" parameterType="java.util.HashMap">
+		update policy_activity_info_t
+		<set>
+			<if test="activityName != null">
+				Activity_Name=#{activityName},
+			</if>
+			<if test="activityDesc != null">
+				Activity_Desc=#{activityDesc},
+			</if>
+		</set>
+		WHERE Activity_Id=#{activityId}
+	</update>
+
+	<insert id="insertInfo" parameterType="hashmap" useGeneratedKeys="true" keyProperty="activity_id">
+		INSERT policy_activity_info_t
+		(<foreach
+				collection="condition"
+				separator=","
+				index="key">${key}</foreach>
+		)
+		values
+		(<foreach
+				collection="condition"
+				separator=","
+				item="value"
+				close="">#{value}</foreach>
+		)
+	</insert>
+
+	<insert id="insertActivityCustomerRelation" parameterType="hashmap" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO customer_activity_relation_t (Customer_Id,Activity_Id,Create_User,Create_Time) VALUES
+		<foreach collection="LIST" item="item" index="index" separator=",">
+			(#{item.Customer_Id},#{item.Activity_Id},#{item.Create_User},#{item.Create_Time})
+		</foreach>
+	</insert>
+
+</mapper>

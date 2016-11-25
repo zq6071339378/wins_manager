@@ -1,0 +1,1135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.PolicyBusinessMapper">
+	<resultMap type="hashmap" id="policyMapperResult">
+		<result property="policyId" column="Policy_Id" />
+		<result property="policyName" column="Policy_Name" />
+		<result property="policyStatus" column="Policy_Status" />
+		<result property="policyLevel" column="Policy_Level" />
+		<result property="policyType" column="Policy_Type" />
+		<result property="policyShow" column="Policy_Show" />
+		<result property="terminalType" column="Terminal_Type" />
+		<result property="pushLimit" column="Push_Limit" />
+		<result property="pushInterval" column="Push_interval" />
+		<result property="showLimit" column="Show_Limit" />
+		<result property="hitLimit" column="Hit_Limit" />
+		<result property="showNum" column="Show_Num" />
+		<result property="hitNum" column="Hit_Num" />
+		<result property="pushURL" column="Push_URL" />
+		<result property="showType" column="Show_Type" />
+		<result property="showHeight" column="Show_Height" />
+		<result property="showWidth" column="Show_Width" />
+		<result property="showTime" column="Show_Time" />
+		<result property="showClose" column="Show_Close" />
+		<result property="syncStatus" column="Sync_Status" />
+		<result property="effectTime" column="Effect_Time" />
+		<result property="createUser" column="Create_User" />
+		<result property="createTime" column="Create_Time" />
+		<result property="checkStatus" column="Check_Status" />
+		
+		<result property="activityId" column="Activity_Id" />
+		<result property="activityName" column="Activity_Name" />
+		<result property="customerId" column="Customer_Id" />
+		<result property="customerName" column="Customer_Name" />
+		<result
+			property="checkUser"
+			column="Check_User" />
+		<result
+			property="checkTime"
+			column="Check_Time" />
+		<result
+			property="description"
+			column="Description" />
+		<result
+			property="cityName"
+			column="City_Name" />
+		<result
+			property="cityId"
+			column="City_Id" />
+		<result
+			property="groupUses"
+			column="groupUses" />
+		<result
+			property="roamType"
+			column="Roam_Type" />
+		<result
+			property="startTime"
+			column="Start_Time" />
+		<result
+			property="endTime"
+			column="End_Time" />
+		<result
+			property="provinceName"
+			column="Province_Name" />
+		<result
+			property="provinceId"
+			column="Province_Id" />
+		<result
+				property="createName"
+				column="Create_Name" />
+
+	</resultMap>
+	<resultMap
+		type="hashmap"
+		id="globalMapperResult">
+		<result
+			property="policyId"
+			column="Policy_Id" />
+		<result
+			property="pushInterval"
+			column="Push_Interval" />
+		<result
+			property="showNum"
+			column="Show_Num" />
+		<result
+			property="showType"
+			column="Show_Type" />
+		<result
+			property="pushStatus"
+			column="Push_Status" />
+		<result
+			property="showTime"
+			column="Show_Time" />
+		<result
+			property="pushLimit"
+			column="Push_Limit" />
+		<result
+		    property="buyType"
+			column="buy_type"
+		                                 />
+
+	</resultMap>
+
+	<select
+		id="getGlobalInfo"
+		parameterType="hashmap"
+		resultMap="globalMapperResult">
+		select * from policy_global_t
+	</select>
+  
+ 	<resultMap type="hashmap" id="industrybaseMapperResult">
+		<result property="industryid" column="industry_id" />
+		<result property="industryname	" column="industry_name"/>
+		<result property="industrylevel" column="industry_level"/>
+		<result property="parentid" column="parent_id"/>
+		
+	</resultMap>
+	<select id="findAllIndustry" parameterType="hashmap" resultMap="industrybaseMapperResult">
+	SELECT industry_id,industry_name,industry_level,parent_id FROM sys_industry_base_info
+	</select>
+    
+	<!-- 查询策略列表 -->
+	<select
+		id="findPolicyList"
+		parameterType="hashmap"
+		resultMap="policyMapperResult">
+		SELECT   c.policy_id AS Policy_Id,par.`Activity_Id`,pai.`Activity_Name`,car.`Customer_Id`,sci.`Customer_Name`,c.Policy_Name AS Policy_Name
+		,c.Policy_Status AS Policy_Status,ppr.`Province_Id`,ppr.`City_Id`,ppr.Province_Name,ppr.City_Name,
+		b.group_users AS groupUses,c.`Roam_Type` AS Roam_Type,c.Terminal_Type
+		AS Terminal_Type, DATE_FORMAT(d.`Start_Time`, '%Y-%m-%d %H:%i:%s') AS
+		Start_Time ,DATE_FORMAT(d.`End_Time`, '%Y-%m-%d %H:%i:%s') AS
+		End_Time,c.`Check_Status` AS Check_Status ,c.`Sync_Status` AS  Sync_Status,s.User_Name AS Create_Name FROM    `policy_business_t`  c
+		LEFT  JOIN  `policy_activity_relation_t`  par  ON  par.`Policy_Id`=c.`Policy_Id`
+		LEFT  JOIN  `customer_activity_relation_t`  car  ON  par.`Activity_Id`=car.`Activity_Id`
+		LEFT  JOIN  `policy_activity_info_t`  pai  ON  par.`Activity_Id`=pai.`Activity_Id`
+		LEFT  JOIN  `sys_customer_info_t`  sci  ON  car.`Customer_Id`=sci.`Customer_Id`
+		LEFT JOIN ( SELECT h.policy_id AS policy_id ,SUM(i.group_users) AS
+				group_users FROM `policy_group_relation_t` h ,`policy_group_t` i WHERE
+				h.group_id=i.group_id GROUP BY h.policy_id)  b ON  c.`Policy_Id`=b.`Policy_Id`
+		LEFT JOIN  (SELECT * FROM `policy_time_t` m GROUP BY m.`Policy_Id`) d ON  c.`Policy_Id`=d.`Policy_Id`
+		LEFT JOIN  (SELECT  e.`Policy_Id`,e.`Province_Id`,e.`City_Id`,p.Province_Name,GROUP_CONCAT(f.`City_Name`) AS City_Name
+		            FROM  `policy_position_relation_t` e 
+		             LEFT  JOIN  sys_province_info_t  p  ON  p.Province_Id=e.Province_Id
+		            LEFT JOIN   sys_city_info_t f ON f.`City_Id`=e.`City_Id`) ppr  ON  ppr.Policy_Id=c.`Policy_Id`
+		LEFT JOIN   sys_user_info_t s ON c.Create_User = s.User_Id
+		<where>
+			(c.`Create_User` in (select u.`User_Id` from `sys_user_info_t` u
+			where u.Create_User=#{userId} and u.`Show_Status`=#{showStatus} ) or
+			c.`Create_User`=#{userId})
+			<if test="searchName!=null ">
+				<if test="searchType==1 ">
+					and sci.`Customer_Name` like "%${searchName}%"
+				</if>
+				<if test="searchType==2 ">
+					and pai.`Activity_Name` like "%${searchName}%"
+				</if>
+				<if test="searchType==0 ">
+					and c.Policy_Name like "%${searchName}%"
+				</if>
+			</if>
+			<if test="cityId!=null">
+				and f.`City_Id` =${cityId}
+			</if>
+			<if test="policyType!=0"> and </if>
+			<if test="policyType==1">
+				<if test="condition!=null">
+					<foreach
+						collection="condition"
+						index="key"
+						item="value"
+						separator="and">
+						${key}=#{value}
+					</foreach>
+				</if>
+				and 
+			 <![CDATA[d.End_Time >='${nowTime}' and d.Start_Time <='${nowTime}' ]]>
+			</if>
+			<if test="policyType==2">
+				<if test="condition!=null">
+					<foreach
+						collection="condition"
+						index="key"
+						item="value"
+						separator="and">
+						${key}=#{value}
+					</foreach>
+				</if>
+				and 
+			 <![CDATA[ d.Start_Time >'${nowTime}' ]]>
+			</if>
+			<if test="policyType==3">
+				<if test="condition!=null">
+					<foreach
+						collection="condition"
+						index="key"
+						item="value"
+						separator="and">
+						${key}=#{value}
+					</foreach>
+				</if>
+				and 
+			 <![CDATA[ d.End_Time >'${nowTime}' ]]>
+			</if>
+			<if test="policyType==4">
+				(
+				<if test="condition!=null">
+					<foreach
+						collection="condition"
+						index="key"
+						item="value"
+						separator="and">
+						${key}=#{value}
+					</foreach>
+				</if>
+				or 
+			 <![CDATA[ d.End_Time <'${nowTime}' ]]>)
+			</if>
+		</where>
+		GROUP BY c.`Policy_Id` order by c.`Create_Time` DESC
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+	<!-- 查询策略列表 -->
+	<select
+		id="findPolicyListEn"
+		parameterType="hashmap"
+		resultMap="policyMapperResult">
+		SELECT   c.policy_id AS Policy_Id,par.`Activity_Id`,pai.`Activity_Name`,car.`Customer_Id`,sci.`Customer_Name`,c.Policy_Name AS Policy_Name
+		,c.Policy_Status AS Policy_Status,ppr.`Province_Id`,ppr.`City_Id`,ppr.Province_Name,ppr.City_Name,
+		b.group_users AS groupUses,c.`Roam_Type` AS Roam_Type,c.Terminal_Type
+		AS Terminal_Type, DATE_FORMAT(d.`Start_Time`, '%Y-%m-%d %H:%i:%s') AS
+		Start_Time ,DATE_FORMAT(d.`End_Time`, '%Y-%m-%d %H:%i:%s') AS
+		End_Time,c.`Check_Status` AS Check_Status ,c.`Sync_Status` AS  Sync_Status,s.User_Name AS Create_Name FROM    `policy_business_t`  c
+		LEFT  JOIN  `policy_activity_relation_t`  par  ON  par.`Policy_Id`=c.`Policy_Id`
+		LEFT  JOIN  `customer_activity_relation_t`  car  ON  par.`Activity_Id`=car.`Activity_Id`
+		LEFT  JOIN  `policy_activity_info_t`  pai  ON  par.`Activity_Id`=pai.`Activity_Id`
+		LEFT  JOIN  `sys_customer_info_t`  sci  ON  car.`Customer_Id`=sci.`Customer_Id`
+		LEFT JOIN ( SELECT h.policy_id AS policy_id ,SUM(i.group_users) AS
+				group_users FROM `policy_group_relation_t` h ,`policy_group_t` i WHERE
+				h.group_id=i.group_id GROUP BY h.policy_id)  b ON  c.`Policy_Id`=b.`Policy_Id`
+		LEFT JOIN  (SELECT * FROM `policy_time_t` m GROUP BY m.`Policy_Id`) d ON  c.`Policy_Id`=d.`Policy_Id`
+		LEFT JOIN  (SELECT  e.`Policy_Id`,e.`Province_Id`,e.`City_Id`,p.Province_Name,GROUP_CONCAT(f.`City_Name`) AS City_Name
+		            FROM  `policy_position_relation_t` e 
+		             LEFT  JOIN  sys_province_info_t  p  ON  p.Province_Id=e.Province_Id
+		            LEFT JOIN   sys_city_info_t f ON f.`City_Id`=e.`City_Id`) ppr  ON  ppr.Policy_Id=c.`Policy_Id`
+		LEFT JOIN   sys_user_info_t s ON c.Create_User = s.User_Id
+		<where>
+			(c.`Create_User` in (select u.`User_Id` from `sys_user_info_t` u
+			where u.Create_User=#{userId} and u.`Show_Status`=#{showStatus} ) or
+			c.`Create_User`=#{userId})
+			<if test="searchName!=null ">
+				<if test="searchType==1 ">
+					and sci.`Customer_Name` like "%${searchName}%"
+				</if>
+				<if test="searchType==2 ">
+					and pai.`Activity_Name` like "%${searchName}%"
+				</if>
+				<if test="searchType==0 ">
+					and c.Policy_Name like "%${searchName}%"
+				</if>
+			</if>
+			<if test="cityId!=null">
+				and f.`City_Id` =${cityId}
+			</if>
+			<if test="policyType!=0"> and </if>
+			<if test="policyType==1">
+				<if test="condition!=null">
+					<foreach
+						collection="condition"
+						index="key"
+						item="value"
+						separator="and">
+						${key}=#{value}
+					</foreach>
+				</if>
+				and 
+			 <![CDATA[d.End_Time >='${nowTime}' and d.Start_Time <='${nowTime}' ]]>
+			</if>
+			<if test="policyType==2">
+				<if test="condition!=null">
+					<foreach
+						collection="condition"
+						index="key"
+						item="value"
+						separator="and">
+						${key}=#{value}
+					</foreach>
+				</if>
+				and 
+			 <![CDATA[ d.Start_Time >'${nowTime}' ]]>
+			</if>
+			<if test="policyType==3">
+				<if test="condition!=null">
+					<foreach
+						collection="condition"
+						index="key"
+						item="value"
+						separator="and">
+						${key}=#{value}
+					</foreach>
+				</if>
+				and 
+			 <![CDATA[ d.End_Time >'${nowTime}' ]]>
+			</if>
+			<if test="policyType==4">
+				
+				<if test="condition!=null">
+					<foreach
+						collection="condition"
+						index="key"
+						item="value"
+						separator="and">
+						${key}=#{value}
+					</foreach>
+				</if>
+				and 
+			 <![CDATA[ d.End_Time <'${nowTime}' ]]>
+			</if>
+			<if test="policyType==5">
+				
+				<if test="condition!=null">
+					<foreach
+						collection="condition"
+						index="key"
+						item="value"
+						separator="and">
+						${key}=#{value}
+					</foreach>
+				</if>
+				and <![CDATA[ d.Start_Time <'${nowTime}' ]]> and 
+			<![CDATA[ d.End_Time >'${nowTime}' ]]>
+			</if>
+		</where>
+		GROUP BY c.`Policy_Id` order by c.`Create_Time` DESC
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+	<!-- 查询策略数量 -->
+	<select
+		id="countByPolicyCondition"
+		parameterType="hashmap"
+		resultType="int">
+		SELECT COUNT(*) FROM(SELECT COUNT(*) FROM `policy_business_t` c
+		LEFT JOIN ( SELECT h.policy_id AS policy_id ,SUM(i.group_users) AS
+		group_users FROM `policy_group_relation_t` h ,`policy_group_t` i WHERE
+		h.group_id=i.group_id GROUP BY h.policy_id) b ON
+		c.`Policy_Id`=b.`Policy_Id`
+		LEFT JOIN (SELECT * FROM `policy_time_t` m GROUP BY m.`Policy_Id`) d ON
+		c.`Policy_Id`=d.`Policy_Id`
+		LEFT JOIN `policy_position_relation_t` e ON c.`Policy_Id`=e.`Policy_Id`
+		LEFT JOIN sys_city_info_t f ON f.`City_Id`=e.`City_Id`
+		LEFT JOIN sys_user_info_t s on c.Create_User = s.User_Id
+		<where>
+			(c.`Create_User` in (select u.`User_Id` from `sys_user_info_t` u
+			where u.Create_User=#{userId} and u.`Show_Status`=#{showStatus} ) or
+			c.`Create_User`=#{userId})
+			<if test="searchName!=null">
+				and c.Policy_Name like "%${searchName}%"
+			</if>
+			<if test="cityId!=null">
+				and f.`City_Id` =${cityId}
+			</if>
+			<if test="policyType!=0"> and </if>
+			<if test="policyType==1">
+				<if test="condition!=null">
+					<foreach
+							collection="condition"
+							index="key"
+							item="value"
+							separator="and">
+						${key}=#{value}
+					</foreach>
+				</if>
+				and
+				<![CDATA[d.End_Time >='${nowTime}' and d.Start_Time <='${nowTime}' ]]>
+			</if>
+			<if test="policyType==2">
+				<if test="condition!=null">
+					<foreach
+							collection="condition"
+							index="key"
+							item="value"
+							separator="and">
+						${key}=#{value}
+					</foreach>
+				</if>
+				and
+				<![CDATA[ d.Start_Time >'${nowTime}' ]]>
+			</if>
+			<if test="policyType==3">
+				<if test="condition!=null">
+					<foreach
+							collection="condition"
+							index="key"
+							item="value"
+							separator="and">
+						${key}=#{value}
+					</foreach>
+				</if>
+				and
+				<![CDATA[ d.End_Time >'${nowTime}' ]]>
+			</if>
+			<if test="policyType==4">
+				(
+				<if test="condition!=null">
+					<foreach
+							collection="condition"
+							index="key"
+							item="value"
+							separator="and">
+						${key}=#{value}
+					</foreach>
+				</if>
+				or
+				<![CDATA[ d.End_Time <'${nowTime}' ]]>)
+			</if>
+		</where>
+		GROUP BY c.`Policy_Id`) as total
+	</select>
+	<select
+		id="countByPolicyConditionEn"
+		parameterType="hashmap"
+		resultType="int">
+		SELECT COUNT(*) FROM(SELECT COUNT(*) FROM `policy_business_t` c
+		LEFT JOIN ( SELECT h.policy_id AS policy_id ,SUM(i.group_users) AS
+		group_users FROM `policy_group_relation_t` h ,`policy_group_t` i WHERE
+		h.group_id=i.group_id GROUP BY h.policy_id) b ON
+		c.`Policy_Id`=b.`Policy_Id`
+		LEFT JOIN (SELECT * FROM `policy_time_t` m GROUP BY m.`Policy_Id`) d ON
+		c.`Policy_Id`=d.`Policy_Id`
+		LEFT JOIN `policy_position_relation_t` e ON c.`Policy_Id`=e.`Policy_Id`
+		LEFT JOIN sys_city_info_t f ON f.`City_Id`=e.`City_Id`
+		LEFT JOIN sys_user_info_t s on c.Create_User = s.User_Id
+		<where>
+			(c.`Create_User` in (select u.`User_Id` from `sys_user_info_t` u
+			where u.Create_User=#{userId} and u.`Show_Status`=#{showStatus} ) or
+			c.`Create_User`=#{userId})
+			<if test="searchName!=null">
+				and c.Policy_Name like "%${searchName}%"
+			</if>
+			<if test="cityId!=null">
+				and f.`City_Id` =${cityId}
+			</if>
+			<if test="policyType!=0"> and </if>
+			<if test="policyType==1">
+				<if test="condition!=null">
+					<foreach
+							collection="condition"
+							index="key"
+							item="value"
+							separator="and">
+						${key}=#{value}
+					</foreach>
+				</if>
+				and
+				<![CDATA[d.End_Time >='${nowTime}' and d.Start_Time <='${nowTime}' ]]>
+			</if>
+			<if test="policyType==2">
+				<if test="condition!=null">
+					<foreach
+							collection="condition"
+							index="key"
+							item="value"
+							separator="and">
+						${key}=#{value}
+					</foreach>
+				</if>
+				and
+				<![CDATA[ d.Start_Time >'${nowTime}' ]]>
+			</if>
+			<if test="policyType==3">
+				<if test="condition!=null">
+					<foreach
+							collection="condition"
+							index="key"
+							item="value"
+							separator="and">
+						${key}=#{value}
+					</foreach>
+				</if>
+				and
+				<![CDATA[ d.End_Time >'${nowTime}' ]]>
+			</if>
+			<if test="policyType==4">
+				
+				<if test="condition!=null">
+					<foreach
+						collection="condition"
+						index="key"
+						item="value"
+						separator="and">
+						${key}=#{value}
+					</foreach>
+				</if>
+				and 
+			 <![CDATA[ d.End_Time <'${nowTime}' ]]>
+			</if>
+			<if test="policyType==5">
+				
+				<if test="condition!=null">
+					<foreach
+						collection="condition"
+						index="key"
+						item="value"
+						separator="and">
+						${key}=#{value}
+					</foreach>
+				</if>
+				and <![CDATA[ d.Start_Time <'${nowTime}' ]]> and 
+			<![CDATA[ d.End_Time >'${nowTime}' ]]>
+			</if>
+		</where>
+		GROUP BY c.`Policy_Id`) as total
+	</select>
+	<!-- 查询单个策略 -->
+	<select
+		id="singlePolicyInfo"
+		parameterType="hashmap"
+		resultMap="policyMapperResult">
+		SELECT  c.Show_Time AS showTime,c.push_day AS pushDay, c.push_speed AS pushSpeed, c.Policy_Id AS Policy_Id,c.Policy_Name AS Policy_Name,c.unit_price AS unit_price,c.object_id AS object_id,c.buy_type AS buy_type 
+		,e.`City_Id`,f.`City_Name` AS City_Name, SUM(a.group_users) AS groupUses,c.`Roam_Type` AS Roam_Type,c.Terminal_Type AS Terminal_Type,c.`PolicyDay_Limit` AS PolicyDay_Limit,
+		DATE_FORMAT(d.`Start_Time`, '%Y-%m-%d %H:%i:%s') AS Start_Time ,DATE_FORMAT(d.`End_Time`, '%Y-%m-%d %H:%i:%s') AS End_Time,
+		DATE_FORMAT(d.`Start_Time`, '%d') AS Start_T ,DATE_FORMAT(d.`End_Time`, '%d') AS End_T, c.`Check_Status` AS Check_Status ,c.`Sync_Status` AS Sync_Status,
+		c.`Policy_Level` AS Policy_Level,c.`Policy_Type` AS Policy_Type, c.`Policy_Show` AS Policy_Show,c.`Terminal_Type` AS Terminal_Type,c.`Push_Limit` AS Push_Limit,
+		c.`Push_interval` AS Push_interval, c.`Show_Limit` AS Show_Limit,c.`Hit_Limit` AS Hit_Limit,c.`Show_Num` AS Show_Num ,c.`Hit_Num` AS Hit_Num,c.`Push_URL` AS Push_URL,
+		c.`object_Id` AS object_Id, c.`Show_Type` AS Show_Type,c.`Roam_Type` AS Roam_Type,c.`Description` AS Description,c.Show_Time AS Show_Time,g.industry_id AS industry_id,g.industry_name AS industry_name
+		FROM `policy_business_t` c
+		LEFT JOIN `policy_group_relation_t` b ON c.`Policy_Id`=b.`Policy_Id`
+		LEFT JOIN `policy_group_t` a ON a.`Group_Id`=b.`Group_ID`
+		LEFT JOIN `policy_time_t` d ON c.`Policy_Id`=d.`Policy_Id`
+		LEFT JOIN `policy_position_relation_t` e ON c.`Policy_Id`=e.`Policy_Id`
+		LEFT JOIN `sys_city_info_t` f ON f.`City_Id`=e.`City_Id`
+		LEFT JOIN `sys_industry_base_info` g ON c.`industry_id`= g.`industry_id`
+		where c.Policy_Id=#{policyId}
+	</select>
+	<!-- 查询单个策略群组 -->
+	<resultMap
+		type="hashmap"
+		id="policyGroupMapperResult">
+		<result
+			property="groupId"
+			column="group_ID" />
+		<result
+			property="groupName"
+			column="group_name" />
+	</resultMap>
+	<select
+		id="singlePolicyGroup"
+		parameterType="hashmap"
+		resultMap="policyGroupMapperResult">
+		SELECT g.`Group_ID` AS group_ID,g.`Group_Name` AS group_name
+		from `policy_group_relation_t` r,`policy_group_t` g where
+		g.`Group_ID`=r.`Group_ID` and r.Policy_Id=#{policyId}
+	</select>
+	<resultMap
+		type="hashmap"
+		id="policyCityMapperResult">
+		<result
+			property="cityId"
+			column="cityId" />
+		<result
+			property="cityName"
+			column="cityName" />
+	</resultMap>
+
+	<resultMap id="policyIPSMapperResult" type="hashmap">
+		<result property="policyId" column="policy_id" />
+		<result property="ipsId" column="ips_id" />
+		<result property="ipsName" column="ips_name" />
+	</resultMap>
+	<!-- 查询单个策略IPS -->
+	<select id="singlePolicyIPS" parameterType="hashmap" resultMap="policyIPSMapperResult">
+		SELECT r.policy_id,i.ips_id,i.ips_name FROM policy_ips_relation_t r,policy_ips_config_t i WHERE r.ips_id = i.ips_id AND r.policy_id = #{policyId}
+	</select>
+
+	<resultMap id="policyCustomerMapperResult" type="hashmap">
+		<result property="policyId" column="Policy_Id"/>
+		<result property="policyName" column="Policy_Name"/>
+		<result property="customerId" column="Customer_Id" />
+		<result property="customerName" column="Customer_Name" />
+		<result property="activityId" column="Activity_Id" />
+		<result property="activityName" column="Activity_Name" />
+	</resultMap>
+	<!-- 查询单个策略广告主 -->
+	<select id="singlePolicyCustomer" parameterType="hashmap" resultMap="policyCustomerMapperResult">
+		SELECT   par.Policy_Id,pb.`Policy_Name`,par.`Activity_Id`,pai.`Activity_Name`,car.`Customer_Id`,sci.`Customer_Name`
+		FROM  `policy_activity_relation_t`  par
+		LEFT  JOIN  `customer_activity_relation_t`  car  ON  par.`Activity_Id`=car.`Activity_Id`
+		LEFT  JOIN  `policy_activity_info_t`  pai  ON  par.`Activity_Id`=pai.`Activity_Id`
+		LEFT  JOIN  `sys_customer_info_t`  sci  ON  car.`Customer_Id`=sci.`Customer_Id`
+		LEFT  JOIN  `policy_business_t`  pb ON  par.`Policy_Id`=pb.`Policy_Id` WHERE par.`Policy_Id`=#{policyId}
+	</select>
+
+	<!-- 查询单个策略地区 -->
+	<select
+		id="singlePolicyArea"
+		parameterType="hashmap"
+		resultMap="policyCityMapperResult">
+		SELECT c.`City_Id` AS cityId,c.`City_Name` AS cityName from
+		`policy_position_relation_t` r,`sys_city_info_t` c where
+		r.`City_Id`=c.`City_Id` and r.Policy_Id=#{policyId}
+	</select>
+	<resultMap
+		type="hashmap"
+		id="policyKeyWordMapperResult">
+		<result
+			property="keyWordId"
+			column="keyWordId" />
+		<result
+			property="keyWordName"
+			column="keyWordName" />
+	</resultMap>
+	<!-- 查询单个策略关键字 -->
+	<select
+		id="singlePolicyKewWord"
+		parameterType="hashmap"
+		resultMap="policyKeyWordMapperResult">
+		SELECT k.`Keyword_Id` AS keyWordId,k.`Keyword_Name` AS
+		keyWordName from policy_keyword_t k where k.`Policy_Id`=#{policyId}
+	</select>
+
+	<resultMap
+		type="hashmap"
+		id="policyKeyUrlMapperResult">
+		<result
+			property="urlDomain"
+			column="url_Domain" />
+		<result
+			property="urlPath"
+			column="url_path" />
+	</resultMap>
+	<!-- 查询单个策略定向网址 -->
+	<select
+		id="singlePolicyUrlDomain"
+		parameterType="hashmap"
+		resultMap="policyKeyUrlMapperResult">
+		SELECT u.`Url_Domain` AS url_Domain,u.`Url_Path` AS url_path
+		from policy_url_t u where u.`Policy_Id`=#{policyId}
+	</select>
+
+
+	<select
+		id="checkPass"
+		parameterType="hashmap"
+		resultType="int">
+		select count(1) from sys_user_info_t where User_Id=#{condition.Update_User} and User_Pwd=#{condition.checkPass}
+	</select>
+	
+	<update
+		id="updateGlobalInfo"
+		parameterType="hashmap">
+		update policy_global_t
+		<set>
+			<foreach
+				collection="condition"
+				separator=","
+				index="key"
+				item="value"
+				close="">
+				${key}=#{value}
+			</foreach>
+		</set>
+	</update>
+
+	<!-- 创建策略 -->
+	<insert
+		id="creatPolicy" parameterType="hashmap"		useGeneratedKeys="true"	keyProperty="policy_id">
+		insert into policy_business_t
+		(
+		<foreach
+			collection="condition"
+			separator=","
+			index="key">${key}</foreach>
+		)
+		values(
+		<foreach
+			collection="condition"
+			separator=","
+			item="value"
+			close="">#{value}</foreach>
+		)
+	</insert>
+
+	<insert
+		id="policyAddGroup"
+		parameterType="hashmap"
+		useGeneratedKeys="true"
+		keyProperty="policy_id">
+		insert into policy_group_relation_t
+		(
+		<foreach
+			collection="condition"
+			separator=","
+			index="key">${key}</foreach>
+		)
+		values(
+		<foreach
+			collection="condition"
+			separator=","
+			item="value"
+			close="">#{value}</foreach>
+		)
+	</insert>
+
+	<insert
+		id="policyAddCity"
+		parameterType="hashmap"
+		useGeneratedKeys="true"
+		keyProperty="policy_id">
+		insert into policy_position_relation_t
+		(
+		<foreach
+			collection="condition"
+			separator=","
+			index="key">${key}</foreach>
+		)
+		values(
+		<foreach
+			collection="condition"
+			separator=","
+			item="value"
+			close="">#{value}</foreach>
+		)
+	</insert>
+
+	<insert
+		id="policyAddTime"
+		parameterType="hashmap"
+		useGeneratedKeys="true"
+		keyProperty="policy_id">
+		insert into policy_time_t
+		(
+		<foreach
+			collection="condition"
+			separator=","
+			index="key">${key}</foreach>
+		)
+		values(
+		<foreach
+			collection="condition"
+			separator=","
+			item="value"
+			close="">#{value}</foreach>
+		)
+	</insert>
+	
+	
+	
+	<resultMap
+		type="hashmap"
+		id="policyPushTimeMapperResult">
+		<result
+			property="cycleWeek"
+			column="CycleWeek" />
+		<result
+			property="cycleDay"
+			column="CycleDay" />
+		<result
+			property="cycleHour"
+			column="CycleHour" />
+	</resultMap>
+	<!-- 查询被选中的推送日期 -->
+	<select
+		id="singlePolicyPushTime"
+		parameterType="hashmap"
+		resultMap="policyPushTimeMapperResult">
+		SELECT k.`Cycle_Week` AS CycleWeek,k.`Cycle_Day` AS CycleDay
+		,k.`Cycle_Hour` AS CycleHour FROM policy_time_t k
+		WHERE k.`Policy_Id`=#{policyId}
+	</select>
+	
+	<!--查询推送类型中的离线网址  -->
+	<resultMap
+		type="hashmap"
+		id="policyOutlineWebMapperResult">
+		<result
+			property="WebUrl"
+			column="webUrl" />
+		
+		
+	</resultMap>
+	<select 
+		id="singlePolicyOutlineWeb"
+		parameterType="hashmap"
+		resultMap="policyOutlineWebMapperResult">
+		SELECT k.`Web_Url` AS WebUrl FROM policy_web_url_t k
+		WHERE k.`Policy_Id`=#{policyId}
+		</select>	
+	
+	<insert
+		id="policyAddKeyWord"
+		parameterType="hashmap"
+		useGeneratedKeys="true"
+		keyProperty="policy_id">
+		insert into policy_keyword_t
+		(
+		<foreach
+			collection="condition"
+			separator=","
+			index="key">${key}</foreach>
+		)
+		values(
+		<foreach
+			collection="condition"
+			separator=","
+			item="value"
+			close="">#{value}</foreach>
+		)
+	</insert>
+	
+	<insert id="policyAddCustomer"
+		parameterType="hashmap"
+		useGeneratedKeys="true"
+		keyProperty="policy_id">
+		insert into policy_customer_relation_t
+		(
+		<foreach
+			collection="condition"
+			separator=","
+			index="key">${key}</foreach>
+		)
+		values(
+		<foreach
+			collection="condition"
+			separator=","
+			item="value"
+			close="">#{value}</foreach>
+		)
+	
+	</insert>
+	
+	<insert
+		id="policyAddUrlDomain"
+		parameterType="hashmap"
+		useGeneratedKeys="true"
+		keyProperty="policy_id">
+		insert into policy_url_t
+		(
+		<foreach
+			collection="condition"
+			separator=","
+			index="key">${key}</foreach>
+		)
+		values(
+		<foreach
+			collection="condition"
+			separator=","
+			item="value"
+			close="">#{value}</foreach>
+		)
+	</insert>
+	<insert
+		id="policyAddOtherUrl"
+		parameterType="hashmap"
+		useGeneratedKeys="true"
+		keyProperty="policy_id">
+		insert into policy_web_url_t
+		(
+		<foreach
+			collection="condition"
+			separator=","
+			index="key">${key}</foreach>
+		)
+		values(
+		<foreach
+			collection="condition"
+			separator=","
+			item="value"
+			close="">#{value}</foreach>
+		)
+	</insert>
+	<delete
+		id="policyDeleteGroup"
+		parameterType="hashmap">
+		delete from policy_group_relation_t where
+		Policy_Id=#{policyId}
+	</delete>
+	<delete
+		id="policyDeleteCity"
+		parameterType="hashmap">
+		delete from policy_position_relation_t where
+		Policy_Id=#{policyId}
+	</delete>
+	<delete
+		id="policyDeleteTime"
+		parameterType="hashmap">
+		delete from policy_time_t where Policy_Id=#{policyId}
+	</delete>
+	<delete
+		id="policyDeleteKeyWord"
+		parameterType="hashmap">
+		delete from policy_keyword_t where Policy_Id=#{policyId}
+	</delete>
+	<delete
+		id="policyDeleteUrlDomain"
+		parameterType="hashmap">
+		delete from policy_url_t where Policy_Id=#{policyId}
+	</delete>
+	<delete
+		id="policyDeleteOtherUrl"
+		parameterType="hashmap">
+		delete from policy_web_url_t where Policy_Id=#{policyId}
+	</delete>
+	<delete
+		id="deletePolicy"
+		parameterType="hashmap">
+		DELETE a, b, c,d, e,f FROM `policy_business_t`
+		a
+		LEFT JOIN `policy_group_relation_t` b ON a.`Policy_Id`=b.`Policy_Id`
+		LEFT JOIN `policy_time_t` c ON a.`Policy_Id`=c.`Policy_Id`
+		LEFT JOIN `policy_position_relation_t` d ON a.`Policy_Id`=d.`Policy_Id`
+		LEFT JOIN `policy_keyword_t` e ON a.`Policy_Id`=e.`Policy_Id`
+		LEFT JOIN `policy_url_t` f ON f.`Policy_Id`=a.`Policy_Id`
+		WHERE a.Policy_Id=#{policyId}
+	</delete>
+
+	<update
+		id="updateStatus"
+		parameterType="hashmap">
+		update policy_business_t
+		<if test="condition!=null">
+			<set>
+				<foreach
+					collection="condition"
+					separator=","
+					index="key"
+					item="value"
+					close="">
+					${key}=#{value}
+				</foreach>
+			</set>
+		</if>
+		where Policy_Id=#{policyId}
+	</update>
+
+	<update
+		id="updataPolicyOne"
+		parameterType="hashmap">
+		update policy_business_t
+		<if test="condition!=null">
+			<set>
+				<foreach
+					collection="condition"
+					separator=","
+					index="key"
+					item="value"
+					close="">
+					${key}=#{value}
+				</foreach>
+			</set>
+		</if>
+		where Policy_Id=#{policyId}
+	</update>
+
+	<update
+		id="updataPolicyTwo"
+		parameterType="hashmap">
+		update policy_business_t
+		<if test="condition!=null">
+			<set>
+				<foreach
+					collection="condition"
+					separator=","
+					index="key"
+					item="value"
+					close="">
+					${key}=#{value}
+				</foreach>
+			</set>
+		</if>
+		where Policy_Id=#{policyId}
+	</update>
+
+	<update
+		id="updataPolicyThree"
+		parameterType="hashmap">
+		update policy_business_t
+		<if test="condition!=null">
+			<set>
+				<foreach
+					collection="condition"
+					separator=","
+					index="key"
+					item="value"
+					close="">
+					${key}=#{value}
+				</foreach>
+			</set>
+		</if>
+		where Policy_Id=#{policyId}
+	</update>
+	<delete
+		id="deleteById"
+		parameterType="int">
+		delete from policy_group_detail_t
+		where group_id=#{id}
+	</delete>
+
+	<delete
+		id="deleteGroupById"
+		parameterType="int">
+		delete from policy_group_t
+		where group_id=#{id}
+	</delete>
+	<resultMap
+		type="hashmap"
+		id="sysCityListResult">
+		<result
+			property="CityName"
+			column="City_Name" />
+		<result
+			property="CityId"
+			column="City_Id" />
+		<result
+			property="ProvinceName"
+			column="Province_Name" />
+		<result
+			property="ProvinceId"
+			column="Province_Id" />
+	</resultMap>
+	<select
+		id="sysCityList"
+		parameterType="hashmap"
+		resultMap="sysCityListResult">
+		select c.City_Name,c.City_Id,b.Province_Name,b.Province_Id from
+		`sys_province_info_t`b
+		LEFT JOIN `sys_city_info_t` c ON c.`Province_Id` = b.`Province_Id`
+		where 1=1
+		<if test="cityId!=null">
+			and c.City_Id = #{cityId}
+		</if>
+		<if test="provinceId!=null">
+			and c.Province_Id=#{provinceId}
+		</if>
+	</select>
+	<resultMap
+		type="hashmap"
+		id="sysCityDistrictResult">
+		<result
+			property="districtName"
+			column="District_Name" />
+		<result
+			property="cityId"
+			column="City_Id" />
+		<result
+			property="districtId"
+			column="District_Id" />
+		<result
+			property="districtEn"
+			column="District_En" />
+	</resultMap>
+	<select
+		id="sysCityDistrict"
+		parameterType="hashmap"
+		resultMap="sysCityDistrictResult">
+		select b.District_Name,b.City_Id,b.District_Id,b.District_En from
+		`sys_district_info_t`b ,`sys_city_info_t` c 
+		where 1=1
+		<if test="provinceId!=null">
+			and c.City_Id=b.City_Id and c.Province_Id=#{provinceId}
+		</if>
+		<if test="cityId!=null">
+			and b.City_Id = #{cityId}
+		</if>
+	</select>
+
+	<resultMap type="hashmap" id="sysIpsListResult">
+		<result property="ipsId" column="Ips_Id" />
+		<result property="ipsName" column="Ips_Name" />
+		<result property="cityId" column="City_Id" />
+		<result property="cityName" column="City_Name" />
+		<result property="cityEn" column="City_En" />
+		<result property="ipsStatus" column="Ips_status" />
+	</resultMap>
+	
+	<select id="sysIpsList" parameterType="hashmap" resultMap="sysIpsListResult">
+		select i.Ips_Id,i.Ips_Name,i.City_Id,c.City_Name from policy_ips_config_t i,sys_city_info_t c
+		<where>
+			i.City_Id = c.City_Id
+			<if test="provinceId!=null">
+				AND i.Province_Id=#{provinceId}
+			</if>
+			<if test="cityId!=null">
+				AND i.City_Id = #{cityId}
+			</if>
+		</where>
+	</select>
+
+	<insert id="insertIpsInfo" parameterType="hashmap" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO policy_ips_relation_t (Policy_Id,Ips_Id,Create_User,Create_Time) VALUES
+		<foreach collection="LIST" separator="," item="item" index="index">
+			(#{policyId},#{item.ipsId},#{createUser},#{createTime})
+		</foreach>
+	</insert>
+	
+	<insert id="insertCustomer" parameterType="hashmap" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO customer_activity_relation_t (Customer_Id,Activity_Id,Create_User,Create_Time) VALUES
+		<foreach collection="LIST" separator="," item="item" index="index">
+			(#{customers},#{item.activityId},#{createUser},#{createTime})
+		</foreach>
+	</insert>
+	<insert id="insertActivity" parameterType="hashmap" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO policy_activity_relation_t (Policy_Id,Activity_Id,Create_User,Create_Time) VALUES
+		<foreach collection="LIST" separator="," item="item" index="index">
+			(#{policyId},#{item.activityId},#{createUser},#{createTime})
+		</foreach>
+	</insert>
+
+	<select id="sysIpsCityList" parameterType="hashmap" resultMap="sysIpsListResult">
+		select DISTINCT i.City_Id,c.City_Name from policy_ips_config_t i,sys_city_info_t c
+		<where>
+			i.City_Id = c.City_Id
+			<if test="provinceId!=null">
+				AND i.Province_Id=#{provinceId}
+			</if>
+			<if test="cityId!=null">
+				AND i.City_Id = #{cityId}
+			</if>
+		</where>
+	</select>
+
+	<select id="getCountByCondition" parameterType="hashmap" resultType="int">
+		select count(1) from policy_business_t where Create_User = #{createUser}
+	</select>
+	<select id="queryCustomerActivity" parameterType="hashmap" resultType="int">
+		SELECT COUNT(1) FROM `customer_activity_relation_t` c 
+		WHERE c.`Activity_Id`=#{activityId} AND c.`Customer_Id`=#{customers} AND c.`Create_User`=#{createUser}
+	</select>
+
+	<delete id="deleteIpsRelation" parameterType="hashmap">
+		DELETE from policy_ips_relation_t where policy_id = #{policyId}
+	</delete>
+</mapper>

@@ -1,0 +1,54 @@
+#wins_toolbar_html {
+	z-index: 2147483646;
+	position: fixed;
+	vertical-align: middle;
+	font-size: 23px;
+	font-weight: bold;
+	line-height: 50px;
+	text-align: center;
+	margin: 15% auto;
+	width: 100%;
+	height: 100%;
+	color: #000;
+}
+
+#wins_toolbar_html i {
+	font-style: normal;
+	color: red;
+}
+
+#wins_toolbar_html .wins_bg {
+	background: url('./images/SmartTips.jpg') no-repeat;
+	width: 300px;
+	height: 360px;
+	position: relative;
+	margin: 0 auto;
+}
+
+#wins_toolbar_html .wins_close {
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	display: block;
+	width: 30px;
+	height: 30px;
+	background-color: red;
+	text-decoration: none;
+	background: url('./images/close2.png') no-repeat;
+}
+
+#wins_toolbar_html p {
+	line-height: 35px;
+	margin: 0px;
+	padding: 0px;
+}
+
+#wins_toolbar_html .tb_btn {
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	width: 268px;
+	height: 44px;
+	background: url(./images/yjxy.png);
+	background-size: 268px 44px;
+}

@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.BlacklistMapper">
+	<!-- 用户黑名单总信息 -->
+	<resultMap
+		type="hashmap"
+		id="UserBlacklistMapperResult">
+		<result
+			property="UserId"
+			column="User_Id" />
+		<result
+			property="FilterUser"
+			column="Filter_User" />
+		<result
+			property="PolicyName"
+			column="Policy_Name" />
+		<result
+			property="PolicyId"
+			column="Policy_Id" />
+		<result
+			property="UserStatus"
+			column="User_Status" />
+		<result
+			property="UserName"
+			column="User_Name" />
+		<result
+			property="CreateTime"
+			column="Create_Time" />
+	</resultMap>
+
+	<sql id="UserBlacklistinfo">
+		a.User_Id,a.Filter_User,a.Policy_Id,b.Policy_Name,
+		CASE a.User_Status
+		WHEN 1 THEN '本日屏蔽'
+		WHEN 2 THEN '本周屏蔽'
+		WHEN 3 THEN '本月屏蔽'
+		WHEN 4 THEN '永久屏蔽'
+		END as User_Status,
+		c.User_Name,date_format(a.Create_Time,'%Y-%m-%d %H:%i:%s')as Create_Time
+	</sql>
+
+	<select id="userBlacklist" parameterType="hashmap" resultMap="UserBlacklistMapperResult">
+		(SELECT f.User_Id,f.Filter_User,f.Policy_Id,f.User_Status,'全部' AS
+		Policy_Name,'' AS User_Name,DATE_FORMAT(f.Create_Time,'%Y-%m-%d
+		%H:%i:%s')AS Create_Time
+		FROM policy_filter_user_t f
+		<where>
+			f.Policy_Id=-1 AND f.Create_User = 0 AND (now() &lt; f.Invalid_Time OR f.User_Status = 4)
+			<if test="FilterUser!=null">
+				and f.Filter_User like '%${FilterUser}%'
+			</if>
+			<if test="UserStatus!=null">
+				and f.User_Status = #{UserStatus}
+			</if>
+		</where>
+		)
+		UNION ALL
+		(SELECT
+		f.User_Id,f.Filter_User,f.Policy_Id,f.User_Status,'全部' AS
+		Policy_Name,u.User_Name,DATE_FORMAT(f.Create_Time,'%Y-%m-%d
+		%H:%i:%s')AS Create_Time
+		FROM policy_filter_user_t f,sys_user_info_t u
+		<where>
+			f.Policy_Id=-1 AND f.Create_User!=0 AND f.Create_User=u.User_Id AND (now() &lt; f.Invalid_Time OR f.User_Status = 4)
+			<if test="FilterUser!=null">
+				and f.Filter_User like '%${FilterUser}%'
+			</if>
+			<if test="UserStatus!=null">
+				and f.User_Status = #{UserStatus}
+			</if>
+			<if test="showStatus!=null">
+				AND u.Show_Status = #{showStatus}
+			</if>
+		</where>
+		)
+		UNION ALL
+		(SELECT
+		f.User_Id,f.Filter_User,f.Policy_Id,f.User_Status,p.Policy_Name AS
+		Policy_Name,
+		u.User_Name,DATE_FORMAT(f.Create_Time,'%Y-%m-%d
+		%H:%i:%s')AS Create_Time
+		FROM policy_filter_user_t f,policy_business_t p,sys_user_info_t u
+		<where>
+			f.Policy_Id != -1 AND f.Create_User!=0 AND f.Create_User=u.User_Id AND (now() &lt; f.Invalid_Time OR f.User_Status = 4)
+			AND f.Policy_Id=p.Policy_Id
+			<if test="FilterUser!=null">
+				and f.Filter_User like '%${FilterUser}%'
+			</if>
+			<if test="UserStatus!=null">
+				and f.User_Status = #{UserStatus}
+			</if>
+			<if test="showStatus!=null">
+				AND u.Show_Status = #{showStatus}
+			</if>
+		</where>
+		)
+		UNION  ALL
+		(SELECT
+		f.User_Id,f.Filter_User,f.Policy_Id,f.User_Status,p.Policy_Name AS
+		Policy_Name,
+		''  AS  User_Name,DATE_FORMAT(f.Create_Time,'%Y-%m-%d
+		%H:%i:%s')AS Create_Time
+		FROM policy_filter_user_t f,policy_business_t p,sys_user_info_t u
+		<where>
+			f.Policy_Id != -1 AND f.Create_User=0 AND f.Policy_Id=p.Policy_Id AND p.Create_User=u.User_Id AND (now() &lt; f.Invalid_Time OR f.User_Status = 4)
+			AND f.Policy_Id=p.Policy_Id
+			<if test="FilterUser!=null">
+				and f.Filter_User like '%${FilterUser}%'
+			</if>
+			<if test="UserStatus!=null">
+				and f.User_Status = #{UserStatus}
+			</if>
+			<if test="showStatus!=null">
+				AND u.Show_Status = #{showStatus}
+			</if>
+		</where>
+		)
+		ORDER BY Create_Time DESC
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+	</select>
+
+	<select
+			id="userBlacklistcount"
+			parameterType="hashmap"
+			resultType="int">
+		select count(1) from (
+		(SELECT f.User_Id,f.Filter_User,f.Policy_Id,f.User_Status,'全部' AS
+		Policy_Name,'' AS User_Name,DATE_FORMAT(f.Create_Time,'%Y-%m-%d
+		%H:%i:%s')AS Create_Time
+		FROM policy_filter_user_t f
+		<where>
+			f.Policy_Id=-1 AND f.Create_User = 0 AND (now() &lt; f.Invalid_Time OR f.User_Status = 4)
+			<if test="FilterUser!=null">
+				and f.Filter_User like '%${FilterUser}%'
+			</if>
+			<if test="UserStatus!=null">
+				and f.User_Status = #{UserStatus}
+			</if>
+		</where>
+		)
+		UNION ALL
+		(SELECT
+		f.User_Id,f.Filter_User,f.Policy_Id,f.User_Status,'全部' AS
+		Policy_Name,u.User_Name,DATE_FORMAT(f.Create_Time,'%Y-%m-%d
+		%H:%i:%s')AS Create_Time
+		FROM policy_filter_user_t f,sys_user_info_t u
+		<where>
+			f.Policy_Id=-1 AND f.Create_User!=0 AND f.Create_User=u.User_Id AND (now() &lt; f.Invalid_Time OR f.User_Status = 4)
+			<if test="FilterUser!=null">
+				and f.Filter_User like '%${FilterUser}%'
+			</if>
+			<if test="UserStatus!=null">
+				and f.User_Status = #{UserStatus}
+			</if>
+			<if test="showStatus!=null">
+				AND u.Show_Status = #{showStatus}
+			</if>
+		</where>
+		)
+		UNION ALL
+		(SELECT
+		f.User_Id,f.Filter_User,f.Policy_Id,f.User_Status,p.Policy_Name AS
+		Policy_Name,
+		u.User_Name,DATE_FORMAT(f.Create_Time,'%Y-%m-%d
+		%H:%i:%s')AS Create_Time
+		FROM policy_filter_user_t f,policy_business_t
+		p,sys_user_info_t u
+		<where>
+			f.Policy_Id != -1 AND f.Create_User!=0 AND f.Create_User=u.User_Id AND (now() &lt; f.Invalid_Time OR f.User_Status = 4)
+			AND f.Policy_Id=p.Policy_Id
+			<if test="FilterUser!=null">
+				and f.Filter_User like '%${FilterUser}%'
+			</if>
+			<if test="UserStatus!=null">
+				and f.User_Status = #{UserStatus}
+			</if>
+			<if test="showStatus!=null">
+				AND u.Show_Status = #{showStatus}
+			</if>
+		</where>
+		)
+		UNION  ALL
+		(SELECT
+		f.User_Id,f.Filter_User,f.Policy_Id,f.User_Status,p.Policy_Name AS
+		Policy_Name,
+		''  AS  User_Name,DATE_FORMAT(f.Create_Time,'%Y-%m-%d
+		%H:%i:%s')AS Create_Time
+		FROM policy_filter_user_t f,policy_business_t p,sys_user_info_t u
+		<where>
+			f.Policy_Id != -1 AND f.Create_User=0 AND f.Policy_Id=p.Policy_Id AND p.Create_User=u.User_Id AND (now() &lt; f.Invalid_Time OR f.User_Status = 4)
+			AND f.Policy_Id=p.Policy_Id
+			<if test="FilterUser!=null">
+				and f.Filter_User like '%${FilterUser}%'
+			</if>
+			<if test="UserStatus!=null">
+				and f.User_Status = #{UserStatus}
+			</if>
+			<if test="showStatus!=null">
+				AND u.Show_Status = #{showStatus}
+			</if>
+		</where>
+		)
+		) as total
+	</select>
+
+	<!-- 获取所有策略信息 -->
+	<resultMap
+		type="hashmap"
+		id="PolicyMapperResult">
+		<result
+			property="PolicyId"
+			column="Policy_Id" />
+		<result
+			property="PolicyName"
+			column="Policy_Name" />
+	</resultMap>
+	<sql id="PolicyMan">
+		Policy_Id,Policy_Name
+	</sql>
+	<select
+		id="showPolicy"
+		parameterType="hashmap"
+		resultMap="PolicyMapperResult">
+		SELECT
+		<include refid="PolicyMan"></include>
+		FROM policy_business_t p JOIN sys_user_info_t u ON p.Create_User =
+		u.User_Id WHERE u.Show_Status = #{showStatus}
+	</select>
+	<!-- 添加用户黑名单 -->
+	<insert
+		id="insertBlackUser"
+		parameterType="hashmap"
+		useGeneratedKeys="true"
+		keyProperty="id">
+		insert into policy_filter_user_t
+		(
+		<foreach
+			collection="condition"
+			separator=","
+			index="key">${key}</foreach>
+		)
+		values(
+		<foreach
+			collection="condition"
+			separator=","
+			item="value"
+			close="">#{value}</foreach>
+		)
+	</insert>
+	<!-- 批量添加用户黑名单 -->
+	<insert
+		id="insertBlackUsers"
+		parameterType="hashmap"
+		useGeneratedKeys="true"
+		keyProperty="id">
+		insert into policy_filter_user_t
+		(Filter_User,User_Status,Policy_Id,Invalid_Time,Create_User,Create_Time,Effect_Time)
+		values
+		<foreach
+			collection="LIST"
+			separator=","
+			item="item"
+			index="index">
+			(#{item.Filter_User},#{User_Status},#{Policy_Id},#{Invalid_Time},#{Create_User},#{Create_Time},#{Effect_Time})
+		</foreach>
+	</insert>
+	<!-- 删除用户黑名单 -->
+	<delete
+		id="delUser"
+		parameterType="int">
+		delete from policy_filter_user_t where User_Id=#{userId}
+	</delete>
+	<!-- 网址黑名单总信息 -->
+	<resultMap
+		type="hashmap"
+		id="UrlBlacklistMapperResult">
+		<result
+			property="UrlId"
+			column="Url_Id" />
+		<result
+			property="UrlDomain"
+			column="Url_Domain" />
+		<result
+			property="UrlPath"
+			column="Url_Path" />
+		<result
+			property="UrlStatus"
+			column="Url_Status" />
+		<result
+			property="UserName"
+			column="User_Name" />
+		<result
+			property="CreateTime"
+			column="Create_Time" />
+	</resultMap>
+
+	<sql id="UrlBlacklistinfo">
+		a.Url_Id,a.Url_Domain,a.Url_Path,a.Url_Status,b.User_Name,date_format(a.Create_Time,'%Y-%m-%d
+		%H:%i:%s')as Create_Time
+	</sql>
+
+	<select
+		id="urlBlacklist"
+		parameterType="hashmap"
+		resultMap="UrlBlacklistMapperResult">
+
+		SELECT
+		<include refid="UrlBlacklistinfo"></include>
+		FROM policy_filter_url_t a,sys_user_info_t b
+		where a.Create_User=b.User_Id
+		<if test="UrlDomain!=null">
+			and a.Url_Domain = #{UrlDomain}
+		</if>
+		<if test="showStatus!=null">
+			AND b.Show_Status = #{showStatus}
+		</if>
+		ORDER BY Create_Time DESC
+		<if test="page!=null">
+			limit ${page.start},${page.limit}
+		</if>
+
+	</select>
+
+	<select
+		id="urlBlacklistcount"
+		parameterType="hashmap"
+		resultType="int">
+		select count(1) from (
+		SELECT
+		<include refid="UrlBlacklistinfo"></include>
+		FROM policy_filter_url_t a,sys_user_info_t b
+		where
+		a.Create_User=b.User_Id
+		<if test="UrlDomain!=null">
+			and a.Url_Domain = #{UrlDomain}
+		</if>
+		<if test="showStatus!=null">
+			AND b.Show_Status = #{showStatus}
+		</if>
+		) as total
+	</select>
+	<!-- 添加网址黑名单 -->
+	<insert
+		id="insertBlackUrl"
+		parameterType="hashmap"
+		useGeneratedKeys="true"
+		keyProperty="id">
+		insert into policy_filter_url_t
+		(
+		<foreach
+			collection="condition"
+			separator=","
+			index="key">${key}</foreach>
+		)
+		values(
+		<foreach
+			collection="condition"
+			separator=","
+			item="value"
+			close="">#{value}</foreach>
+		)
+	</insert>
+	<!-- 批量添加网址黑名单 -->
+	<insert
+		id="insertBlackUrls"
+		parameterType="hashmap"
+		useGeneratedKeys="true"
+		keyProperty="id">
+		insert into policy_filter_url_t
+		(Url_Domain,Url_Path,Url_Status,Create_User,Create_Time)
+		values
+		<foreach
+			collection="LIST"
+			separator=","
+			item="item"
+			index="index">
+			(#{item.Url_Domain},#{item.Url_Path},#{Url_Status},#{Create_User},#{Create_Time})
+		</foreach>
+	</insert>
+	<!-- 删除网址黑名单 -->
+	<delete
+		id="delUrl"
+		parameterType="int">
+		delete from policy_filter_url_t where Url_Id=#{urlId}
+	</delete>
+
+	<select
+		id="getBlackUrlcount"
+		parameterType="hashmap"
+		resultType="int">
+		select count(1) from policy_filter_url_t
+		<where>
+			Url_Domain = #{Url_Domain} AND Url_Path = #{Url_Path}
+		</where>
+	</select>
+
+</mapper>

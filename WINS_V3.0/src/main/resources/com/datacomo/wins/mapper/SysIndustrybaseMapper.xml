@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.datacomo.wins.mapper.SysIndustrybaseMapper">
+
+	<resultMap type="hashmap" id="industrybaseMapperResult">
+		<result property="industryid" column="industry_id" />
+		<result property="industryname	" column="industry_name"/>
+		<result property="industrylevel" column="industry_level"/>
+		<result property="parentid" column="parent_id"/>
+		
+	</resultMap>
+	
+	
+
+	<select id="findFirstIndustry" parameterType="hashmap" resultMap="industrybaseMapperResult">
+	SELECT industry_id,industry_name,industry_level,parent_id FROM sys_industry_base_info
+	</select>
+
+	<!-- <insert id="insertInfo" parameterType="hashmap" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO sys_industry_label_t (Industry_uuid,Industry_puuid,En_Name,Yn_Name,Ch_Name,Create_Time) VALUES
+		<foreach collection="list" separator="," item="item" index="index">
+			(#{item.uuid},#{item.puuid},#{item.enName},#{item.ynName},#{item.chName},#{createTime})
+		</foreach>
+	</insert> -->
+
+	
+	<select id="findChildIndustry" parameterType="hashmap" resultMap="industryMapperResult">
+		SELECT industry_id,industry_name,industry_level,parent_id  FROM sys_industry_label_t
+            <where>
+		  <if test="parent_id">
+			  parent_id=#{parent_id}
+		  </if>
+	  </where>
+	</select>
+
+
+</mapper>
