@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com</groupId>
-	<artifactId>wins3.0_en</artifactId>
+	<artifactId>wins3.0_ad</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 
@@ -201,7 +201,7 @@
 
 
 	<build>
-		<finalName>wins3.0_en</finalName>
+		<finalName>wins3.0_ad</finalName>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -212,5 +212,5 @@
 			</plugin>
 		</plugins>
 	</build>
-	<name>WINS_V3.0_EN</name>
+	<name>WINS_V3.0_AD</name>
 </project>
