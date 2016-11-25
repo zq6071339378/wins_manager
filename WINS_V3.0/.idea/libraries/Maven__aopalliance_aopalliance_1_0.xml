@@ -2,8 +2,6 @@
   <library name="Maven: aopalliance:aopalliance:1.0">
     <CLASSES>
       <root url="jar://$USER_HOME$/.m2/repository/aopalliance/aopalliance/1.0/aopalliance-1.0.jar!/" />
-      <root url="jar://$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/javax.mail.jar!/" />
-      <root url="jar://$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/sendmessage.jar!/" />
       <root url="jar://$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/commons-beanutils-1.7.0.jar!/" />
       <root url="jar://$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/commons-collections-3.1.jar!/" />
       <root url="jar://$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/commons-lang-2.5.jar!/" />
@@ -11,12 +9,10 @@
       <root url="jar://$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/ezmorph-1.0.3.jar!/" />
       <root url="jar://$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/json-lib-2.1-jdk15.jar!/" />
       <root url="jar://$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/mail.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/mina-core-2.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/sendmessage.jar!/" />
     </CLASSES>
-    <JAVADOC>
-      <root url="jar://$USER_HOME$/.m2/repository/aopalliance/aopalliance/1.0/aopalliance-1.0-javadoc.jar!/" />
-    </JAVADOC>
-    <SOURCES>
-      <root url="jar://$USER_HOME$/.m2/repository/aopalliance/aopalliance/1.0/aopalliance-1.0-sources.jar!/" />
-    </SOURCES>
+    <JAVADOC />
+    <SOURCES />
   </library>
 </component>

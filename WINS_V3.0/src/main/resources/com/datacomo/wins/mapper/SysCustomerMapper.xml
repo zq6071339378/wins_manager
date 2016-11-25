@@ -212,44 +212,80 @@
 
 
 	<select id="selectAllInfo" parameterType="hashmap" resultMap="customerMapperResult">
-		SELECT cr.Customer_Id,cr.Trade_No,cr.Trade_Type,cr.Trade_Amount,cr.Account_Balance,cr.Trade_Remark,cr.Trade_Time,cr.Create_User,cr.Create_Time,
-		cu.Customer_Name,cu.Customer_Phone,cu.Customer_Email,cu.Customer_Company,cu.contract_code,cu.Customer_office,cu.Customer_Address,su.User_Name
-		FROM customer_trade_record cr LEFT JOIN sys_customer_info_t cu ON cr.Customer_Id=cu.Customer_Id
-		LEFT JOIN sys_user_info_t su ON cr.Create_User=su.User_Id
-		<where>
-			cr.Create_User IS NOT NULL AND cr.Create_User!=0 AND cr.Customer_Id=#{customerId}
-			<if test="tradeType!=null">
-				AND cr.Trade_Type =#{tradeType}
-			</if>
-			<if test="startTime==endTime">
-				AND cr.Trade_Time LIKE '%${startTime}%'
-			</if>
-			<if test="startTime!=endTime">
-				AND cr.Trade_Time <![CDATA[>=]]> #{startTime} AND cr.Trade_Time <![CDATA[<=]]> #{endTime}
-			</if>
-		</where>
-
-
-		ORDER BY cr.Trade_Time DESC
+		SELECT * FROM (
+			SELECT cr.Customer_Id,cr.Trade_No,cr.Trade_Type,cr.Trade_Amount,cr.Account_Balance,cr.Trade_Remark,cr.Trade_Time,cr.Create_User,cr.Create_Time,
+			cu.Customer_Name,cu.Customer_Phone,cu.Customer_Email,cu.Customer_Company,cu.contract_code,cu.Customer_office,cu.Customer_Address,su.User_Name AS User_Name
+			FROM customer_trade_record cr LEFT JOIN sys_customer_info_t cu ON cr.Customer_Id=cu.Customer_Id
+			LEFT JOIN sys_user_info_t su ON cr.Create_User=su.User_Id
+			<where>
+				cr.Create_User IS NOT NULL AND cr.Create_User!=0 AND cr.Customer_Id=#{customerId}
+				<if test="tradeType!=null">
+					AND cr.Trade_Type =#{tradeType}
+				</if>
+				<if test="startTime==endTime">
+					AND cr.Trade_Time LIKE '%${startTime}%'
+				</if>
+				<if test="startTime!=endTime">
+					AND cr.Trade_Time <![CDATA[>=]]> #{startTime} AND cr.Trade_Time <![CDATA[<=]]> date_add(#{endTime},INTERVAL 1 DAY)
+				</if>
+			</where>
+			UNION ALL
+			SELECT cr.Customer_Id,cr.Trade_No,cr.Trade_Type,cr.Trade_Amount,cr.Account_Balance,cr.Trade_Remark,cr.Trade_Time,cr.Create_User,cr.Create_Time,
+			cu.Customer_Name,cu.Customer_Phone,cu.Customer_Email,cu.Customer_Company,cu.contract_code,cu.Customer_office,cu.Customer_Address,'System' AS User_Name
+			FROM customer_trade_record cr LEFT JOIN sys_customer_info_t cu ON cr.Customer_Id=cu.Customer_Id
+			<where>
+				(cr.Create_User IS NULL OR cr.Create_User=0) AND cr.Customer_Id=#{customerId}
+				<if test="tradeType!=null">
+					AND cr.Trade_Type =#{tradeType}
+				</if>
+				<if test="startTime==endTime">
+					AND cr.Trade_Time LIKE '%${startTime}%'
+				</if>
+				<if test="startTime!=endTime">
+					AND cr.Trade_Time <![CDATA[>=]]> #{startTime} AND cr.Trade_Time <![CDATA[<=]]> date_add(#{endTime},INTERVAL 1 DAY)
+				</if>
+			</where>
+		)t ORDER BY t.Trade_Time DESC
 		<if test="page!=null">
 			limit ${page.start},${page.limit}
 		</if>
 	</select>
 
 	<select id="countAllInfo" parameterType="hashmap" resultType="int">
-		SELECT count(*) FROM customer_trade_record cr LEFT JOIN sys_customer_info_t cu ON cr.Customer_Id=cu.Customer_Id
-		<where>
-			cr.Customer_Id=#{customerId}
-			<if test="tradeType!=null">
-				AND cr.Trade_Type =#{tradeType}
-			</if>
-			<if test="startTime==endTime">
-				AND cr.Trade_Time LIKE '%${startTime}%'
-			</if>
-			<if test="startTime!=endTime">
-				AND cr.Trade_Time <![CDATA[>=]]> #{startTime} AND cr.Trade_Time <![CDATA[<=]]> #{endTime}
-			</if>
-		</where>
+		SELECT count(*) FROM (
+			SELECT cr.Customer_Id,cr.Trade_No,cr.Trade_Type,cr.Trade_Amount,cr.Account_Balance,cr.Trade_Remark,cr.Trade_Time,cr.Create_User,cr.Create_Time,
+			cu.Customer_Name,cu.Customer_Phone,cu.Customer_Email,cu.Customer_Company,cu.contract_code,cu.Customer_office,cu.Customer_Address,su.User_Name AS User_Name
+			FROM customer_trade_record cr LEFT JOIN sys_customer_info_t cu ON cr.Customer_Id=cu.Customer_Id
+			LEFT JOIN sys_user_info_t su ON cr.Create_User=su.User_Id
+			<where>
+				cr.Create_User IS NOT NULL AND cr.Create_User!=0 AND cr.Customer_Id=#{customerId}
+				<if test="tradeType!=null">
+					AND cr.Trade_Type =#{tradeType}
+				</if>
+				<if test="startTime==endTime">
+					AND cr.Trade_Time LIKE '%${startTime}%'
+				</if>
+				<if test="startTime!=endTime">
+					AND cr.Trade_Time <![CDATA[>=]]> #{startTime} AND cr.Trade_Time <![CDATA[<=]]> date_add(#{endTime},INTERVAL 1 DAY)
+				</if>
+			</where>
+			UNION ALL
+			SELECT cr.Customer_Id,cr.Trade_No,cr.Trade_Type,cr.Trade_Amount,cr.Account_Balance,cr.Trade_Remark,cr.Trade_Time,cr.Create_User,cr.Create_Time,
+			cu.Customer_Name,cu.Customer_Phone,cu.Customer_Email,cu.Customer_Company,cu.contract_code,cu.Customer_office,cu.Customer_Address,'System' AS User_Name
+			FROM customer_trade_record cr LEFT JOIN sys_customer_info_t cu ON cr.Customer_Id=cu.Customer_Id
+			<where>
+				(cr.Create_User IS NULL OR cr.Create_User=0) AND cr.Customer_Id=#{customerId}
+				<if test="tradeType!=null">
+					AND cr.Trade_Type =#{tradeType}
+				</if>
+				<if test="startTime==endTime">
+					AND cr.Trade_Time LIKE '%${startTime}%'
+				</if>
+				<if test="startTime!=endTime">
+					AND cr.Trade_Time <![CDATA[>=]]> #{startTime} AND cr.Trade_Time <![CDATA[<=]]> date_add(#{endTime},INTERVAL 1 DAY)
+				</if>
+			</where>
+		) as total
 	</select>
 
 

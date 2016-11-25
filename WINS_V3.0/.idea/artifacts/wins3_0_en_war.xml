@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="war" name="wins3.0_en:war">
-    <output-path>$PROJECT_DIR$/target</output-path>
-    <root id="archive" name="wins3.0_en.war">
-      <element id="artifact" artifact-name="wins3.0_en:war exploded" />
-    </root>
-  </artifact>
-</component>

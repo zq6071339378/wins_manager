@@ -52,6 +52,24 @@
 					load_page('customer/transactionRecord.html?startTime='+startTime+'&endTime='+endTime+'&customerId='+customerId);
 				});
 	});
+
+	function exportTransactionRecord(){
+		var customerId=$("#customer_Id").val();
+		var startTime=$("#start_Time").val();
+		var endTime=$("#end_Time").val();
+		window.location.href='${basePpath}customer/exportRecord?startTime='+startTime+'&endTime='+endTime+'&customerId='+customerId;
+		/*$.ajax({
+			url:"customer/exportRecord",
+			method:"post",
+			data:{"startTime":startTime,"endTime":endTime,'customerId':customerId},
+			success:function(data){
+
+			},
+			error: function () {
+				alert("System exception, please try again later!");
+			}
+		});*/
+	}
 </script>
 <script src="${basePath}js/jquery.form.js"></script>
 <!--main_container-->
@@ -86,8 +104,8 @@
 				</div>
 				<!-- /PAGE HEADER -->
 				<div class="row">
-					<div class="col-md-12">
-						<div class="col-md-3">
+					<div class="col-md-12" style="padding-left: 0px;">
+						<div class="col-md-3" style="padding-left: 0px;">
 							<div class="controls">
 								<div class="input-group date" id="reservation">
 									<input type="hidden" id="customer_Id" value="${result.customerId}">
@@ -102,8 +120,8 @@
 						</div>
 						<div class="from-group pull-right">
 							<div class="col-md-1">
-								<div class="input-append">
-									<a class="btn btn-primary">导出&nbsp;</a>
+								<div class="input-append" style="margin-right: 20px;">
+									<a class="btn btn-primary" onclick="exportTransactionRecord();">导出&nbsp;</a>
 								</div>
 							</div>
 						</div>

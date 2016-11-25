@@ -50,6 +50,13 @@
 																<div class="tab-pane active" id="account">
 																	<div class="divide-40"></div>
 																	<div class="form-group create_font">
+																		<label class="control-label col-md-3 old lable_height"><%=Config.message.get("CONTRACT_NO")%>：</label>
+																		<div class="col-md-4">
+																			<span class="span_font">${result.contractCode}</span>
+																		</div>
+																	</div>
+																	<div class="divide-20"></div>
+																	<div class="form-group create_font">
 																		<label class="control-label col-md-3 old lable_height"><span class="star">*</span>&nbsp;<%=Config.message.get("ACTIVITY_TOPUP")%>：</label>
 																		<div class="col-md-4">
 																			<input type="text" class="form-control" name="accountBalance1"  oninput="hideErrorSpan(this)" placeholder="<%=Config.message.get("ADNETWORK_PLEASE_INPUT_FIGURE")%>" onkeyup="value=value.replace(/[^\0-9\.]/g,'')" onpaste="value=value.replace(/[^\0-9\.]/g,'')" oncontextmenu = "value=value.replace(/[^\0-9\.]/g,'')">
