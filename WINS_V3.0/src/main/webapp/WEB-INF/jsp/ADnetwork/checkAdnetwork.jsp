@@ -57,13 +57,13 @@
 																			<span class="span_font">${result.networkName}</span>
 																		</div>
 																	</div>
-																	<div class="divide-20"></div>
+																	<%-- <div class="divide-20"></div>
 																	<div class="form-group create_font">
 																		<label class="control-label col-md-3 lable_height"><%=Config.message.get("ADNETWORK_EXPORT_FLUX")%>：</label>
 																		<div class="col-md-4">
 																			<span class="span_font">${result.exportFlux}</span>
 																		</div>
-																	</div>
+																	</div> --%>
 																	<div class="divide-20"></div>
 																	<div class="form-group create_font">
 																		<label class="control-label col-md-3 old lable_height"><%=Config.message.get("ADNETWORK_FLUX_RATIO")%>：</label>

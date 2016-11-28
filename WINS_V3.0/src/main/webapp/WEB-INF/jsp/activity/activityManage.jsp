@@ -80,8 +80,9 @@
 								<thead>
 									<tr>
 										<th><%=Config.message.get("CUSTOMER_SORT")%></th>
-										<th><%=Config.message.get("ACTIVITY_NAME")%></th>
 										<th><%=Config.message.get("CREATEPOLICY_ADVERTISER")%></th>
+										<th><%=Config.message.get("ACTIVITY_NAME")%></th>
+										
 										<th><%=Config.message.get("CREATEPOLICY_POLICYCOUNTS")%></th>
 										<th><%=Config.message.get("CUSTOMER_CREATE_USER")%></th>
 										<th><%=Config.message.get("CUSTOMER_CREATE_TIME")%></th>
@@ -93,8 +94,9 @@
 									<c:forEach var="ac" items="${result.list}" varStatus="vs">
 									<tr>
 										<td>${vs.count}</td>
-										<td>${ac.activityName}</td>
 										<td>${ac.customerName}</td>
+										<td>${ac.activityName}</td>
+										
 										<td>${ac.policyNum}</td>
 										<td>${ac.createName}</td>
 										<td><fmt:formatDate value="${ac.createTime}" pattern="yyyy-MM-dd HH:mm:ss" /></td>

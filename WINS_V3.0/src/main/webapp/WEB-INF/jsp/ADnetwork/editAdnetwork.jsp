@@ -59,13 +59,13 @@
 																		</div>
 																	</div>
 																	<div class="divide-20"></div>
-																	<div class="form-group create_font">
+																	<%-- <div class="form-group create_font">
 																		<label class="control-label col-md-3 lable_height"><span class="star">*</span>&nbsp;<%=Config.message.get("ADNETWORK_EXPORT_FLUX")%>：</label>
 																		<div class="col-md-4">
 																			<input type="text" class="form-control" value="${result.exportFlux}" placeholder="<%=Config.message.get("ADNETWORK_PLEASE_INPUT_FIGURE")%>" name="export_flux" onchange="checkPhoneNum(this)" onkeyup='this.value=this.value.replace(/\D/g,"")'>
 																			<span class="error-span" style="color: red; font: 8; margin-left: 0px"></span>
 																		</div>
-																	</div>
+																	</div> --%>
 																	<div class="divide-20"></div>
 																	<div class="form-group create_font">
 																		<label class="control-label col-md-3 old lable_height"><span class="star"></span>&nbsp;<%=Config.message.get("ADNETWORK_FLUX_RATIO")%>：</label>
@@ -85,10 +85,7 @@
 																				 <input type="radio" id="optionsRadios4" name="buy_type" required="required" value="2" > &nbsp;&nbsp;CPC
 																			 </label>
 																		 </div>
-																		<%-- <div class="col-md-4">
-																			<input type="text" class="form-control" value="${result.buyType}" name="buy_type" onchange="hideErrorSpan(this)">
-																			<span class="error-span" style="color: red; font: 8; margin-left: 0px"></span>
-																		</div> --%>
+																	
 																	</div>
 																	<div class="divide-20"></div>
 																	<div class="form-group create_font">
@@ -116,22 +113,7 @@
 																</div>
 															</div>
 														</div>
-																	<div class="divide-20"></div>
-																	<div class="form-group create_font">
-																		<label class="control-label col-md-3 lable_height"><span class="star">*</span>&nbsp;<%=Config.message.get("ADNETWORK_CREATE_TIME")%>：</label>
-																		<div class="col-md-4">
-																			<input type="text" class="form-control" value="${result.creatTime}" name="creat_time" onchange="hideErrorSpan(this)">
-																			<span class="error-span" style="color: red; font: 8; margin-left: 0px"></span>
-																		</div>
-																	</div>
-																	<%-- <div class="divide-20"></div>
-																	<div class="form-group create_font">
-																		<label class="control-label col-md-3 old lable_height"><span class="star"></span>&nbsp;<%=Config.message.get("CUSTOMER_REMARKS")%>：</label>
-																		<div class="col-md-4">
-																			<input type="text" class="form-control" value="${result.remarks}" name="remarks">
-																			<span class="error-span" style="color: red; font: 8; margin-left: 0px"></span>
-																		</div>
-																	</div> --%>
+																
 																</div>
 																<div class="divide-20"></div>
 																<input type="hidden" id="networkId" value="${result.networkId}">

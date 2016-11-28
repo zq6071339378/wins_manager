@@ -83,7 +83,7 @@
 									<tr>
 										<th><%=Config.message.get("ADNETWORK_SORT")%></th>
 										<th><%=Config.message.get("ADNETWORK_NAME")%></th>
-										<th><%=Config.message.get("ADNETWORK_EXPORT_FLUX")%></th>
+									
 										<th><%=Config.message.get("ADNETWORK_FLUX_RATIO")%></th>
 										<th><%=Config.message.get("ADNETWORK_WAYSOFPAYMENTS")%></th>
 										<th><%=Config.message.get("ADNETWORK_TOTAL_PRICE")%></th>
@@ -101,7 +101,7 @@
 									<tr>
 										<td>${vs.count}</td>
 										<td>${adnetwork.networkName}</td>
-										<td>${adnetwork.exportFlux}</td>
+										
 										<td>${adnetwork.flowRadio}</td>
 										<td>
 										<c:if test="${adnetwork.buyType eq 1}">CPM</c:if>

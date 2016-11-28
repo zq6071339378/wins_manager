@@ -57,14 +57,14 @@
 																			<span class="error-span" style="color: red; font: 8; margin-left: 0px"></span>
 																		</div>
 																	</div>
-																	<div class="divide-20"></div>
+																<%-- 	<div class="divide-20"></div>
 																	<div class="form-group create_font">
 																		<label class="control-label col-md-3 lable_height"><span class="star">*</span>&nbsp;<%=Config.message.get("ADNETWORK_EXPORT_FLUX")%>：</label>
 																		<div class="col-md-4">
 																			<input type="text" class="form-control" name="export_flux"   placeholder="<%=Config.message.get("ADNETWORK_PLEASE_INPUT_FIGURE")%>"  onchange="checkPhoneNum(this)" onkeyup='this.value=this.value.replace(/\D/g,"")' />
 																			<span class="error-span" style="color: red; font: 8; margin-left: 0px"></span>
 																		</div>
-																	</div>
+																	</div> --%>
 																	<div class="divide-20"></div>
 																	<div class="form-group create_font">
 																		<label class="control-label col-md-3 old lable_height"><span class="star">*</span>&nbsp;<%=Config.message.get("ADNETWORK_FLUX_RATIO")%>：</label>
