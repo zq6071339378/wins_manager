@@ -215,12 +215,12 @@ response.setDateHeader ("Expires", 0); //prevents caching at the proxy server
 											style="width: 100%; margin-left: 20%; color: red;"></div>
 									</div>
 										 <div class="col-md-7">
-													            	<div class="form-policy has-error">
-																		<label class="col-md-3"></label> <label
-																			class="control-label" for="inputWarning"
-																			id="policyNameMsg"></label>
-																	</div>
-													            </div>
+											<div class="form-policy has-error">
+												<label class="col-md-3"></label> <label
+													class="control-label" for="inputWarning"
+													id="policyNameMsg"></label>
+											</div>
+										</div>
 								</form>
 							</div>
 							<div class="modal-footer">

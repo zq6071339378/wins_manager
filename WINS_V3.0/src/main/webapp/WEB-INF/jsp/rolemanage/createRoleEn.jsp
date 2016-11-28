@@ -89,6 +89,7 @@
 																							<th><%=Config.message.get("ROLE_EDIT")%></th>
 																							<th><%=Config.message.get("ROLE_DELETE")%></th>
 																							<th><%=Config.message.get("ROLE_AUDIT")%></th>
+																							<th>二级审核</th>
 																							<th><%=Config.message.get("ROLE_GLOBAL")%></th>
 																						</tr>
 																					</thead>
@@ -98,6 +99,7 @@
 																							<td><%=Config.message.get("PUSH_VIEW")%></td>
 																							<td>--</td>
 																							<td><input type="checkbox" checked="checked" name="pushView" value="1"></td>
+																							<td>--</td>
 																							<td>--</td>
 																							<td>--</td>
 																							<td>--</td>
@@ -119,6 +121,7 @@
 																							<td><input type="checkbox" checked="checked"
 																								name="policyManage" value="16">
 																							</td>
+																							<td>--</td>
 																							<td><input type="checkbox" checked="checked"
 																								name="policyManage" value="32"></td>
 																						</tr>
@@ -131,6 +134,7 @@
 																							<td>--</td>
 																							<td><input type="checkbox" checked="checked"
 																								name="templateManage" value="8"></td>
+																							<td>--</td>
 																							<td>--</td>
 																							<td>--</td>
 																						</tr>
@@ -146,6 +150,7 @@
 																								name="pageManage" value="8"></td>
 																							<td>--</td>
 																							<td>--</td>
+																							<td>--</td>
 																						</tr>
 																						<tr>
 																							<td><%=Config.message.get("GROUP_MANAGE")%></td>
@@ -156,6 +161,7 @@
 																							<td>--</td>
 																							<td><input type="checkbox" checked="checked"
 																								name="groupManage" value="8"></td>
+																							<td>--</td>
 																							<td>--</td>
 																							<td>--</td>
 																						</tr>
@@ -171,6 +177,7 @@
 																								name="areaManage" value="8"></td>
 																							<td>--</td>
 																							<td>--</td>
+																							<td>--</td>
 																						</tr>
 																						<tr>
 																							<td rowspan="4"><input type="checkbox" checked="checked"></td>
@@ -183,11 +190,13 @@
 																							<td>--</td>
 																							<td>--</td>
 																							<td>--</td>
+																							<td>--</td>
 																						</tr>
 																						<tr>
 																							<td><%=Config.message.get("USER_COMPLAINT_MANAGE")%></td>
 																							<td><input type="checkbox" checked="checked"
 																								name="userComplaintManage" value="1"></td>
+																							<td>--</td>
 																							<td>--</td>
 																							<td>--</td>
 																							<td>--</td>
@@ -205,6 +214,7 @@
 																								name="userBlackManage" value="8"></td>
 																							<td>--</td>
 																							<td>--</td>
+																							<td>--</td>
 																						</tr>
 																						<tr>
 																							<td><%=Config.message.get("URL_BLACK_MANAGE")%></td>
@@ -217,10 +227,11 @@
 																								name="urlBlackManage" value="8"></td>
 																							<td>--</td>
 																							<td>--</td>
+																							<td>--</td>
 																						</tr>
 																						<tr>
-																							<td rowspan="5"><input type="checkbox" checked="checked"></td>
-																							<td rowspan="5"><%=Config.message.get("SYSTEM_MANAGE")%></td>
+																							<td rowspan="6"><input type="checkbox" checked="checked"></td>
+																							<td rowspan="6"><%=Config.message.get("SYSTEM_MANAGE")%></td>
 																							<td><%=Config.message.get("ROLE_MANAGE")%></td>
 																							<td><input type="checkbox" name="roleManage"
 																								value="1"></td>
@@ -232,6 +243,7 @@
 																								value="8"></td>
 																							<td>--</td>
 																							<td>--</td>
+																							<td>--</td>
 																						</tr>
 																						<tr>
 																							<td><%=Config.message.get("ACCOUNT_MANAGE")%></td>
@@ -239,6 +251,7 @@
 																							<td><input type="checkbox" name="accountManage" value="2"></td>
 																							<td><input type="checkbox" name="accountManage" value="4"></td>
 																							<td><input type="checkbox" name="accountManage" value="8"></td>
+																							<td>--</td>
 																							<td>--</td>
 																							<td>--</td>
 																						</tr>
@@ -250,8 +263,9 @@
 																							<td>--</td>
 																							<td>--</td>
 																							<td>--</td>
+																							<td>--</td>
 																						</tr>
-																						<%--<tr>
+																						<tr>
 																							<td><%=Config.message.get("CUSTOMER_MANAGE")%></td>
 																							<td><input type="checkbox" checked="checked" name="customerManage" value="1"></td>
 																							<td><input type="checkbox" checked="checked" name="customerManage" value="2"></td>
@@ -260,10 +274,11 @@
 																							<td>--</td>
 																							<td>--</td>
 																							<td>--</td>
-																						</tr>--%>
+																						</tr>
 																						<tr>
 																							<td><%=Config.message.get("LOG_MANAGE")%></td>
 																							<td><input type="checkbox" checked="checked" name="logManage" value="1"></td>
+																							<td>--</td>
 																							<td>--</td>
 																							<td>--</td>
 																							<td>--</td>
@@ -281,6 +296,7 @@
 																								name="newsManage" value="8"></td>
 																							<td>--</td>
 																							<td>--</td>
+																							<td>--</td>
 																						</tr>
 																						<tr>
 																							<td rowspan="3"><input type="checkbox" checked="checked"></td>
@@ -294,6 +310,7 @@
 																							<td>--</td>
 																							<td>--</td>
 																							<td>--</td>
+																							<td>--</td>
 																						</tr>
 																						<tr>
 																							<td><%=Config.message.get("SYS_MESSAGES")%></td>
@@ -303,6 +320,7 @@
 																							<td>--</td>
 																							<td><input type="checkbox" checked="checked"
 																								name="sysNews" value="8"></td>
+																							<td>--</td>
 																							<td>--</td>
 																							<td>--</td>
 																						</tr>
@@ -319,6 +337,7 @@
 																							<td><%=Config.message.get("OPERATE_RECORD")%></td>
 																							<td><input type="checkbox" checked="checked"
 																								name="operateRecord" value="1"></td>
+																							<td>--</td>
 																							<td>--</td>
 																							<td>--</td>
 																							<td>--</td>

@@ -64,11 +64,8 @@ public class RoleManageController extends BaseController {
     private static final int ACCOUNT_SET_MENU_ID = 22;          //账户设置
     private static final int ACCOUNT_INFO_MENU_ID = 23;         //账户信息
     private static final int SYS_NEWS_MENU_ID = 24;             //系统消息
-    //private static final int ACCOUNT_SAFE_MENU_ID = 24;       //账户安全
+    //private static final int ACCOUNT_SAFE_MENU_ID = 24;         //账户安全
     private static final int OPERATE_RECORD_MENU_ID = 25;       //操作记录
-    private static final int AD_NETWORK_MENU_ID = 26;           //AD Network
-    private static final int ACTIVITY_MANAGE_MENU_ID = 27;      //Activity management
-    private static final int DEVICE_MANAGEMENT_MENU_ID = 28;    //Device management
 
     /**
      * 自定义方法---创建权限
@@ -356,18 +353,17 @@ public class RoleManageController extends BaseController {
         if(roleId != 0){
             String [] pushView = this.getRequest().getParameterValues("pushView");
             createMenuRelation(pushView,PUSH_VIEW_MENU_ID);
+
             //String [] pushManage = this.getRequest().getParameterValues("pushManage");
             String [] policyManage = this.getRequest().getParameterValues("policyManage");
             String [] materialManage = this.getRequest().getParameterValues("materialManage");
             String [] groupManage = this.getRequest().getParameterValues("groupManage");
             String [] areaManage = this.getRequest().getParameterValues("areaManage");
-            String [] customerManage = this.getRequest().getParameterValues("customerManage");
-            String [] activityManage = this.getRequest().getParameterValues("activityManage");
             //这两个在素材管理下
             String [] templateManage = this.getRequest().getParameterValues("templateManage");
             String [] pageManage = this.getRequest().getParameterValues("pageManage");
             int pushValue=0;
-            if(policyManage!=null || materialManage!=null || groupManage!=null || templateManage!=null || pageManage!=null ||areaManage!=null || customerManage!=null ||activityManage!=null){
+            if(policyManage!=null || materialManage!=null || groupManage!=null || templateManage!=null || pageManage!=null){
                 pushValue=1;
                 createParentMenuRelation(pushValue,PUSH_MANAGE_MENU_ID);
             }
@@ -381,8 +377,6 @@ public class RoleManageController extends BaseController {
             createMenuRelation(areaManage,AREA_MANAGE_MENU_ID);
             createMenuRelation(templateManage,TEMPLATE_MANAGE_MENU_ID);
             createMenuRelation(pageManage,PAGE_MANAGE_MENU_ID);
-            createMenuRelation(customerManage,CUSTOMER_MANAGE_MENU_ID);
-            createMenuRelation(activityManage,ACTIVITY_MANAGE_MENU_ID);
             //String [] operateManage = this.getRequest().getParameterValues("operateManage");
             String [] pushReportManage = this.getRequest().getParameterValues("pushReportManage");
             String [] userComplaintManage = this.getRequest().getParameterValues("userComplaintManage");
@@ -409,22 +403,20 @@ public class RoleManageController extends BaseController {
             String [] roleManage = this.getRequest().getParameterValues("roleManage");
             String [] accountManage = this.getRequest().getParameterValues("accountManage");
             String [] monitorManage = this.getRequest().getParameterValues("monitorManage");
+            String [] customerManage = this.getRequest().getParameterValues("customerManage");
             String [] logManage = this.getRequest().getParameterValues("logManage");
             String [] newsManage = this.getRequest().getParameterValues("newsManage");
-            String [] adNetwork = this.getRequest().getParameterValues("adNetwork");
-            String [] deviceManage = this.getRequest().getParameterValues("deviceManage");
             int sysValue = 0;
-            if (roleManage!=null || accountManage!=null || monitorManage!=null || logManage!=null || newsManage!=null || adNetwork!=null || deviceManage!=null){
+            if (roleManage!=null || accountManage!=null || monitorManage!=null || logManage!=null || newsManage!=null || customerManage!=null){
                 sysValue = 1;
                 createParentMenuRelation(sysValue,SYSTEM_MANAGE_MENU_ID);
             }
             createMenuRelation(roleManage,ROLE_MANAGE_MENU_ID);
             createMenuRelation(accountManage,ACCOUNT_MANAGE_MENU_ID);
             createMenuRelation(monitorManage,MONITOR_MANAGE_MENU_ID);
+            //createMenuRelation(customerManage,CUSTOMER_MANAGE_MENU_ID);
             createMenuRelation(logManage,LOG_MANAGE_MENU_ID);
             createMenuRelation(newsManage,NEWS_MANAGE_MENU_ID);
-            createMenuRelation(adNetwork,AD_NETWORK_MENU_ID);
-            createMenuRelation(deviceManage,DEVICE_MANAGEMENT_MENU_ID);
             //String [] accountSet = this.getRequest().getParameterValues("accountSet");
             String [] accountInfo = this.getRequest().getParameterValues("accountInfo");
             String [] sysNews = this.getRequest().getParameterValues("sysNews");
@@ -521,18 +513,17 @@ public class RoleManageController extends BaseController {
         if(roleId != 0){
             String [] pushView = this.getRequest().getParameterValues("pushView");
             createMenuRelation(pushView,PUSH_VIEW_MENU_ID);
+
             //String [] pushManage = this.getRequest().getParameterValues("pushManage");
             String [] policyManage = this.getRequest().getParameterValues("policyManage");
             String [] materialManage = this.getRequest().getParameterValues("materialManage");
             String [] groupManage = this.getRequest().getParameterValues("groupManage");
             String [] areaManage = this.getRequest().getParameterValues("areaManage");
-            String [] customerManage = this.getRequest().getParameterValues("customerManage");
-            String [] activityManage = this.getRequest().getParameterValues("activityManage");
             //这两个在素材管理下
             String [] templateManage = this.getRequest().getParameterValues("templateManage");
             String [] pageManage = this.getRequest().getParameterValues("pageManage");
             int pushValue=0;
-            if(policyManage!=null || materialManage!=null || groupManage!=null || templateManage!=null || pageManage!=null ||areaManage!=null || customerManage!=null ||activityManage!=null){
+            if(policyManage!=null || materialManage!=null || groupManage!=null || templateManage!=null || pageManage!=null){
                 pushValue=1;
                 createParentMenuRelation(pushValue,PUSH_MANAGE_MENU_ID);
             }
@@ -546,8 +537,6 @@ public class RoleManageController extends BaseController {
             createMenuRelation(areaManage,AREA_MANAGE_MENU_ID);
             createMenuRelation(templateManage,TEMPLATE_MANAGE_MENU_ID);
             createMenuRelation(pageManage,PAGE_MANAGE_MENU_ID);
-            createMenuRelation(customerManage,CUSTOMER_MANAGE_MENU_ID);
-            createMenuRelation(activityManage,ACTIVITY_MANAGE_MENU_ID);
             //String [] operateManage = this.getRequest().getParameterValues("operateManage");
             String [] pushReportManage = this.getRequest().getParameterValues("pushReportManage");
             String [] userComplaintManage = this.getRequest().getParameterValues("userComplaintManage");
@@ -574,22 +563,20 @@ public class RoleManageController extends BaseController {
             String [] roleManage = this.getRequest().getParameterValues("roleManage");
             String [] accountManage = this.getRequest().getParameterValues("accountManage");
             String [] monitorManage = this.getRequest().getParameterValues("monitorManage");
+            String [] customerManage = this.getRequest().getParameterValues("customerManage");
             String [] logManage = this.getRequest().getParameterValues("logManage");
             String [] newsManage = this.getRequest().getParameterValues("newsManage");
-            String [] adNetwork = this.getRequest().getParameterValues("adNetwork");
-            String [] deviceManage = this.getRequest().getParameterValues("deviceManage");
             int sysValue = 0;
-            if (roleManage!=null || accountManage!=null || monitorManage!=null || logManage!=null || newsManage!=null || adNetwork!=null || deviceManage!=null){
+            if (roleManage!=null || accountManage!=null || monitorManage!=null || logManage!=null || newsManage!=null){
                 sysValue = 1;
                 createParentMenuRelation(sysValue,SYSTEM_MANAGE_MENU_ID);
             }
             createMenuRelation(roleManage,ROLE_MANAGE_MENU_ID);
             createMenuRelation(accountManage,ACCOUNT_MANAGE_MENU_ID);
             createMenuRelation(monitorManage,MONITOR_MANAGE_MENU_ID);
+            //createMenuRelation(customerManage,CUSTOMER_MANAGE_MENU_ID);
             createMenuRelation(logManage,LOG_MANAGE_MENU_ID);
             createMenuRelation(newsManage,NEWS_MANAGE_MENU_ID);
-            createMenuRelation(adNetwork,AD_NETWORK_MENU_ID);
-            createMenuRelation(deviceManage,DEVICE_MANAGEMENT_MENU_ID);
             //String [] accountSet = this.getRequest().getParameterValues("accountSet");
             String [] accountInfo = this.getRequest().getParameterValues("accountInfo");
             String [] sysNews = this.getRequest().getParameterValues("sysNews");

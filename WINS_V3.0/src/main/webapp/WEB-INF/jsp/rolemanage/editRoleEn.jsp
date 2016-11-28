@@ -307,8 +307,8 @@
 																							<td>--</td>
 																						</tr>
 																						<tr>
-																							<td rowspan="5"><input type="checkbox" checked="checked"></td>
-																							<td rowspan="5"><%=Config.message.get("SYSTEM_MANAGE")%></td>
+																							<td rowspan="6"><input type="checkbox" checked="checked"></td>
+																							<td rowspan="6"><%=Config.message.get("SYSTEM_MANAGE")%></td>
 																							<td><%=Config.message.get("ROLE_MANAGE")%></td>
 																							<td><input type="checkbox"
 																								<c:forEach items="${result.MenuRelation}" var="c">
@@ -368,6 +368,36 @@
 																							<td>--</td>
 																							<td>--</td>
 																							<td>--</td>
+																							<td>--</td>
+																							<td>--</td>
+																						</tr>
+																						<tr>
+																							<td><%=Config.message.get("CUSTOMER_MANAGE")%></td>
+																							<td>
+																								<input type="checkbox"
+																								<c:forEach items="${result.MenuRelation}" var="c">
+																									   <c:if test="${c.menuId==19 && c.see_permission!=0}" >checked="checked" </c:if>
+																								</c:forEach>
+																									   name="customerManage" value="1">
+																							</td>
+																							<td><input type="checkbox"
+																							<c:forEach items="${result.MenuRelation}" var="c">
+																									   <c:if test="${c.menuId==19 && c.add_permission!=0}" >checked="checked" </c:if>
+																							</c:forEach>
+																									   name="customerManage" value="2">
+																							</td>
+																							<td><input type="checkbox"
+																							<c:forEach items="${result.MenuRelation}" var="c">
+																									   <c:if test="${c.menuId==19 && c.update_permission!=0}" >checked="checked" </c:if>
+																							</c:forEach>
+																									   name="customerManage" value="4">
+																							</td>
+																							<td><input type="checkbox"
+																							<c:forEach items="${result.MenuRelation}" var="c">
+																									   <c:if test="${c.menuId==19 && c.delete_permission!=0}" >checked="checked" </c:if>
+																							</c:forEach>
+																									   name="customerManage" value="8">
+																							</td>
 																							<td>--</td>
 																							<td>--</td>
 																						</tr>
