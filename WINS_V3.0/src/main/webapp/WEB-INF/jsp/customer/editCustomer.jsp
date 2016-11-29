@@ -23,7 +23,7 @@
 									<a href="index.html"><%=Config.message.get("HOME")%></a>
 								</li>
 								<li>
-									<a href="javascript:void(0);"><%=Config.message.get("SYSTEM_MANAGE")%></a>
+									<a href="javascript:void(0);"><%=Config.message.get("CUSTOMER_MANAGEMENT")%></a>
 								</li>
 							</ul>
 							<!-- /BREADCRUMBS -->

@@ -301,7 +301,7 @@
 																						<tr>
 																							<td rowspan="5"><input type="checkbox"
 																								disabled="disabled"></td>
-																							<td rowspan="5"><%=Config.message.get("SYSTEM_MANAGE")%></td>
+																							<td rowspan="5"><%=Config.message.get("ROLE_SYSTEM_MANAGEMENT")%></td>
 																							<td><%=Config.message.get("ROLE_MANAGE")%></td>
 																							<td><input type="checkbox"
 																								<c:forEach items="${result.MenuRelation}" var="c">

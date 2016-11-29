@@ -41,7 +41,7 @@
 									<a href="index.html"><%=Config.message.get("HOME")%></a>
 								</li>
 								<li>
-									<a href="javascript:void(0);"><%=Config.message.get("SYSTEM_MANAGE")%></a>
+									<a href="javascript:void(0);"><%=Config.message.get("ADNETWORK_MANAGEMENT")%></a>
 								</li>
 							</ul>
 							<!-- /BREADCRUMBS -->
@@ -86,6 +86,7 @@
 										<th><%=Config.message.get("ADNETWORK_FLUX_RATIO")%></th>
 										<th><%=Config.message.get("ADNETWORK_WAYSOFPAYMENTS")%></th>
 										<th><%=Config.message.get("ADNETWORK_TOTAL_PRICE")%></th>
+										<th>Create account</th>
 										<th><%=Config.message.get("ADNETWORK_START_TIME")%></th>
 										<th><%=Config.message.get("ADNETWORK_END_TIME")%></th>
 										<th><%=Config.message.get("ADNETWORK_CREATE_TIME")%></th>
@@ -107,6 +108,7 @@
 												<c:if test="${adnetwork.buyType eq 2}">CPC</c:if>
 										</td>
 										<td>${adnetwork.totalPrice}</td>
+										<td> </td>
 										<td>${adnetwork.startTime}</td>
 										<td>${adnetwork.endTime}</td>
 										<td> ${adnetwork.creatTime}  </td>

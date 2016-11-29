@@ -40,7 +40,7 @@
 									<a href="index.html"><%=Config.message.get("HOME")%></a>
 								</li>
 								<li>
-									<a href="#"><%=Config.message.get("SYSTEM_MANAGE")%></a>
+									<a href="#"><%=Config.message.get("CUSTOMER_MANAGEMENT")%></a>
 								</li>
 							</ul>
 							<!-- /BREADCRUMBS -->

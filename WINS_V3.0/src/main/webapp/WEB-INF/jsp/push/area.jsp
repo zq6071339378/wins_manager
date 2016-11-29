@@ -21,7 +21,7 @@
 													<i class="fa fa-home"></i><a href="index.html"><%=Config.message.get("HOME")%></a>
 												</li>
 												<li>
-													<a href="#"><%=Config.message.get("PUSH_MANAGEMENT")%></a>
+													<a href="#"><%=Config.message.get("AREA_MANAGEMENT")%></a>
 												</li>
 											</ul>
 											<!-- /BREADCRUMBS -->
