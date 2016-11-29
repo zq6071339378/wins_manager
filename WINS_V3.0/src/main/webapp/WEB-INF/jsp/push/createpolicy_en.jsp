@@ -22,7 +22,7 @@
 							</ul>
 							<!-- /BREADCRUMBS -->
 							<div class="clearfix">
-								<h3 class="content-title pull-left"><%=Config.message.get("POLICY_MANAGER_CREATE_POLICY")%></h3>
+								<h3 class="content-title pull-left"><%=Config.message.get("POLICY_MANAGEMENT_CREATE_NEW_POLIICY")%></h3>
 							</div>
 							<div class="description"><%=Config.message.get("CREATE_POLICY_ATTENTIONS12")%></div>
 						</div>
@@ -227,7 +227,7 @@
 														 <li class="myli02">
 															<a class="wiz-step" href="#tijiao">
 															<span class="step-number">6</span>
-															<span class="step-name">Complete </span>   
+															<span class="step-name">Submit Policy </span>   
 															</a> 
 														 </li>
 													  </ul>
@@ -255,11 +255,11 @@
 			<thead>
 				<tr>
 					<th><%=Config.message.get("CREATEPOLICY_SORT")%></th>
-					<th><%=Config.message.get("CREATEPOLICY_COMPANYNAME")%></th>
 					<th><%=Config.message.get("CREATEPOLICY_ADVERTISER_NAME")%></th>
+					<th><%=Config.message.get("CREATEPOLICY_COMPANYNAME")%></th>
 					<th><%=Config.message.get("CREATEPOLICY_POSITION")%></th>
-					<th><%=Config.message.get("CREATEPOLICY_CREATETIME")%></th>
 					<th><%=Config.message.get("CREATEPOLICY_CREATEACCOUNT")%></th>
+					<th><%=Config.message.get("CREATEPOLICY_CREATETIME")%></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -268,8 +268,9 @@
 					<td>
 						<input type="radio" name="customerName"  value="${customer.customerId}_${customer.customerName}"  <c:if test="${vs.count eq 1}">checked="true"</c:if> />${vs.count}
 					</td>
-						<td>${customer.customerCompany}</td>
-						<td class="customerlistclass">${customer.customerName}</td>
+					    <td class="customerlistclass">${customer.customerName}</td>
+						<td>${customer.customerCode}</td>
+						
 						<td>${customer.customerOffice}</td>
 						<td>${customer.createName}</td>
 						<td><fmt:formatDate value="${customer.createTime}" pattern="yyyy-MM-dd HH:mm:ss" /></td>
@@ -288,7 +289,7 @@
 										</div>
 								</div>
 								<div class="from-group col-md-2 row_left">
-									<a  href="#box-add-activity" data-toggle="modal" class="btn btn-danger" type="button">add</a>
+									<a  href="#box-add-activity" data-toggle="modal" class="btn btn-danger" type="button">New campaign</a>
 								</div>
 							</div>
 							<div class="divide-10">
@@ -299,19 +300,21 @@
 									<tr>
 										<th><%=Config.message.get("CUSTOMER_SORT")%></th>
 										<th><%=Config.message.get("CREATEPOLICY_ADVERTISER_NAME")%></th>
-										<th><%=Config.message.get("CREATEPOLICY_ADVERTISER")%></th>
+										<th><%=Config.message.get("CREATEPOLICY_ACTIVITYNAME")%></th>
+										<th>Campaign description</th>
 										<th><%=Config.message.get("CREATEPOLICY_POLICYCOUNTS")%></th>
 										<th><%=Config.message.get("CUSTOMER_CREATE_USER")%></th>
 										<th><%=Config.message.get("CUSTOMER_CREATE_TIME")%></th>
 									</tr>
 								</thead>
-								<tbody id="activitylist_Id">
+								<tbody id="activitylist_Id">s
 								<c:if test="${!empty activitylist}">
 									<c:forEach var="ac" items="${activitylist.list}" varStatus="vs">
 									<tr>
 										<td><input type="radio" value="${ac.activityId}_${ac.activityName}" name="activityNamekey" <c:if test="${vs.count eq 1}">checked="true"</c:if>/>${vs.count}</td>
 										<td class="activitylistclass">${ac.activityName}</td>
 										<td>${ac.customerName}</td>
+										<td></td>
 										<td><c:if test="${empty ac.policyNum}">0</c:if><c:if test="${!empty ac.policyNum}">${ac.policyNum}</c:if></td>
 										<td>${ac.createName}</td>
 										<td><fmt:formatDate value="${ac.createTime}" pattern="yyyy-MM-dd HH:mm:ss" /></td>
@@ -353,7 +356,7 @@
 																</div>
 															</div>
 														</div>
-														<div class="form-group msg_font form_group">
+													<%-- 	<div class="form-group msg_font form_group">
 															<label class="col-md-3 control-label" for="password-input"><span class="star"></span>&nbsp;<%=Config.message.get("CREATE_POLICY_INDUSTRY_ATTRIBUTES")%>：</label>
 															<div class="col-md-2" style="margin-top:-15px;">
 												          <select id="selid" onchange="selectChild(this);" class="form-control"  name="industry-bear"></select>
@@ -361,9 +364,9 @@
 															<div id="second_industry" class="col-md-2" style="margin-top:-15px;display: none;">
 												          <select id="subselid" onchange="" class="form-control" name=""></select>
 															</div>
-															<%--<div class="col-md-2" style="margin-top:-15px;">
+															<div class="col-md-2" style="margin-top:-15px;">
                                                           <select id="threadselid" onchange="" class="form-control" name="industry-bear"></select>
-                                                            </div>--%>
+                                                            </div>
 														</div>
 														<div class="form-group msg_font form_group">
 															<label for="password-input" class="col-md-3 control-label">
@@ -381,7 +384,7 @@
 																	<option value="9"><%=Config.message.get("POLICY_MANAGEMENT_OTHERS0")%></option>
 																</select>
 															</div>
-														</div>
+														</div> --%>
 															<div class="form-group msg_font form_group">
 																<label for="password-input"
 																	   class="col-md-3 control-label"><span
@@ -1175,7 +1178,7 @@
 															</div>
 														</div>
 														<!--高级设置TABLE-->
-														<div class="form-group msg_font form_group">
+												<%-- 		<div class="form-group msg_font form_group">
 															<label for="password-input" class="col-md-3 control-label">
 																<span class="star">*</span>&nbsp;&nbsp;<%=Config.message.get("CREATE_POLICY_PUSH_USER_TYPE")%>：
 															</label>
@@ -1190,7 +1193,8 @@
 																	<option value="4"><%=Config.message.get("NETWORK_TRAFFIC_USER")%></option>
 																</select>
 															</div>
-														</div>
+														</div> --%>
+														<input  type="hidden"  value="1"  id="push_user_type"  name="pushUserType" />
 														<input type="hidden" id="changeTime_id" required="required" name="timeIds" value="" />
 														<input type="hidden" id="changegroupName_id" name="groupIds" value="" />
 																<!-- INTERESTS -->
@@ -1693,7 +1697,7 @@
 														</div>
 														<div class="form-group msg_font form_group">
 															<label for="password-input"
-																   class="col-md-3 control-label"><%=Config.message.get("CREATEPOLICY_ADVERTISER_NAME")%>：</label>
+																   class="col-md-3 control-label"><%=Config.message.get("POLICY_MANAGEMENT_CAMPAIGNNAME")%>：</label>
 															<div class="col-sm-4">
 																<span class="span_font proshowdata"
 																	  data-name="activityName">---</span>

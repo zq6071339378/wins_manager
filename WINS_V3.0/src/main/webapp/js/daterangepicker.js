@@ -127,7 +127,7 @@
          /*  var bool="${isEnglish}";
            alert(bool);*/
             this.locale = {
-                applyLabel: 'Sure',
+                applyLabel: 'Ok',
                 cancelLabel: 'Cancel',
                 fromLabel: 'From',
                 toLabel: 'To',

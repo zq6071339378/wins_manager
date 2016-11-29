@@ -83,7 +83,6 @@
 									<tr>
 										<th><%=Config.message.get("ADNETWORK_SORT")%></th>
 										<th><%=Config.message.get("ADNETWORK_NAME")%></th>
-									
 										<th><%=Config.message.get("ADNETWORK_FLUX_RATIO")%></th>
 										<th><%=Config.message.get("ADNETWORK_WAYSOFPAYMENTS")%></th>
 										<th><%=Config.message.get("ADNETWORK_TOTAL_PRICE")%></th>

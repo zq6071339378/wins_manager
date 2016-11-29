@@ -49,8 +49,15 @@
 														<div class="wizard-content">
 															<div class="tab-content">
 																<div class="tab-pane active" id="account">
-																
 																	<div class="divide-40"></div>
+																	<div class="form-group create_font">
+																		<label class="control-label col-md-3 old lable_height"><span class="star">*</span>&nbsp;<%=Config.message.get("CUSTOMER_NAME")%>：</label>
+																		<div class="col-md-4">
+																			<input type="text" class="form-control" name="customer_name" onchange="hideErrorSpan(this)">
+																			<span class="error-span" style="color: red; font: 8; margin-left: 0px"></span>
+																		</div>
+																	</div>
+																	<div class="divide-20"></div>
 																	<div class="form-group create_font">
 																		<label class="control-label col-md-3 lable_height"><span class="star">*</span>&nbsp;<%=Config.message.get("CUSTOMER_COMPANY_NAME")%>：</label>
 																		<div class="col-md-4">
@@ -74,22 +81,8 @@
 																			<span class="error-span" style="color: red; font: 8; margin-left: 0px"></span>
 																		</div>
 																	</div>
-																	<div class="divide-20"></div>
-																	<div class="form-group create_font">
-																		<label class="control-label col-md-3 old lable_height"><span class="star">*</span>&nbsp;<%=Config.message.get("CUSTOMER_NAME")%>：</label>
-																		<div class="col-md-4">
-																			<input type="text" class="form-control" name="customer_name" onchange="hideErrorSpan(this)">
-																			<span class="error-span" style="color: red; font: 8; margin-left: 0px"></span>
-																		</div>
-																	</div>
-																	<%-- <div class="divide-20"></div>
-																	<div class="form-group create_font">
-																		<label class="control-label col-md-3 old lable_height"><span class="star"></span>&nbsp;<%=Config.message.get("CUSTOMER_OFFICE")%>：</label>
-																		<div class="col-md-4">
-																			<input type="text" class="form-control" name="customer_office" onchange="hideErrorSpan(this)">
-																			<span class="error-span" style="color: red; font: 8; margin-left: 0px"></span>
-																		</div>
-																	</div> --%>
+																
+																	
 																	<div class="divide-20"></div>
 																	<div class="form-group create_font">
 																		<label class="control-label col-md-3 lable_height"><span class="star">*</span>&nbsp;<%=Config.message.get("CUSTOMER_CONTACT_NUMBER")%>：</label>
